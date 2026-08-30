@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>FinManage - Đăng Nhập & Quản Lý Tài Chính</title>
   
+  <!-- Favicon Logo Icon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='grad' x1='0%y1='0%x2='100%y2='100%'><stop offset='0%27 stop-color='%236366F1'/><stop offset='100%27 stop-color='%234338CA'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='url(%23grad)'/><text x='50%' y='55%' dominant-baseline='central' text-anchor='middle' fill='white' font-size='50' font-family='sans-serif' font-weight='bold'>❖</text></svg>">
+
   <!-- PWA Manifest & Meta Tags -->
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
     &quot;name&quot;: &quot;FinManage Dashboard&quot;,
@@ -15,9 +18,9 @@
     &quot;theme_color&quot;: &quot;%23030509&quot;,
     &quot;icons&quot;: [
       {
-        &quot;src&quot;: &quot;https://cdn-icons-png.flaticon.com/512/3135/3135715.png&quot;,
+        &quot;src&quot;: &quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%236366F1'/><text x='50%' y='55%' dominant-baseline='central' text-anchor='middle' fill='white' font-size='50' font-weight='bold'>❖</text></svg>&quot;,
         &quot;sizes&quot;: &quot;512x512&quot;,
-        &quot;type&quot;: &quot;image/png&quot;
+        &quot;type&quot;: &quot;image/svg+xml&quot;
       }
     ]
   }">
@@ -696,7 +699,7 @@
       }
     }
 
-    // TẢI DỮ LIỆU TỪ FIRESTORE CỦA BẠN (Hoàn toàn trống, không có dữ liệu mẫu)
+    // TẢI DỮ LIỆU TỪ FIRESTORE CỦA BẠN
     async function loadDataFromCloud() {
       try {
         document.getElementById('sync-status').innerText = "Đang tải...";
@@ -709,7 +712,7 @@
           window.transactions = data.transactions || [];
           window.budgets = data.budgets || [];
         } else {
-          // Khởi tạo hoàn toàn trống
+          // Bắt đầu hoàn toàn trống 0 đồng
           window.assets = [];
           window.liabilities = [];
           window.transactions = [];
