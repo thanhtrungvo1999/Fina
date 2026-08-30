@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinManage - Cloud Database OLED</title>
+  <title>FinManage - Đăng Nhập & Quản Lý Tài Chính</title>
   
   <!-- PWA Manifest & Meta Tags -->
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
@@ -117,14 +117,14 @@
 </head>
 <body class="bg-[#030509] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
 
-  <!-- MÀN HÌNH LOADING -->
+  <!-- MÀN HÌNH LOADING 3S -->
   <div id="loading-screen" class="fixed inset-0 bg-[#030509] z-[100] flex flex-col items-center justify-center space-y-4">
     <div class="w-16 h-16 rounded-3xl gradient-indigo flex items-center justify-center text-white font-display font-bold text-2xl shadow-lg glow-indigo animate-spin-slow">
       ❖
     </div>
     <div class="text-center space-y-1">
       <h2 class="font-display font-bold text-lg text-white tracking-widest">FinManage</h2>
-      <p id="loading-text" class="text-[11px] text-indigo-400 font-semibold tracking-wider">Đang kết nối Cloud Database...</p>
+      <p id="loading-text" class="text-[11px] text-indigo-400 font-semibold tracking-wider">Đang kết nối Firebase Database...</p>
     </div>
     <div class="w-48 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
       <div id="loading-progress" class="h-full bg-indigo-500 transition-all duration-100" style="width: 0%;"></div>
@@ -175,7 +175,7 @@
           </div>
           <div>
             <h1 class="font-display font-bold text-lg text-white leading-tight tracking-wide">FinManage<span class="text-indigo-500">.</span></h1>
-            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Cloud Database Sync</p>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Custom Firebase DB</p>
           </div>
         </div>
 
@@ -210,7 +210,7 @@
 
         <div class="pt-2 border-t border-slate-900 space-y-2">
           <div class="flex items-center justify-between px-1">
-            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">● Cloud Sync</span>
+            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">● Firebase DB</span>
             <span id="sync-status" class="text-[10px] font-semibold text-slate-500">Đã đồng bộ</span>
           </div>
 
@@ -582,20 +582,26 @@
     </div>
   </div>
 
-  <!-- FIREBASE SDKS -->
+  <!-- CUSTOM FIREBASE CONFIG & SDKS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "demo", projectId: "demo" };
+    // Cấu hình Firebase của riêng bạn
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHOQSdlPxPstS3cTzAgg43qIK-HjGrZxI",
+      authDomain: "quan-ly-tai-chinh-d0bf1.firebaseapp.com",
+      projectId: "quan-ly-tai-chinh-d0bf1",
+      storageBucket: "quan-ly-tai-chinh-d0bf1.firebasestorage.app",
+      messagingSenderId: "1054695985785",
+      appId: "1:1054695985785:web:4b5691c2936e825638baa8",
+      measurementId: "G-0BCT2C2799"
+    };
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'thanhtrungvo1999-finmanage';
-
-    let currentUser = null;
-    let isCloudLoaded = false;
 
     // Khởi tạo hệ thống & Loading 3s
     window.onload = function() {
@@ -626,22 +632,12 @@
 
     async function initCloudAuth() {
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (e) {
         await signInAnonymously(auth);
-      }
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
+        await loadDataFromCloud();
+      } catch (e) {
         await loadDataFromCloud();
       }
-    });
+    }
 
     window.handleLogin = async function(e) {
       e.preventDefault();
@@ -657,7 +653,7 @@
         const loadingScreen = document.getElementById('loading-screen');
         const loadingText = document.getElementById('loading-text');
         const progressBar = document.getElementById('loading-progress');
-        if (loadingText) loadingText.innerText = "Đang kết nối Cloud Database...";
+        if (loadingText) loadingText.innerText = "Đang kết nối Database của bạn...";
         if (progressBar) progressBar.style.width = '0%';
         if (loadingScreen) loadingScreen.classList.remove('hidden');
 
@@ -683,30 +679,28 @@
       location.reload();
     }
 
-    // LƯU DỮ LIỆU LÊN CLOUD FIRESTORE
+    // LƯU DỮ LIỆU THẲNG VÀO FIRESTORE CỦA BẠN
     async function saveDataToCloud() {
-      if (!currentUser) return;
       try {
         document.getElementById('sync-status').innerText = "Đang lưu...";
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data');
+        const docRef = doc(db, "finmanage_data", "thanhtrungvo1999");
         await setDoc(docRef, {
           assets: window.assets || [],
           liabilities: window.liabilities || [],
           transactions: window.transactions || [],
           budgets: window.budgets || []
         });
-        document.getElementById('sync-status').innerText = "Đã lưu Cloud";
+        document.getElementById('sync-status').innerText = "Đã đồng bộ";
       } catch (err) {
-        document.getElementById('sync-status').innerText = "Lỗi lưu Cloud";
+        document.getElementById('sync-status').innerText = "Lỗi lưu DB";
       }
     }
 
-    // TẢI DỮ LIỆU TỪ CLOUD FIRESTORE
+    // TẢI DỮ LIỆU TỪ FIRESTORE CỦA BẠN (Hoàn toàn trống, không có dữ liệu mẫu)
     async function loadDataFromCloud() {
-      if (!currentUser) return;
       try {
         document.getElementById('sync-status').innerText = "Đang tải...";
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data');
+        const docRef = doc(db, "finmanage_data", "thanhtrungvo1999");
         const snap = await getDoc(docRef);
         if (snap.exists()) {
           const data = snap.data();
@@ -714,13 +708,19 @@
           window.liabilities = data.liabilities || [];
           window.transactions = data.transactions || [];
           window.budgets = data.budgets || [];
+        } else {
+          // Khởi tạo hoàn toàn trống
+          window.assets = [];
+          window.liabilities = [];
+          window.transactions = [];
+          window.budgets = [];
+          await saveDataToCloud();
         }
-        isCloudLoaded = true;
         document.getElementById('sync-status').innerText = "Đã đồng bộ";
         window.updateMonthDisplay();
         window.renderApp();
       } catch (err) {
-        document.getElementById('sync-status').innerText = "Lỗi đồng bộ";
+        document.getElementById('sync-status').innerText = "Lỗi tải DB";
         window.updateMonthDisplay();
         window.renderApp();
       }
