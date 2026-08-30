@@ -1,0 +1,54 @@
+{
+"assets": [
+{
+"id": "a_1",
+"name": "Tiền mặt ví",
+"category": "Tiền mặt",
+"value": 2000000
+},
+{
+"id": "a_2",
+"name": "Tài khoản MBBank",
+"category": "Ngân hàng",
+"value": 15000000
+}
+],
+"liabilities": [
+{
+"id": "l_1",
+"name": "Thẻ tín dụng Visa",
+"category": "Thẻ tín dụng",
+"value": 1500000
+}
+],
+"transactions": [
+{
+"id": "t_1",
+"type": "income",
+"amount": 12000000,
+"category": "Lương",
+"account": "Tài khoản MBBank",
+"date": "2026-08-01",
+"note": "Lương tháng 8"
+},
+{
+"id": "t_2",
+"type": "expense",
+"amount": 500000,
+"category": "Ăn uống",
+"account": "Tiền mặt ví",
+"date": "2026-08-02",
+"note": "Ăn trưa văn phòng"
+}
+],
+"budgets": [
+{
+"category": "Ăn uống",
+"limit": 4000000
+},
+{
+"category": "Mua sắm",
+"limit": 2000000
+}
+]
+}
