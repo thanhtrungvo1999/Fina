@@ -119,14 +119,14 @@
 </head>
 <body class="bg-[#030509] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white pb-24 md:pb-0">
 
-  <!-- MÀN HÌNH LOADING 3S -->
+  <!-- MÀN HÌNH LOADING CHUNG -->
   <div id="loading-screen" class="fixed inset-0 bg-[#030509] z-[100] flex flex-col items-center justify-center space-y-4">
     <div class="w-16 h-16 rounded-3xl gradient-indigo flex items-center justify-center text-white font-display font-bold text-2xl shadow-lg glow-indigo animate-spin-slow">
       ❖
     </div>
     <div class="text-center space-y-1">
       <h2 class="font-display font-bold text-lg text-white tracking-widest">FinManage</h2>
-      <p id="loading-text" class="text-[11px] text-indigo-400 font-semibold tracking-wider">Đang kết nối Cloud Database...</p>
+      <p id="loading-text" class="text-[11px] text-indigo-400 font-semibold tracking-wider">Đang khởi tạo hệ thống...</p>
     </div>
     <div class="w-48 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
       <div id="loading-progress" class="h-full bg-indigo-500 transition-all duration-100" style="width: 0%;"></div>
@@ -606,31 +606,39 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // 1. Khi load trang: giữ hiệu ứng loading 3 giây rồi mới hiện bảng đăng nhập hoặc tự vào app
     window.onload = function() {
+      const isAuth = localStorage.getItem('finmanage_auth');
+      
+      runStartupLoading(async () => {
+        if (isAuth === 'true') {
+          // Đã đăng nhập: Tiến hành kết nối & tải dữ liệu từ database trực tiếp
+          await initCloudAuth();
+        } else {
+          // Chưa đăng nhập: Tắt loading và hiện màn hình đăng nhập
+          document.getElementById('loading-screen').classList.add('hidden');
+          document.getElementById('login-screen').classList.remove('hidden');
+        }
+      });
+    };
+
+    // Hàm chạy loading chuẩn đúng 3 giây
+    function runStartupLoading(callback) {
       let progress = 0;
       const progressBar = document.getElementById('loading-progress');
-      const loadingScreen = document.getElementById('loading-screen');
-      const loginScreen = document.getElementById('login-screen');
-      const appWrapper = document.getElementById('app-wrapper');
+      const loadingText = document.getElementById('loading-text');
+      loadingText.innerText = "Đang khởi tạo hệ thống...";
 
       const interval = setInterval(() => {
-        progress += 3.33;
+        progress += 3.33; // 3 giây (30 bước * 100ms)
         if (progressBar) progressBar.style.width = Math.min(progress, 100) + '%';
 
         if (progress >= 100) {
           clearInterval(interval);
-          if (loadingScreen) loadingScreen.classList.add('hidden');
-
-          const isAuth = localStorage.getItem('finmanage_auth');
-          if (isAuth === 'true') {
-            if (appWrapper) appWrapper.classList.remove('hidden');
-            initCloudAuth();
-          } else {
-            if (loginScreen) loginScreen.classList.remove('hidden');
-          }
+          callback();
         }
       }, 100);
-    };
+    }
 
     async function initCloudAuth() {
       try {
@@ -641,6 +649,7 @@
       }
     }
 
+    // 2. Khi bấm đăng nhập xong -> Hiển thị loading và giữ đến khi kết nối database thành công
     window.handleLogin = async function(e) {
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim();
@@ -650,26 +659,13 @@
       if (u === 'thanhtrungvo1999' && p === 'May1905') {
         localStorage.setItem('finmanage_auth', 'true');
         document.getElementById('login-screen').classList.add('hidden');
+        
+        // Hiện lại màn hình loading để chờ kết nối database
+        document.getElementById('loading-screen').classList.remove('hidden');
+        document.getElementById('loading-text').innerText = "Đang kết nối Database...";
+        document.getElementById('loading-progress').style.width = '30%';
 
-        const loadingScreen = document.getElementById('loading-screen');
-        const loadingText = document.getElementById('loading-text');
-        const progressBar = document.getElementById('loading-progress');
-        if (loadingText) loadingText.innerText = "Đang đồng bộ Bento DB...";
-        if (progressBar) progressBar.style.width = '0%';
-        if (loadingScreen) loadingScreen.classList.remove('hidden');
-
-        let pLogin = 0;
-        const loginInterval = setInterval(async () => {
-          pLogin += 10;
-          if (progressBar) progressBar.style.width = pLogin + '%';
-          if (pLogin >= 100) {
-            clearInterval(loginInterval);
-            if (loadingScreen) loadingScreen.classList.add('hidden');
-            document.getElementById('app-wrapper').classList.remove('hidden');
-            await initCloudAuth();
-          }
-        }, 100);
-
+        await initCloudAuth();
       } else {
         errEl.classList.remove('hidden');
       }
@@ -698,6 +694,7 @@
 
     async function loadDataFromCloud() {
       try {
+        document.getElementById('loading-progress').style.width = '70%';
         document.getElementById('sync-status').innerText = "Đang tải...";
         const docRef = doc(db, "finmanage_data", "thanhtrungvo1999");
         const snap = await getDoc(docRef);
@@ -714,13 +711,23 @@
           window.budgets = [];
           await saveDataToCloud();
         }
+        document.getElementById('loading-progress').style.width = '100%';
         document.getElementById('sync-status').innerText = "Đã đồng bộ";
         window.updateMonthDisplay();
         window.renderApp();
+
+        // Hoàn tất tải dữ liệu từ Cloud Database thành công -> Tắt loading, hiện app chính
+        setTimeout(() => {
+          document.getElementById('loading-screen').classList.add('hidden');
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('app-wrapper').classList.remove('hidden');
+        }, 300);
       } catch (err) {
         document.getElementById('sync-status').innerText = "Lỗi tải DB";
         window.updateMonthDisplay();
         window.renderApp();
+        document.getElementById('loading-screen').classList.add('hidden');
+        document.getElementById('app-wrapper').classList.remove('hidden');
       }
     }
 
@@ -1071,8 +1078,12 @@
 
     // MODAL CONTROLS
     window.openTxModal = function() {
-      const monthStr = selectedMonth < 10 ? `0${selectedMonth}` : `${selectedMonth}`;
-      document.getElementById('tx-date').value = `${selectedYear}-${monthStr}-01`;
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('tx-date').value = `${yyyy}-${mm}-${dd}`;
+
       document.getElementById('tx-amount').value = '';
       populateCategoryDropdown();
       populateAccountDropdown();
