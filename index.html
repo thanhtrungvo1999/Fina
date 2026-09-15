@@ -1,1320 +1,433 @@
 <!DOCTYPE html>
 <html lang="vi" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinManage - Mobile Bento OLED</title>
-  
-  <!-- Favicon Logo Icon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='grad' x1='0%y1='0%x2='100%y2='100%'><stop offset='0%27 stop-color='%236366F1'/><stop offset='100%27 stop-color='%234338CA'/></linearGradient></defs><rect width='100' height='100' rx='28' fill='url(%23grad)'/><text x='50%' y='55%' dominant-baseline='central' text-anchor='middle' fill='white' font-size='52' font-family='sans-serif' font-weight='bold'>❖</text></svg>">
-
-  <!-- PWA Manifest & Meta Tags -->
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-    &quot;name&quot;: &quot;FinManage Mobile Bento&quot;,
-    &quot;short_name&quot;: &quot;FinManage&quot;,
-    &quot;start_url&quot;: &quot;.&quot;,
-    &quot;display&quot;: &quot;standalone&quot;,
-    &quot;background_color&quot;: &quot;%23030509&quot;,
-    &quot;theme_color&quot;: &quot;%23030509&quot;,
-    &quot;icons&quot;: [
-      {
-        &quot;src&quot;: &quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='%236366F1'/><text x='50%' y='55%' dominant-baseline='central' text-anchor='middle' fill='white' font-size='52' font-weight='bold'>❖</text></svg>&quot;,
-        &quot;sizes&quot;: &quot;512x512&quot;,
-        &quot;type&quot;: &quot;image/svg+xml&quot;
-      }
-    ]
-  }">
-  <meta name="theme-color" content="#030509">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FinManage">
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['"Space Grotesk"', 'sans-serif'],
-          },
-          colors: {
-            oled: {
-              bg: '#030509',
-              card: '#0B0F19',
-              border: '#1E2638',
-              hover: '#141C2E'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wallzy Pro - NextGen Wallpaper Studio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            950: '#090a0f',
+                            900: '#10121b',
+                            800: '#1a1d2d',
+                            700: '#262a3f'
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-  <style>
-    input, select, textarea {
-      font-size: 16px !important;
-    }
-
-    .oled-input {
-      background: #060911 !important;
-      border: 1px solid #1E2638 !important;
-      border-radius: 16px !important;
-      color: #F8FAFC !important;
-      width: 100% !important;
-      padding: 14px 16px !important;
-      box-sizing: border-box !important;
-      display: block !important;
-      appearance: none !important;
-      -webkit-appearance: none !important;
-    }
-    .oled-input:focus {
-      outline: none !important;
-      border-color: #6366F1 !important;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
-    }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
-    }
-
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: #030509; }
-    ::-webkit-scrollbar-thumb { background: #1E2638; border-radius: 9999px; }
-
-    .bento-card {
-      background: #0B0F19;
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-radius: 24px;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .bento-card:active {
-      transform: scale(0.99);
-    }
-
-    .glow-indigo { box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
-    .glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
-    .glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
-    .gradient-indigo { background: linear-gradient(135deg, #6366F1 0%, #4338CA 100%); }
-
-    @keyframes spin-slow {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .animate-spin-slow {
-      animation: spin-slow 1.5s linear infinite;
-    }
-  </style>
-</head>
-<body class="bg-[#030509] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white pb-24 md:pb-0">
-
-  <!-- MÀN HÌNH LOADING CHUNG -->
-  <div id="loading-screen" class="fixed inset-0 bg-[#030509] z-[100] flex flex-col items-center justify-center space-y-4">
-    <div class="w-16 h-16 rounded-3xl gradient-indigo flex items-center justify-center text-white font-display font-bold text-2xl shadow-lg glow-indigo animate-spin-slow">
-      ❖
-    </div>
-    <div class="text-center space-y-1">
-      <h2 class="font-display font-bold text-lg text-white tracking-widest">FinManage</h2>
-      <p id="loading-text" class="text-[11px] text-indigo-400 font-semibold tracking-wider">Đang khởi tạo hệ thống...</p>
-    </div>
-    <div class="w-48 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-      <div id="loading-progress" class="h-full bg-indigo-500 transition-all duration-100" style="width: 0%;"></div>
-    </div>
-  </div>
-
-  <!-- MÀN HÌNH ĐĂNG NHẬP -->
-  <div id="login-screen" class="fixed inset-0 bg-[#030509] z-50 flex items-center justify-center p-4 hidden">
-    <div class="bento-card p-6 w-full max-w-sm space-y-5 border border-slate-800 shadow-2xl">
-      <div class="text-center space-y-2">
-        <div class="w-14 h-14 rounded-2xl gradient-indigo flex items-center justify-center text-white font-display font-bold text-2xl shadow-lg glow-indigo mx-auto">
-          ❖
-        </div>
-        <h1 class="font-display font-bold text-xl text-white tracking-wide">FinManage</h1>
-        <p class="text-[11px] text-slate-500 uppercase tracking-widest">Quản Lý Tài Chính Cá Nhân</p>
-      </div>
-
-      <form onsubmit="handleLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Tên tài khoản</label>
-          <input type="text" id="login-user" required placeholder="thanhtrungvo1999" class="oled-input text-white font-bold text-sm">
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Mật khẩu</label>
-          <input type="password" id="login-pass" required placeholder="••••••••" class="oled-input text-white font-bold text-sm">
-        </div>
-
-        <div id="login-error" class="text-xs text-rose-500 font-bold text-center hidden">
-          Tên tài khoản hoặc mật khẩu không chính xác!
-        </div>
-
-        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-2xl shadow-lg glow-indigo transition-all">
-          Đăng Nhập Hệ Thống
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- NỘI DUNG CHÍNH -->
-  <div id="app-wrapper" class="hidden flex-1 flex flex-col md:flex-row min-h-screen">
-    
-    <!-- DESKTOP SIDEBAR / MOBILE BOTTOM FLOATING DOCK -->
-    <aside class="fixed bottom-3 left-3 right-3 md:bottom-auto md:relative md:w-64 bg-[#0B0F19]/95 backdrop-blur-xl border border-slate-800/80 md:border-r md:border-t-0 rounded-2xl md:rounded-none flex md:flex-col justify-around md:justify-between shrink-0 z-40 p-2 md:p-4 shadow-2xl">
-      <div class="hidden md:flex items-center space-x-3 p-3 border-b border-slate-800/80 mb-2">
-        <div class="w-9 h-9 rounded-xl gradient-indigo flex items-center justify-center text-white font-display font-bold text-lg shadow-lg glow-indigo">
-          ❖
-        </div>
-        <div>
-          <h1 class="font-display font-bold text-sm text-white leading-tight">FinManage<span class="text-indigo-500">.</span></h1>
-          <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Cloud Database</p>
-        </div>
-      </div>
-
-      <nav class="flex md:flex-col justify-around md:space-y-1.5 w-full items-center">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col md:flex-row items-center md:space-x-3 p-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
-          <span class="text-base md:text-sm">💎</span>
-          <span>Tổng Quan</span>
-        </button>
-
-        <button onclick="switchTab('assets')" id="nav-assets" class="nav-btn flex flex-col md:flex-row items-center md:space-x-3 p-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold text-slate-400 hover:text-white transition-all">
-          <span class="text-base md:text-sm">🏛️</span>
-          <span>Tài Sản</span>
-        </button>
-
-        <!-- Quick Add Center Floating Button for Mobile -->
-        <button onclick="openTxModal()" class="flex md:hidden flex-col items-center justify-center w-11 h-11 bg-emerald-500 text-slate-950 rounded-full shadow-lg glow-emerald active:scale-95 transition-all -mt-3">
-          <span class="text-xl font-bold">+</span>
-        </button>
-
-        <button onclick="switchTab('transactions')" id="nav-transactions" class="nav-btn flex flex-col md:flex-row items-center md:space-x-3 p-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold text-slate-400 hover:text-white transition-all">
-          <span class="text-base md:text-sm">⚡</span>
-          <span>Thu Chi</span>
-        </button>
-
-        <button onclick="switchTab('budgets')" id="nav-budgets" class="nav-btn flex flex-col md:flex-row items-center md:space-x-3 p-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold text-slate-400 hover:text-white transition-all">
-          <span class="text-base md:text-sm">🎯</span>
-          <span>Ngân Sách</span>
-        </button>
-      </nav>
-
-      <div class="hidden md:block pt-4 border-t border-slate-800/80 space-y-2">
-        <div class="flex items-center justify-between px-2">
-          <span class="text-[10px] font-bold text-emerald-400 uppercase">● Firebase</span>
-          <span id="sync-status" class="text-[10px] font-semibold text-slate-500">Đã đồng bộ</span>
-        </div>
-        <button onclick="handleLogout()" class="w-full py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold rounded-xl text-xs border border-rose-500/20 transition-colors">
-          Đăng Xuất
-        </button>
-      </div>
-    </aside>
-
-    <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-4">
-
-      <!-- TOP BAR & MONTH SELECTOR (Cân chỉnh ra giữa) -->
-      <div class="bento-card p-4 flex flex-col items-center justify-center text-center relative gap-3">
-        <button onclick="handleLogout()" class="md:hidden absolute left-4 top-4 px-2.5 py-1.5 bg-rose-500/10 text-rose-400 font-bold rounded-xl text-[10px] border border-rose-500/20">
-          Thoát
-        </button>
-
-        <div class="space-y-0.5">
-          <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Thời Gian Báo Cáo</span>
-          <h2 id="display-selected-month" class="text-sm font-display font-bold text-white">Tháng 08 / 2026</h2>
-        </div>
-
-        <div class="flex items-center space-x-2 justify-center">
-          <button onclick="changeMonth(-1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-xl text-xs border border-slate-800">
-            &larr;
-          </button>
-          <input type="month" id="month-picker" onchange="handleMonthChange(this.value)" class="oled-input text-white text-xs font-bold px-2 py-2 text-center" style="width: auto !important;">
-          <button onclick="changeMonth(1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-xl text-xs border border-slate-800">
-            &rarr;
-          </button>
-        </div>
-      </div>
-
-      <!-- BALANCED BENTO METRICS GRID -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        <!-- TÀI SẢN RÒNG -->
-        <div class="bento-card p-4 col-span-2">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tài Sản Ròng (Tài sản - Nợ)</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded">Tổng</span>
-          </div>
-          <div id="stat-networth" class="text-2xl md:text-3xl font-display font-bold text-white my-1">0 ₫</div>
-        </div>
-
-        <!-- TÀI SẢN -->
-        <div class="bento-card p-4">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tổng Tài Sản</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">Có</span>
-          </div>
-          <div id="stat-assets" class="text-lg md:text-xl font-display font-bold text-emerald-400 my-1 truncate">0 ₫</div>
-          <div id="stat-assets-count" class="text-[10px] font-semibold text-slate-500">0 mục</div>
-        </div>
-
-        <!-- TỔNG NỢ -->
-        <div class="bento-card p-4">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tổng Nợ</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded">Nợ</span>
-          </div>
-          <div id="stat-liabilities" class="text-lg md:text-xl font-display font-bold text-rose-400 my-1 truncate">0 ₫</div>
-          <div id="stat-liabilities-count" class="text-[10px] font-semibold text-slate-500">0 khoản</div>
-        </div>
-
-        <!-- THU NHẬP THÁNG -->
-        <div class="bento-card p-4">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Thu Nhập Tháng</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded" id="badge-income-month">Tháng</span>
-          </div>
-          <div id="stat-income" class="text-lg md:text-xl font-display font-bold text-blue-400 my-1 truncate">0 ₫</div>
-          <div class="text-[10px] font-semibold text-slate-500">Tháng này</div>
-        </div>
-
-        <!-- CHI TIÊU THÁNG -->
-        <div class="bento-card p-4">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Chi Tiêu Tháng</span>
-            <span class="px-2 py-0.5 text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded" id="badge-expense-month">Tháng</span>
-          </div>
-          <div id="stat-expense" class="text-lg md:text-xl font-display font-bold text-rose-400 my-1 truncate">0 ₫</div>
-          <div id="stat-cashflow" class="text-[10px] font-semibold text-slate-500 truncate">Dư: 0 ₫</div>
-        </div>
-      </div>
-
-      <!-- TAB 1: OVERVIEW DASHBOARD -->
-      <section id="tab-dashboard" class="tab-content space-y-4">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="bento-card p-5">
-            <h3 class="font-display font-bold text-sm text-white flex items-center space-x-2 mb-3">
-              <span class="text-emerald-400">❖</span>
-              <span>Cơ Cấu Tài Sản</span>
-            </h3>
-            <div class="relative h-56 flex items-center justify-center">
-              <canvas id="chart-assets"></canvas>
-            </div>
-          </div>
-
-          <div class="bento-card p-5">
-            <h3 class="font-display font-bold text-sm text-white flex items-center space-x-2 mb-3">
-              <span class="text-rose-400">❖</span>
-              <span>Phân Bổ Chi Tiêu</span>
-            </h3>
-            <div class="relative h-56 flex items-center justify-center">
-              <canvas id="chart-expenses"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="bento-card p-5">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="font-display font-bold text-sm text-white flex items-center space-x-2">
-              <span>⚡</span>
-              <span>Giao Dịch Gần Đây</span>
-            </h3>
-            <button onclick="switchTab('transactions')" class="text-xs font-bold text-indigo-400">Tất cả &rarr;</button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="text-slate-500 font-bold uppercase border-b border-slate-800/80">
-                <tr>
-                  <th class="pb-2.5 px-2">Ngày</th>
-                  <th class="pb-2.5 px-2">Danh mục</th>
-                  <th class="pb-2.5 px-2">Ví</th>
-                  <th class="pb-2.5 px-2 text-right">Số tiền</th>
-                </tr>
-              </thead>
-              <tbody id="dashboard-tx-list" class="divide-y divide-slate-800/50 font-semibold text-slate-300"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 2: ASSETS & LIABILITIES -->
-      <section id="tab-assets" class="tab-content hidden space-y-4">
-        <div class="bento-card p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <div>
-            <h2 class="font-display font-bold text-white text-sm">Quản Lý Tài Sản & Khoản Nợ</h2>
-            <p class="text-[11px] font-semibold text-slate-500">Tiền mặt, ngân hàng, khoản vay...</p>
-          </div>
-          <button onclick="openAssetModal()" class="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg glow-indigo">
-            + Thêm Tài Sản / Nợ
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="bento-card p-5">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="font-display font-bold text-emerald-400 text-sm flex items-center space-x-2">
-                <span>🏛️</span>
-                <span>Tài Sản</span>
-              </h3>
-              <span id="asset-sum-text" class="text-sm font-bold text-white">0 ₫</span>
-            </div>
-            <div id="assets-list" class="space-y-2.5"></div>
-          </div>
-
-          <div class="bento-card p-5">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="font-display font-bold text-rose-400 text-sm flex items-center space-x-2">
-                <span>💳</span>
-                <span>Khoản Nợ</span>
-              </h3>
-              <span id="liability-sum-text" class="text-sm font-bold text-white">0 ₫</span>
-            </div>
-            <div id="liabilities-list" class="space-y-2.5"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 3: TRANSACTIONS (THU CHI) -->
-      <section id="tab-transactions" class="tab-content hidden space-y-4">
-        <div class="bento-card p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <span class="text-xs font-bold text-slate-500">Lọc:</span>
-            <select id="filter-type" onchange="renderTransactions()" class="oled-input text-xs font-bold text-slate-200 px-3 py-2" style="width: auto !important;">
-              <option value="all">Tất cả giao dịch</option>
-              <option value="income">Thu nhập</option>
-              <option value="expense">Chi tiêu</option>
-            </select>
-          </div>
-          <button onclick="openTxModal()" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg glow-emerald">
-            + Thêm Thu/Chi
-          </button>
-        </div>
-
-        <div class="bento-card overflow-hidden p-2">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs font-semibold">
-              <thead class="text-slate-500 font-bold uppercase border-b border-slate-800/80">
-                <tr>
-                  <th class="p-2.5">Ngày</th>
-                  <th class="p-2.5">Loại</th>
-                  <th class="p-2.5">Danh mục</th>
-                  <th class="p-2.5">Ví</th>
-                  <th class="p-2.5">Ghi chú</th>
-                  <th class="p-2.5 text-right">Số tiền</th>
-                  <th class="p-2.5 text-center">Xóa</th>
-                </tr>
-              </thead>
-              <tbody id="full-tx-list" class="divide-y divide-slate-800/50 text-slate-300"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 4: BUDGETS -->
-      <section id="tab-budgets" class="tab-content hidden space-y-4">
-        <div class="bento-card p-4 flex justify-between items-center">
-          <div>
-            <h2 class="font-display font-bold text-white text-sm">Hạn Mức Ngân Sách</h2>
-            <p class="text-[11px] font-semibold text-slate-500">Quản lý, chỉnh sửa hoặc xóa hạn mức chi tiêu.</p>
-          </div>
-          <button onclick="openBudgetModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl">
-            + Thiết Lập
-          </button>
-        </div>
-
-        <div id="budgets-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- MODAL 1: ADD TRANSACTION -->
-  <div id="modal-tx" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="bento-card p-5 w-full max-w-sm space-y-4 border border-slate-800 shadow-2xl">
-      <div class="flex justify-between items-center pb-2.5 border-b border-slate-800">
-        <h3 class="font-display font-bold text-white text-sm">Thêm Thu / Chi Mới</h3>
-        <button onclick="closeTxModal()" class="text-slate-500 hover:text-white font-bold">✕</button>
-      </div>
-
-      <form id="form-tx" onsubmit="handleSaveTx(event)" class="space-y-3">
-        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-900">
-          <button type="button" id="btn-type-expense" onclick="setTxType('expense')" class="py-2 text-xs font-bold rounded-xl bg-rose-600 text-white">Chi (-)</button>
-          <button type="button" id="btn-type-income" onclick="setTxType('income')" class="py-2 text-xs font-bold rounded-xl text-slate-500">Thu (+)</button>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Số tiền (VNĐ)</label>
-          <input type="text" id="tx-amount" required placeholder="500.000" oninput="formatCurrencyInput(this)" class="oled-input text-white font-bold text-base">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[11px] font-bold text-slate-500 mb-1">Danh mục</label>
-            <select id="tx-category" class="oled-input text-xs font-bold text-slate-200 py-3"></select>
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold text-slate-500 mb-1">Ví tài khoản</label>
-            <select id="tx-account" class="oled-input text-xs font-bold text-slate-200 py-3"></select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Ngày giao dịch</label>
-          <input type="date" id="tx-date" required class="oled-input text-xs font-bold text-slate-200 py-3">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Ghi chú</label>
-          <input type="text" id="tx-note" placeholder="Ăn trưa, nhận lương..." class="oled-input text-xs font-semibold text-slate-200 py-3">
-        </div>
-
-        <div class="flex space-x-2 pt-2">
-          <button type="button" onclick="closeTxModal()" class="flex-1 py-3 bg-slate-900 text-slate-400 font-bold text-xs rounded-xl">Hủy</button>
-          <button type="submit" class="flex-1 py-3 bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg glow-emerald">Lưu</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL 2: ADD ASSET / LIABILITY -->
-  <div id="modal-asset" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="bento-card p-5 w-full max-w-sm space-y-4 border border-slate-800 shadow-2xl">
-      <div class="flex justify-between items-center pb-2.5 border-b border-slate-800">
-        <h3 class="font-display font-bold text-white text-sm">Thêm Tài Sản Hoặc Nợ</h3>
-        <button onclick="closeAssetModal()" class="text-slate-500 hover:text-white font-bold">✕</button>
-      </div>
-
-      <form id="form-asset" onsubmit="handleSaveAsset(event)" class="space-y-3">
-        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-900">
-          <button type="button" id="btn-asset-type-false" onclick="setAssetType(false)" class="py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white">Tài Sản</button>
-          <button type="button" id="btn-asset-type-true" onclick="setAssetType(true)" class="py-2 text-xs font-bold rounded-xl text-slate-500">Khoản Nợ</button>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Tên ví / Tài khoản</label>
-          <input type="text" id="asset-name" required placeholder="MBBank, Tiền mặt..." class="oled-input text-xs font-semibold text-slate-200 py-3">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Phân loại</label>
-          <select id="asset-category" class="oled-input text-xs font-bold text-slate-200 py-3"></select>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Số tiền (VNĐ)</label>
-          <input type="text" id="asset-value" required placeholder="10.000.000" oninput="formatCurrencyInput(this)" class="oled-input font-bold text-sm text-white py-3">
-        </div>
-
-        <div class="flex space-x-2 pt-2">
-          <button type="button" onclick="closeAssetModal()" class="flex-1 py-3 bg-slate-900 text-slate-400 font-bold text-xs rounded-xl">Hủy</button>
-          <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white font-bold text-xs rounded-xl shadow-lg glow-indigo">Thêm</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL 3: ADD/EDIT BUDGET -->
-  <div id="modal-budget" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="bento-card p-5 w-full max-w-sm space-y-4 border border-slate-800 shadow-2xl">
-      <div class="flex justify-between items-center pb-2.5 border-b border-slate-800">
-        <h3 id="budget-modal-title" class="font-display font-bold text-white text-sm">Cài Đặt Ngân Sách</h3>
-        <button onclick="closeBudgetModal()" class="text-slate-500 hover:text-white font-bold">✕</button>
-      </div>
-
-      <form id="form-budget" onsubmit="handleSaveBudget(event)" class="space-y-3">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Danh mục chi tiêu</label>
-          <select id="budget-category" class="oled-input text-xs font-bold text-slate-200 py-3"></select>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-500 mb-1">Hạn mức tối đa (VNĐ)</label>
-          <input type="text" id="budget-limit" required placeholder="5.000.000" oninput="formatCurrencyInput(this)" class="oled-input font-bold text-sm text-white py-3">
-        </div>
-
-        <div class="flex space-x-2 pt-2">
-          <button type="button" onclick="closeBudgetModal()" class="flex-1 py-3 bg-slate-900 text-slate-400 font-bold text-xs rounded-xl">Hủy</button>
-          <button type="submit" class="flex-1 py-3 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl">Lưu Ngân Sách</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ALERT MODAL DELETE TX -->
-  <div id="modal-alert-delete-tx" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="bento-card p-5 w-full max-w-xs space-y-3 text-center border border-rose-500/30">
-      <div class="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto text-base font-bold">✕</div>
-      <h3 class="font-display font-bold text-white text-sm">Xóa Giao Dịch</h3>
-      <p id="alert-tx-info" class="text-xs text-slate-400 p-2.5 bg-slate-950 rounded-xl"></p>
-      <div class="flex space-x-2 pt-2">
-        <button type="button" onclick="closeDeleteTxAlert()" class="flex-1 py-2 bg-slate-900 text-slate-400 font-bold text-xs rounded-xl">Hủy</button>
-        <button type="button" id="btn-confirm-delete-tx" class="flex-1 py-2 bg-rose-600 text-white font-bold text-xs rounded-xl">Xóa</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ALERT MODAL DELETE ASSET -->
-  <div id="modal-alert-delete-asset" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="bento-card p-5 w-full max-w-xs space-y-3 text-center border border-amber-500/30">
-      <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto text-base font-bold">⚠️</div>
-      <h3 class="font-display font-bold text-white text-sm">Xóa Mục Này?</h3>
-      <p id="alert-asset-info" class="text-xs text-slate-400 p-2.5 bg-slate-950 rounded-xl"></p>
-      <div class="flex space-x-2 pt-2">
-        <button type="button" onclick="closeDeleteAssetAlert()" class="flex-1 py-2 bg-slate-900 text-slate-400 font-bold text-xs rounded-xl">Hủy</button>
-        <button type="button" id="btn-confirm-delete-asset" class="flex-1 py-2 bg-rose-600 text-white font-bold text-xs rounded-xl">Xóa</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ALERT MODAL DELETE BUDGET -->
-  <div id="modal-alert-delete-budget" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="bento-card p-5 w-full max-w-xs space-y-3 text-center border border-rose-500/30">
-      <div class="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto text-base font-bold">🗑️</div>
-      <h3 class="font-display font-bold text-white text-sm">Xóa Hạn Mức Ngân Sách</h3>
-      <p id="alert-budget-info" class="text-xs text-slate-400 p-2.5 bg-slate-950 rounded-xl"></p>
-      <div class="flex space-x-2 pt-2">
-        <button type="button" onclick="closeDeleteBudgetAlert()" class="flex-1 py-2 bg-slate-900 text-slate-400 font-bold text-xs rounded-xl">Hủy</button>
-        <button type="button" id="btn-confirm-delete-budget" class="flex-1 py-2 bg-rose-600 text-white font-bold text-xs rounded-xl">Xóa Ngay</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FIREBASE & APP LOGIC -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDHOQSdlPxPstS3cTzAgg43qIK-HjGrZxI",
-      authDomain: "quan-ly-tai-chinh-d0bf1.firebaseapp.com",
-      projectId: "quan-ly-tai-chinh-d0bf1",
-      storageBucket: "quan-ly-tai-chinh-d0bf1.firebasestorage.app",
-      messagingSenderId: "1054695985785",
-      appId: "1:1054695985785:web:4b5691c2936e825638baa8",
-      measurementId: "G-0BCT2C2799"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // 1. Khi load trang: giữ hiệu ứng loading 3 giây rồi mới hiện bảng đăng nhập hoặc tự vào app
-    window.onload = function() {
-      const isAuth = localStorage.getItem('finmanage_auth');
-      
-      runStartupLoading(async () => {
-        if (isAuth === 'true') {
-          // Đã đăng nhập: Tiến hành kết nối & tải dữ liệu từ database trực tiếp
-          await initCloudAuth();
-        } else {
-          // Chưa đăng nhập: Tắt loading và hiện màn hình đăng nhập
-          document.getElementById('loading-screen').classList.add('hidden');
-          document.getElementById('login-screen').classList.remove('hidden');
-        }
-      });
-    };
-
-    // Hàm chạy loading chuẩn đúng 3 giây
-    function runStartupLoading(callback) {
-      let progress = 0;
-      const progressBar = document.getElementById('loading-progress');
-      const loadingText = document.getElementById('loading-text');
-      loadingText.innerText = "Đang khởi tạo hệ thống...";
-
-      const interval = setInterval(() => {
-        progress += 3.33; // 3 giây (30 bước * 100ms)
-        if (progressBar) progressBar.style.width = Math.min(progress, 100) + '%';
-
-        if (progress >= 100) {
-          clearInterval(interval);
-          callback();
-        }
-      }, 100);
-    }
-
-    async function initCloudAuth() {
-      try {
-        await signInAnonymously(auth);
-        await loadDataFromCloud();
-      } catch (e) {
-        await loadDataFromCloud();
-      }
-    }
-
-    // 2. Khi bấm đăng nhập xong -> Hiển thị loading và giữ đến khi kết nối database thành công
-    window.handleLogin = async function(e) {
-      e.preventDefault();
-      const u = document.getElementById('login-user').value.trim();
-      const p = document.getElementById('login-pass').value.trim();
-      const errEl = document.getElementById('login-error');
-
-      if (u === 'thanhtrungvo1999' && p === 'May1905') {
-        localStorage.setItem('finmanage_auth', 'true');
-        document.getElementById('login-screen').classList.add('hidden');
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
-        // Hiện lại màn hình loading để chờ kết nối database
-        document.getElementById('loading-screen').classList.remove('hidden');
-        document.getElementById('loading-text').innerText = "Đang kết nối Database...";
-        document.getElementById('loading-progress').style.width = '30%';
-
-        await initCloudAuth();
-      } else {
-        errEl.classList.remove('hidden');
-      }
-    }
-
-    window.handleLogout = function() {
-      localStorage.removeItem('finmanage_auth');
-      location.reload();
-    }
-
-    async function saveDataToCloud() {
-      try {
-        document.getElementById('sync-status').innerText = "Đang lưu...";
-        const docRef = doc(db, "finmanage_data", "thanhtrungvo1999");
-        await setDoc(docRef, {
-          assets: window.assets || [],
-          liabilities: window.liabilities || [],
-          transactions: window.transactions || [],
-          budgets: window.budgets || []
-        });
-        document.getElementById('sync-status').innerText = "Đã đồng bộ";
-      } catch (err) {
-        document.getElementById('sync-status').innerText = "Lỗi lưu DB";
-      }
-    }
-
-    async function loadDataFromCloud() {
-      try {
-        document.getElementById('loading-progress').style.width = '70%';
-        document.getElementById('sync-status').innerText = "Đang tải...";
-        const docRef = doc(db, "finmanage_data", "thanhtrungvo1999");
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          window.assets = data.assets || [];
-          window.liabilities = data.liabilities || [];
-          window.transactions = data.transactions || [];
-          window.budgets = data.budgets || [];
-        } else {
-          window.assets = [];
-          window.liabilities = [];
-          window.transactions = [];
-          window.budgets = [];
-          await saveDataToCloud();
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        document.getElementById('loading-progress').style.width = '100%';
-        document.getElementById('sync-status').innerText = "Đã đồng bộ";
-        window.updateMonthDisplay();
-        window.renderApp();
 
-        // Hoàn tất tải dữ liệu từ Cloud Database thành công -> Tắt loading, hiện app chính
-        setTimeout(() => {
-          document.getElementById('loading-screen').classList.add('hidden');
-          document.getElementById('login-screen').classList.add('hidden');
-          document.getElementById('app-wrapper').classList.remove('hidden');
-        }, 300);
-      } catch (err) {
-        document.getElementById('sync-status').innerText = "Lỗi tải DB";
-        window.updateMonthDisplay();
-        window.renderApp();
-        document.getElementById('loading-screen').classList.add('hidden');
-        document.getElementById('app-wrapper').classList.remove('hidden');
-      }
-    }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
-    window.triggerCloudSave = function() {
-      saveDataToCloud();
-    }
-  </script>
+        .glass-panel {
+            background: rgba(16, 18, 27, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
 
-  <!-- APP LOGIC -->
-  <script>
-    const CATEGORIES = {
-      income: ['Lương', 'Freelance', 'Đầu tư', 'Khác'],
-      expense: ['Ăn uống', 'Nhà ở', 'Đi lại', 'Giải trí', 'Mua sắm', 'Khác'],
-      asset: ['Tiền mặt', 'Ngân hàng', 'Lương tích lũy', 'Tiết kiệm', 'Đầu tư & Cổ phiếu', 'Bất động sản', 'Xe cộ', 'Tài sản khác'],
-      liability: ['Thẻ tín dụng', 'Khoản vay ngân hàng', 'Nợ cá nhân', 'Nợ khác']
-    };
+        .glass-card {
+            background: rgba(26, 29, 45, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
 
-    window.assets = [];
-    window.liabilities = [];
-    window.transactions = [];
-    window.budgets = [];
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: float-slow 4s ease-in-out infinite;
+        }
 
-    const now = new Date();
-    let selectedYear = now.getFullYear();
-    let selectedMonth = now.getMonth() + 1;
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-effect {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-dark-950 text-gray-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white overflow-x-hidden" id="bodyElement">
 
-    let currentTxType = 'expense';
-    let isLiabilityForm = false;
-    let assetChartObj = null;
-    let expenseChartObj = null;
+    <div id="splashScreen" class="fixed inset-0 bg-dark-950 z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+        <div class="relative flex items-center justify-center mb-6">
+            <div class="absolute w-32 h-32 bg-indigo-600 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+            <div class="relative glass-card p-6 rounded-3xl shadow-2xl z-10 flex items-center justify-center border-indigo-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles text-indigo-400 text-5xl animate-float"></i>
+            </div>
+        </div>
+        <h1 class="font-extrabold text-3xl tracking-wider bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">WALLZY STUDIO</h1>
+        <p class="text-xs text-gray-400 font-medium tracking-widest uppercase">Next-Generation Wallpapers</p>
+        <div class="flex space-x-1.5 mt-6">
+            <div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.15s;"></div>
+            <div class="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style="animation-delay: 0.3s;"></div>
+        </div>
+    </div>
 
-    let pendingDeleteTxId = null;
-    let pendingDeleteAssetId = null;
-    let pendingDeleteAssetIsLiability = false;
-    let pendingDeleteBudgetCategory = null;
-
-    function formatCurrencyInput(input) {
-      let value = input.value.replace(/\D/g, '');
-      if (value === '') {
-        input.value = '';
-        return;
-      }
-      input.value = new Intl.NumberFormat('vi-VN').format(parseInt(value, 10));
-    }
-
-    function parseFormattedCurrency(str) {
-      if (!str) return 0;
-      return parseInt(str.toString().replace(/\./g, '').replace(/\D/g, ''), 10) || 0;
-    }
-
-    const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
-
-    function getSelectedMonthTransactions() {
-      const monthStr = selectedMonth < 10 ? `0${selectedMonth}` : `${selectedMonth}`;
-      const prefix = `${selectedYear}-${monthStr}`;
-      return window.transactions.filter(t => t.date && t.date.startsWith(prefix));
-    }
-
-    window.updateMonthDisplay = function() {
-      const monthStr = selectedMonth < 10 ? `0${selectedMonth}` : `${selectedMonth}`;
-      document.getElementById('display-selected-month').innerText = `Tháng ${monthStr} / ${selectedYear}`;
-      const picker = document.getElementById('month-picker');
-      if (picker) picker.value = `${selectedYear}-${monthStr}`;
-      
-      const badgeIncome = document.getElementById('badge-income-month');
-      const badgeExpense = document.getElementById('badge-expense-month');
-      if (badgeIncome) badgeIncome.innerText = `${monthStr}/${selectedYear}`;
-      if (badgeExpense) badgeExpense.innerText = `${monthStr}/${selectedYear}`;
-    }
-
-    window.handleMonthChange = function(val) {
-      if (!val) return;
-      const parts = val.split('-');
-      selectedYear = parseInt(parts[0], 10);
-      selectedMonth = parseInt(parts[1], 10);
-      window.updateMonthDisplay();
-      window.renderApp();
-    }
-
-    window.changeMonth = function(delta) {
-      selectedMonth += delta;
-      if (selectedMonth > 12) {
-        selectedMonth = 1;
-        selectedYear += 1;
-      } else if (selectedMonth < 1) {
-        selectedMonth = 12;
-        selectedYear -= 1;
-      }
-      window.updateMonthDisplay();
-      window.renderApp();
-    }
-
-    window.switchTab = function(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
-
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.className = 'nav-btn flex flex-col md:flex-row items-center md:space-x-3 p-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold text-slate-400 hover:text-white transition-all';
-      });
-
-      const activeBtn = document.getElementById('nav-' + tabId);
-      if(activeBtn) {
-        activeBtn.className = 'nav-btn flex flex-col md:flex-row items-center md:space-x-3 p-2 md:px-4 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20';
-      }
-    }
-
-    window.renderApp = function() {
-      const totalAssets = window.assets.reduce((sum, a) => sum + Number(a.value), 0);
-      const totalLiabilities = window.liabilities.reduce((sum, l) => sum + Number(l.value), 0);
-      const netWorth = totalAssets - totalLiabilities;
-
-      const monthTxList = getSelectedMonthTransactions();
-      const totalIncome = monthTxList.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
-      const totalExpense = monthTxList.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
-
-      document.getElementById('stat-networth').innerText = formatVND(netWorth);
-      document.getElementById('stat-assets').innerText = formatVND(totalAssets);
-      document.getElementById('stat-assets-count').innerText = `${window.assets.length} mục`;
-      
-      document.getElementById('stat-liabilities').innerText = formatVND(totalLiabilities);
-      document.getElementById('stat-liabilities-count').innerText = `${window.liabilities.length} khoản`;
-
-      document.getElementById('stat-income').innerText = formatVND(totalIncome);
-      document.getElementById('stat-expense').innerText = formatVND(totalExpense);
-      document.getElementById('stat-cashflow').innerText = `Dư: ${formatVND(totalIncome - totalExpense)}`;
-
-      document.getElementById('asset-sum-text').innerText = formatVND(totalAssets);
-      document.getElementById('liability-sum-text').innerText = formatVND(totalLiabilities);
-
-      renderDashboardTxList(monthTxList);
-      renderTransactions(monthTxList);
-      renderAssetsList();
-      renderBudgets(monthTxList);
-      renderCharts(monthTxList);
-    }
-
-    function renderDashboardTxList(monthTxList) {
-      const container = document.getElementById('dashboard-tx-list');
-      if (monthTxList.length === 0) {
-        container.innerHTML = `<tr><td colSpan="4" class="py-5 text-center text-xs font-semibold text-slate-600">Chưa có giao dịch phát sinh.</td></tr>`;
-        return;
-      }
-      container.innerHTML = monthTxList.slice(0, 5).map(t => `
-        <tr class="hover:bg-slate-900/60 transition-colors">
-          <td class="py-3 px-2 text-slate-400 font-bold">${t.date}</td>
-          <td class="py-3 px-2 font-bold text-slate-200">${t.category}</td>
-          <td class="py-3 px-2 text-slate-400 font-semibold">${t.account}</td>
-          <td class="py-3 px-2 text-right font-extrabold ${t.type === 'income' ? 'text-emerald-400' : 'text-slate-200'}">
-            ${t.type === 'income' ? '+' : '-'}${formatVND(t.amount)}
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    window.renderTransactions = function() {
-      const monthTxList = getSelectedMonthTransactions();
-      const filter = document.getElementById('filter-type').value;
-      const container = document.getElementById('full-tx-list');
-      const filtered = monthTxList.filter(t => filter === 'all' || t.type === filter);
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<tr><td colSpan="7" class="p-5 text-center text-xs font-semibold text-slate-600">Không có giao dịch nào.</td></tr>`;
-        return;
-      }
-
-      container.innerHTML = filtered.map(t => `
-        <tr class="hover:bg-slate-900/60 transition-colors">
-          <td class="p-2.5 text-slate-400 font-bold">${t.date}</td>
-          <td class="p-2.5">
-            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold ${t.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
-              ${t.type === 'income' ? 'Thu' : 'Chi'}
-            </span>
-          </td>
-          <td class="p-2.5 font-bold text-slate-200">${t.category}</td>
-          <td class="p-2.5 text-slate-400 font-semibold">${t.account}</td>
-          <td class="p-2.5 text-slate-500 font-medium">${t.note || '-'}</td>
-          <td class="p-2.5 text-right font-extrabold ${t.type === 'income' ? 'text-emerald-400' : 'text-slate-200'}">
-            ${t.type === 'income' ? '+' : '-'}${formatVND(t.amount)}
-          </td>
-          <td class="p-2.5 text-center">
-            <button onclick="triggerDeleteTxAlert('${t.id}')" class="px-2 py-1 bg-rose-500/10 text-rose-400 font-bold rounded-lg text-xs">✕</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderAssetsList() {
-      const aContainer = document.getElementById('assets-list');
-      if (window.assets.length === 0) {
-        aContainer.innerHTML = `<p class="text-xs font-semibold text-slate-600 text-center py-3">Chưa có tài sản nào.</p>`;
-      } else {
-        aContainer.innerHTML = window.assets.map(a => `
-          <div class="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800/80 flex justify-between items-center">
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 sm:px-6 py-3.5 flex justify-between items-center transition-all">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-bolt-lightning text-white text-sm"></i>
+            </div>
             <div>
-              <p class="font-extrabold text-slate-200 text-xs">${a.name}</p>
-              <p class="text-[10px] font-semibold text-indigo-400">${a.category || 'Tài sản'}</p>
+                <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-gray-200 to-indigo-300 bg-clip-text text-transparent">Wallzy</span>
+                <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-bold ml-1.5 border border-indigo-500/30 uppercase">PRO</span>
             </div>
-            <div class="flex items-center space-x-3">
-              <span class="font-extrabold text-emerald-400 text-xs">${formatVND(a.value)}</span>
-              <button onclick="triggerDeleteAssetAlert('${a.id}', false)" class="text-slate-600 hover:text-rose-400 font-bold text-xs">✕</button>
+        </div>
+        
+        <div class="flex items-center space-x-2">
+            <button onclick="openAiPromptModal()" class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition cursor-pointer active:scale-95 border border-white/10">
+                <i class="fa-solid fa-sparkles text-amber-300"></i>
+                <span class="hidden sm:inline">AI Generator</span>
+            </button>
+            <div class="flex items-center glass-card px-3 py-1.5 rounded-xl space-x-2 border-white/10 text-xs font-medium text-gray-300">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                <span class="hidden md:inline">Full HD / 4K</span>
             </div>
-          </div>
-        `).join('');
-      }
+        </div>
+    </header>
 
-      const lContainer = document.getElementById('liabilities-list');
-      if (window.liabilities.length === 0) {
-        lContainer.innerHTML = `<p class="text-xs font-semibold text-slate-600 text-center py-3">Không có khoản nợ nào.</p>`;
-      } else {
-        lContainer.innerHTML = window.liabilities.map(l => `
-          <div class="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800/80 flex justify-between items-center">
+    <nav class="px-4 py-3 max-w-5xl mx-auto w-full flex space-x-2.5 overflow-x-auto scrollbar-none">
+        <button onclick="filterCategory('all')" class="cat-btn bg-indigo-600 text-white px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition shadow-md shadow-indigo-600/30 cursor-pointer border border-indigo-400/30 flex items-center space-x-2">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Tất cả</span>
+        </button>
+        <button onclick="filterCategory('anime')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-wand-magic"></i>
+            <span>Anime & Cyber</span>
+        </button>
+        <button onclick="filterCategory('nature')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-tree"></i>
+            <span>Phong cảnh</span>
+        </button>
+        <button onclick="filterCategory('minimal')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-cube"></i>
+            <span>Tối giản & 3D</span>
+        </button>
+        <button onclick="filterCategory('ai')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-robot text-purple-400"></i>
+            <span>Sáng tạo AI</span>
+        </button>
+    </nav>
+
+    <main class="flex-1 px-4 py-2 max-w-5xl mx-auto w-full mb-12">
+        <div id="wallpaperGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <!-- Dynamic Grid Items -->
+        </div>
+    </main>
+
+    <div id="aiModal" class="fixed inset-0 bg-dark-950/80 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card border border-indigo-500/30 p-6 rounded-3xl max-w-md w-full space-y-5 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
+            <div class="flex justify-between items-center relative z-10">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h3 class="font-bold text-base text-white">Tạo Ảnh AI Độc Quyền</h3>
+                </div>
+                <button onclick="closeAiModal()" class="text-gray-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center glass-card transition cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 relative z-10">Nhập ý tưởng của bạn, AI sẽ vẽ ra bức hình nền độc nhất vô nhị chỉ trong vài giây.</p>
+            
+            <div class="space-y-3 relative z-10">
+                <textarea id="aiPromptInput" rows="3" placeholder="Ví dụ: Một chú mèo phi hành gia ngắm sao trên bề mặt mặt trăng, phong cách Cyberpunk 4k..." class="w-full glass-card p-3.5 rounded-2xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition border border-white/10 resize-none"></textarea>
+                <button onclick="generateAiWallpaper()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-bold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-98">
+                    <i class="fa-solid fa-bolt text-amber-300"></i>
+                    <span class="text-xs uppercase tracking-wider">Khởi Tạo Bằng AI</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="fixed inset-0 bg-dark-950 z-50 hidden flex flex-col justify-between p-0 overflow-hidden">
+        <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-black cursor-pointer" onclick="toggleFullScreenFromModal()">
+            <canvas id="imageCanvas" class="w-full h-full object-contain block"></canvas>
+            <div class="absolute inset-0 bg-gradient-to-b from-dark-950/80 via-transparent to-dark-950/90 pointer-events-none"></div>
+        </div>
+
+        <div class="relative z-10 flex justify-between items-center p-4 sm:p-6 w-full">
+            <button onclick="closeModal()" class="text-white text-sm p-3 glass-card hover:bg-dark-800 rounded-full w-11 h-11 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <span id="modalCategory" class="text-[10px] uppercase tracking-widest glass-card text-indigo-300 px-4 py-1.5 rounded-full border border-indigo-500/30 font-bold shadow-lg">Anime</span>
+            <button onclick="toggleFullScreenFromModal()" class="text-white text-sm p-3 glass-card hover:bg-dark-800 rounded-full w-11 h-11 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xem toàn màn hình">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+        </div>
+        
+        <div class="relative z-10 flex flex-col space-y-3 p-4 sm:p-6 w-full max-w-md mx-auto">
+            <div class="flex space-x-2 w-full overflow-x-auto py-1 scrollbar-none glass-card p-1.5 rounded-2xl border border-white/10">
+                <button onclick="applyFilter('normal')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-white">Gốc</button>
+                <button onclick="applyFilter('vivid')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-indigo-300">Rực Rỡ</button>
+                <button onclick="applyFilter('warm')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-amber-300">Ấm Áp</button>
+                <button onclick="applyFilter('noir')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-gray-300">Điện Ảnh</button>
+            </div>
+
+            <button onclick="triggerDownloadWithAd()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-bold py-4 rounded-2xl shadow-2xl transition flex items-center justify-center space-x-2.5 cursor-pointer active:scale-95 border border-white/10">
+                <i class="fa-solid fa-cloud-arrow-down text-lg text-amber-300"></i>
+                <span class="text-xs uppercase tracking-wider font-extrabold">Xem QC Mở Khóa Tải Ảnh</span>
+            </button>
+            <p class="text-center text-[11px] text-gray-400">Xem quảng cáo 5 giây để lưu ảnh chất lượng gốc 4K.</p>
+        </div>
+    </div>
+
+    <div id="fullscreenModal" class="fixed inset-0 bg-dark-950 z-[1000] hidden flex flex-col items-center justify-center p-0" onclick="closeFullScreen()">
+        <button class="absolute top-4 right-4 text-white text-base glass-card hover:bg-dark-800 w-11 h-11 rounded-full flex items-center justify-center z-20 transition cursor-pointer border border-white/10 shadow-2xl">
+            <i class="fa-solid fa-compress"></i>
+        </button>
+        <img id="fullscreenImg" src="" alt="Fullscreen" class="w-full h-full object-contain block">
+    </div>
+
+    <div id="adModal" class="fixed inset-0 bg-dark-950/90 backdrop-blur-2xl z-[1050] hidden flex flex-col items-center justify-center p-6 text-center">
+        <div class="glass-card border border-indigo-500/30 p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl">
+            <div class="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto text-indigo-400 text-2xl border border-indigo-500/30 animate-pulse">
+                <i class="fa-solid fa-rectangle-ad"></i>
+            </div>
             <div>
-              <p class="font-extrabold text-slate-200 text-xs">${l.name}</p>
-              <p class="text-[10px] font-semibold text-rose-400">${l.category || 'Nợ'}</p>
+                <h3 class="text-base font-bold text-white">Đang phát nhà tài trợ</h3>
+                <p class="text-xs text-gray-400 mt-1">Vui lòng chờ <span id="countdown" class="text-amber-400 font-extrabold text-sm">5</span> giây để chuẩn bị tải xuống.</p>
             </div>
-            <div class="flex items-center space-x-3">
-              <span class="font-extrabold text-rose-400 text-xs">${formatVND(l.value)}</span>
-              <button onclick="triggerDeleteAssetAlert('${l.id}', true)" class="text-slate-600 hover:text-rose-400 font-bold text-xs">✕</button>
+            <div class="w-full bg-dark-800 h-2 rounded-full overflow-hidden border border-white/5">
+                <div id="adProgress" class="bg-gradient-to-r from-indigo-500 to-pink-500 h-full w-full transition-all duration-1000"></div>
             </div>
-          </div>
-        `).join('');
-      }
-    }
+        </div>
+    </div>
 
-    function renderBudgets(monthTxList) {
-      const container = document.getElementById('budgets-grid');
-      if (window.budgets.length === 0) {
-        container.innerHTML = `<div class="col-span-2 bento-card p-6 text-center text-xs font-semibold text-slate-600">Chưa cài đặt hạn mức ngân sách nào. Bấm '+ Thiết Lập' để thêm.</div>`;
-        return;
-      }
-      container.innerHTML = window.budgets.map(b => {
-        const spent = monthTxList
-          .filter(t => t.type === 'expense' && t.category === b.category)
-          .reduce((sum, t) => sum + Number(t.amount), 0);
-
-        const percent = Math.min(Math.round((spent / b.limit) * 100), 100);
-        const isOver = spent > b.limit;
-
-        return `
-          <div class="bento-card p-4 space-y-2.5">
-            <div class="flex justify-between items-start">
-              <div>
-                <h4 class="font-extrabold text-slate-200 text-xs">${b.category}</h4>
-                <p class="text-[10px] font-semibold text-slate-500">Hạn mức: ${formatVND(b.limit)}</p>
-              </div>
-              <div class="flex items-center space-x-1.5">
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${isOver ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
-                  ${percent}%
-                </span>
-                <button onclick="openBudgetModal('${b.category}', ${b.limit})" class="px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded-lg text-[10px] font-bold border border-indigo-500/20">Sửa</button>
-                <button onclick="triggerDeleteBudgetAlert('${b.category}')" class="px-2 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold border border-rose-500/20">Xóa</button>
-              </div>
+    <div id="successModal" class="fixed inset-0 bg-dark-950/90 backdrop-blur-xl z-[1100] hidden flex flex-col items-center justify-center p-4">
+        <div class="glass-card border border-indigo-500/40 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-[0_0_50px_rgba(99,102,241,0.2)]">
+            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg text-white text-2xl">
+                <i class="fa-solid fa-check"></i>
             </div>
-
-            <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden p-0.5 border border-slate-800/80">
-              <div class="h-full rounded-full transition-all duration-300" style="width: ${percent}%; background: ${isOver ? '#F43F5E' : percent > 80 ? '#F59E0B' : '#10B981'};"></div>
+            <div>
+                <h3 class="text-lg font-extrabold text-white">Tải Xuống Thành Công!</h3>
+                <p class="text-xs text-gray-400 mt-1">Hình nền đã được lưu về thiết bị của bạn.</p>
             </div>
+            <button onclick="closeSuccessModal()" class="w-full bg-dark-800 hover:bg-dark-700 text-white font-bold py-3 rounded-xl transition text-xs cursor-pointer border border-white/10 shadow">
+                Hoàn tất
+            </button>
+        </div>
+    </div>
 
-            <div class="flex justify-between items-center text-[10px] font-semibold text-slate-500">
-              <span>Đã chi: <strong class="text-slate-200 font-bold">${formatVND(spent)}</strong></span>
-              <span>Còn: <strong class="${b.limit - spent < 0 ? 'text-rose-400' : 'text-emerald-400'} font-bold">${formatVND(b.limit - spent)}</strong></span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderCharts(monthTxList) {
-      const assetCtx = document.getElementById('chart-assets').getContext('2d');
-      if (assetChartObj) assetChartObj.destroy();
-
-      const assetCategoryMap = {};
-      window.assets.forEach(a => {
-        const cat = a.category || 'Tài sản khác';
-        assetCategoryMap[cat] = (assetCategoryMap[cat] || 0) + Number(a.value);
-      });
-
-      if (Object.keys(assetCategoryMap).length > 0) {
-        assetChartObj = new Chart(assetCtx, {
-          type: 'doughnut',
-          data: {
-            labels: Object.keys(assetCategoryMap),
-            datasets: [{
-              data: Object.values(assetCategoryMap),
-              backgroundColor: ['#6366F1', '#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', '#14B8A6', '#F97316'],
-              borderWidth: 2,
-              borderColor: '#0B0F19'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'bottom', labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', weight: 'bold', size: 10 } } },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const value = context.raw || 0;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                    return ` ${context.label}: ${formatVND(value)} (${percentage}%)`;
-                  }
-                }
-              }
-            }
-          }
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splashScreen');
+            const body = document.getElementById('bodyElement');
+            
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                body.classList.remove('overflow-hidden');
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 700);
+            }, 1500);
         });
-      }
 
-      const expMap = {};
-      monthTxList.filter(t => t.type === 'expense').forEach(t => expMap[t.category] = (expMap[t.category] || 0) + Number(t.amount));
+        const wallpapers = [
+            { id: 1, category: 'anime', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1080&auto=format&fit=crop&q=80' },
+            { id: 2, category: 'minimal', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1080&auto=format&fit=crop&q=80' },
+            { id: 3, category: 'nature', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&auto=format&fit=crop&q=80' },
+            { id: 4, category: 'minimal', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1080&auto=format&fit=crop&q=80' },
+            { id: 5, category: 'anime', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1080&auto=format&fit=crop&q=80' },
+            { id: 6, category: 'anime', url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&auto=format&fit=crop&q=80' },
+            { id: 7, category: 'nature', url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&auto=format&fit=crop&q=80' },
+            { id: 8, category: 'minimal', url: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=1080&auto=format&fit=crop&q=80' }
+        ];
 
-      const expCtx = document.getElementById('chart-expenses').getContext('2d');
-      if (expenseChartObj) expenseChartObj.destroy();
+        let currentSelectedWallpaper = null;
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        let activeImage = new Image();
 
-      if (Object.keys(expMap).length > 0) {
-        expenseChartObj = new Chart(expCtx, {
-          type: 'pie',
-          data: {
-            labels: Object.keys(expMap),
-            datasets: [{
-              data: Object.values(expMap),
-              backgroundColor: ['#F43F5E', '#FB923C', '#F59E0B', '#10B981', '#06B6D4', '#EC4899'],
-              borderWidth: 2,
-              borderColor: '#0B0F19'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'bottom', labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', weight: 'bold', size: 10 } } },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const value = context.raw || 0;
-                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                    return ` ${context.label}: ${formatVND(value)} (${percentage}%)`;
-                  }
+        function renderWallpapers(category = 'all') {
+            const grid = document.getElementById('wallpaperGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 6; i++) {
+                const skeleton = document.createElement('div');
+                skeleton.className = 'glass-card rounded-2xl aspect-[9/16] animate-pulse flex flex-col justify-end p-3';
+                skeleton.innerHTML = `<div class="h-4 w-16 bg-white/10 rounded-full"></div>`;
+                grid.appendChild(skeleton);
+            }
+
+            setTimeout(() => {
+                grid.innerHTML = '';
+                const filtered = category === 'all' ? wallpapers : wallpapers.filter(w => w.category === category);
+
+                filtered.forEach(w => {
+                    const card = document.createElement('div');
+                    card.className = 'relative group rounded-2xl overflow-hidden glass-card aspect-[9/16] cursor-pointer border border-white/10 hover:border-indigo-500/50 transition-all duration-300 shadow-xl';
+                    card.onclick = () => openModal(w);
+                    card.innerHTML = `
+                        <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-dark-950/80 via-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-3.5">
+                            <span class="text-[10px] font-bold text-white glass-card px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">${w.category}</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }, 400);
+        }
+
+        function filterCategory(cat) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = 'cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2';
+            });
+            event.currentTarget.className = 'cat-btn bg-indigo-600 text-white px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition shadow-md shadow-indigo-600/30 cursor-pointer border border-indigo-400/30 flex items-center space-x-2';
+            renderWallpapers(cat);
+        }
+
+        function openAiPromptModal() {
+            document.getElementById('aiModal').classList.remove('hidden');
+        }
+
+        function closeAiModal() {
+            document.getElementById('aiModal').classList.add('hidden');
+        }
+
+        function generateAiWallpaper() {
+            const prompt = document.getElementById('aiPromptInput').value.trim();
+            if (!prompt) {
+                alert('Vui lòng nhập mô tả ý tưởng hình nền!');
+                return;
+            }
+            closeAiModal();
+            
+            // Thêm ảnh AI giả lập vào danh sách
+            const aiId = wallpapers.length + 1;
+            const newAiWallpaper = {
+                id: aiId,
+                category: 'ai',
+                url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&auto=format&fit=crop&q=80'
+            };
+            wallpapers.unshift(newAiWallpaper);
+            renderWallpapers('all');
+        }
+
+        function openModal(wallpaper) {
+            currentSelectedWallpaper = wallpaper;
+            document.getElementById('modalCategory').innerText = wallpaper.category;
+            document.getElementById('detailModal').classList.remove('hidden');
+
+            activeImage.crossOrigin = "anonymous";
+            activeImage.src = wallpaper.url;
+            activeImage.onload = function() {
+                drawImageToCanvas('normal');
+            };
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function drawImageToCanvas(filterType) {
+            canvas.width = 1080;
+            canvas.height = 1920;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let hRatio = canvas.width / activeImage.width;
+            let vRatio = canvas.height / activeImage.height;
+            let ratio = Math.max(hRatio, vRatio);
+            
+            let centerShiftX = (canvas.width - activeImage.width * ratio) / 2;
+            let centerShiftY = (canvas.height - activeImage.height * ratio) / 2;
+
+            if (filterType === 'vivid') {
+                ctx.filter = 'contrast(1.25) saturate(1.3) brightness(1.05)';
+            } else if (filterType === 'warm') {
+                ctx.filter = 'sepia(0.3) contrast(1.1) brightness(1.05)';
+            } else if (filterType === 'noir') {
+                ctx.filter = 'grayscale(1) contrast(1.3)';
+            } else {
+                ctx.filter = 'none';
+            }
+
+            ctx.drawImage(activeImage, 0, 0, activeImage.width, activeImage.height,
+                          centerShiftX, centerShiftY, activeImage.width * ratio, activeImage.height * ratio);
+            ctx.filter = 'none';
+        }
+
+        function applyFilter(type) {
+            drawImageToCanvas(type);
+        }
+
+        function toggleFullScreenFromModal() {
+            const fullscreenModal = document.getElementById('fullscreenModal');
+            const fullscreenImg = document.getElementById('fullscreenImg');
+            fullscreenImg.src = canvas.toDataURL('image/jpeg', 0.98);
+            fullscreenModal.classList.remove('hidden');
+        }
+
+        function closeFullScreen() {
+            document.getElementById('fullscreenModal').classList.add('hidden');
+        }
+
+        function triggerDownloadWithAd() {
+            closeModal();
+            const adModal = document.getElementById('adModal');
+            const countdownEl = document.getElementById('countdown');
+            adModal.classList.remove('hidden');
+
+            let timeLeft = 5;
+            countdownEl.innerText = timeLeft;
+
+            let timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    adModal.classList.add('hidden');
+                    executeDownload();
                 }
-              }
-            }
-          }
-        });
-      }
-    }
-
-    // MODAL CONTROLS
-    window.openTxModal = function() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      document.getElementById('tx-date').value = `${yyyy}-${mm}-${dd}`;
-
-      document.getElementById('tx-amount').value = '';
-      populateCategoryDropdown();
-      populateAccountDropdown();
-      document.getElementById('modal-tx').classList.remove('hidden');
-    }
-    window.closeTxModal = function() { document.getElementById('modal-tx').classList.add('hidden'); }
-
-    window.openAssetModal = function() { 
-      document.getElementById('asset-value').value = '';
-      populateAssetCategoryDropdown();
-      document.getElementById('modal-asset').classList.remove('hidden'); 
-    }
-    window.closeAssetModal = function() { document.getElementById('modal-asset').classList.add('hidden'); }
-
-    window.openBudgetModal = function(editCategory = '', editLimit = '') {
-      const select = document.getElementById('budget-category');
-      select.innerHTML = CATEGORIES.expense.map(c => `<option value="${c}">${c}</option>`).join('');
-      
-      const limitInput = document.getElementById('budget-limit');
-      const titleEl = document.getElementById('budget-modal-title');
-
-      if (editCategory) {
-        select.value = editCategory;
-        select.disabled = true;
-        limitInput.value = new Intl.NumberFormat('vi-VN').format(editLimit);
-        titleEl.innerText = "Chỉnh Sửa Ngân Sách";
-      } else {
-        select.disabled = false;
-        limitInput.value = '';
-        titleEl.innerText = "Cài Đặt Ngân Sách";
-      }
-
-      document.getElementById('modal-budget').classList.remove('hidden');
-    }
-    window.closeBudgetModal = function() { document.getElementById('modal-budget').classList.add('hidden'); }
-
-    window.setTxType = function(type) {
-      currentTxType = type;
-      document.getElementById('btn-type-expense').className = type === 'expense' ? 'py-2 text-xs font-bold rounded-xl bg-rose-600 text-white' : 'py-2 text-xs font-bold rounded-xl text-slate-500';
-      document.getElementById('btn-type-income').className = type === 'income' ? 'py-2 text-xs font-bold rounded-xl bg-emerald-500 text-slate-950' : 'py-2 text-xs font-bold rounded-xl text-slate-500';
-      populateCategoryDropdown();
-    }
-
-    window.setAssetType = function(isLiability) {
-      isLiabilityForm = isLiability;
-      document.getElementById('btn-asset-type-false').className = !isLiability ? 'py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white' : 'py-2 text-xs font-bold rounded-xl text-slate-500';
-      document.getElementById('btn-asset-type-true').className = isLiability ? 'py-2 text-xs font-bold rounded-xl bg-rose-600 text-white' : 'py-2 text-xs font-bold rounded-xl text-slate-500';
-      populateAssetCategoryDropdown();
-    }
-
-    function populateCategoryDropdown() {
-      document.getElementById('tx-category').innerHTML = CATEGORIES[currentTxType].map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    function populateAssetCategoryDropdown() {
-      const select = document.getElementById('asset-category');
-      const list = isLiabilityForm ? CATEGORIES.liability : CATEGORIES.asset;
-      select.innerHTML = list.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    function populateAccountDropdown() {
-      const select = document.getElementById('tx-account');
-      if (window.assets.length === 0) {
-        select.innerHTML = '<option value="Ví chung">Ví chung</option>';
-        return;
-      }
-      select.innerHTML = window.assets.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
-    }
-
-    window.handleSaveTx = function(e) {
-      e.preventDefault();
-      const amountVal = parseFormattedCurrency(document.getElementById('tx-amount').value);
-      if (amountVal <= 0) return;
-
-      const accountName = document.getElementById('tx-account').value;
-      const txDate = document.getElementById('tx-date').value;
-
-      const newTx = {
-        id: 't_' + Date.now(),
-        type: currentTxType,
-        amount: amountVal,
-        category: document.getElementById('tx-category').value,
-        account: accountName,
-        date: txDate,
-        note: document.getElementById('tx-note').value
-      };
-
-      if (txDate) {
-        const parts = txDate.split('-');
-        selectedYear = parseInt(parts[0], 10);
-        selectedMonth = parseInt(parts[1], 10);
-        window.updateMonthDisplay();
-      }
-
-      let assetIndex = window.assets.findIndex(a => a.name === accountName);
-      if (assetIndex !== -1) {
-        if (currentTxType === 'income') {
-          window.assets[assetIndex].value += amountVal;
-        } else if (currentTxType === 'expense') {
-          window.assets[assetIndex].value -= amountVal;
+            }, 1000);
         }
-      } else {
-        if (currentTxType === 'income') {
-          window.assets.push({
-            id: 'a_' + Date.now(),
-            name: accountName,
-            category: 'Lương tích lũy',
-            value: amountVal
-          });
+
+        function executeDownload() {
+            const dataURL = canvas.toDataURL('image/jpeg', 0.95);
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `wallzy-pro-${currentSelectedWallpaper.id}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            document.getElementById('successModal').classList.remove('hidden');
         }
-      }
 
-      window.transactions.unshift(newTx);
-      window.renderApp();
-      window.triggerCloudSave();
-      window.closeTxModal();
-      document.getElementById('form-tx').reset();
-    }
-
-    window.handleSaveAsset = function(e) {
-      e.preventDefault();
-      const val = parseFormattedCurrency(document.getElementById('asset-value').value);
-      const cat = document.getElementById('asset-category').value;
-      
-      const newItem = {
-        id: (isLiabilityForm ? 'l_' : 'a_') + Date.now(),
-        name: document.getElementById('asset-name').value,
-        category: cat,
-        value: val
-      };
-
-      if (isLiabilityForm) window.liabilities.push(newItem);
-      else window.assets.push(newItem);
-
-      window.renderApp();
-      window.triggerCloudSave();
-      window.closeAssetModal();
-      document.getElementById('form-asset').reset();
-    }
-
-    window.handleSaveBudget = function(e) {
-      e.preventDefault();
-      const cat = document.getElementById('budget-category').value;
-      const limit = parseFormattedCurrency(document.getElementById('budget-limit').value);
-
-      if (limit <= 0) return;
-
-      const existingIndex = window.budgets.findIndex(b => b.category === cat);
-      if (existingIndex !== -1) {
-        window.budgets[existingIndex].limit = limit;
-      } else {
-        window.budgets.push({ category: cat, limit: limit });
-      }
-
-      window.renderApp();
-      window.triggerCloudSave();
-      window.closeBudgetModal();
-      document.getElementById('form-budget').reset();
-    }
-
-    // DELETE HANDLERS
-    window.triggerDeleteTxAlert = function(id) {
-      const tx = window.transactions.find(t => t.id === id);
-      if (!tx) return;
-      pendingDeleteTxId = id;
-      document.getElementById('alert-tx-info').innerText = `${tx.category} • ${formatVND(tx.amount)}`;
-      document.getElementById('modal-alert-delete-tx').classList.remove('hidden');
-
-      document.getElementById('btn-confirm-delete-tx').onclick = function() {
-        if (pendingDeleteTxId) {
-          const targetTx = window.transactions.find(t => t.id === pendingDeleteTxId);
-          if (targetTx) {
-            const assetIndex = window.assets.findIndex(a => a.name === targetTx.account);
-            if (assetIndex !== -1) {
-              if (targetTx.type === 'income') {
-                window.assets[assetIndex].value -= targetTx.amount;
-              } else if (targetTx.type === 'expense') {
-                window.assets[assetIndex].value += targetTx.amount;
-              }
-            }
-          }
-
-          window.transactions = window.transactions.filter(t => t.id !== pendingDeleteTxId);
-          pendingDeleteTxId = null;
-          window.renderApp();
-          window.triggerCloudSave();
-          window.closeDeleteTxAlert();
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
         }
-      };
-    }
-    window.closeDeleteTxAlert = function() { document.getElementById('modal-alert-delete-tx').classList.add('hidden'); pendingDeleteTxId = null; }
 
-    window.triggerDeleteAssetAlert = function(id, isLiability) {
-      const item = isLiability ? window.liabilities.find(l => l.id === id) : window.assets.find(a => a.id === id);
-      if (!item) return;
-      pendingDeleteAssetId = id;
-      pendingDeleteAssetIsLiability = isLiability;
-      document.getElementById('alert-asset-info').innerText = `${item.name} - ${formatVND(item.value)}`;
-      document.getElementById('modal-alert-delete-asset').classList.remove('hidden');
-
-      document.getElementById('btn-confirm-delete-asset').onclick = function() {
-        if (pendingDeleteAssetId) {
-          if (pendingDeleteAssetIsLiability) {
-            window.liabilities = window.liabilities.filter(l => l.id !== pendingDeleteAssetId);
-          } else {
-            window.assets = window.assets.filter(a => a.id !== pendingDeleteAssetId);
-          }
-          window.renderApp();
-          window.triggerCloudSave();
-          window.closeDeleteAssetAlert();
-        }
-      };
-    }
-    window.closeDeleteAssetAlert = function() { document.getElementById('modal-alert-delete-asset').classList.add('hidden'); pendingDeleteAssetId = null; }
-
-    window.triggerDeleteBudgetAlert = function(category) {
-      pendingDeleteBudgetCategory = category;
-      document.getElementById('alert-budget-info').innerText = `Danh mục: ${category}`;
-      document.getElementById('modal-alert-delete-budget').classList.remove('hidden');
-
-      document.getElementById('btn-confirm-delete-budget').onclick = function() {
-        if (pendingDeleteBudgetCategory) {
-          window.budgets = window.budgets.filter(b => b.category !== pendingDeleteBudgetCategory);
-          pendingDeleteBudgetCategory = null;
-          window.renderApp();
-          window.triggerCloudSave();
-          window.closeDeleteBudgetAlert();
-        }
-      };
-    }
-    window.closeDeleteBudgetAlert = function() { document.getElementById('modal-alert-delete-budget').classList.add('hidden'); pendingDeleteBudgetCategory = null; }
-  </script>
+        renderWallpapers();
+    </script>
 </body>
 </html>
