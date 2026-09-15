@@ -1,269 +1,310 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<html lang="vi" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallzy Pro - NextGen Wallpaper Studio</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallzy Wallpaper Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
                     colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        },
                         dark: {
-                            950: '#090a0f',
-                            900: '#10121b',
-                            800: '#1a1d2d',
-                            700: '#262a3f'
+                            800: '#1e2028',
+                            900: '#14161f',
+                            950: '#0b0c10',
                         }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
         }
-
-        .scrollbar-none::-webkit-scrollbar {
-            display: none;
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-        .scrollbar-none {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 4px;
         }
-
-        .glass-panel {
-            background: rgba(16, 18, 27, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        @keyframes glow {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(1.06); }
         }
-
-        .glass-card {
-            background: rgba(26, 29, 45, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
-
-        @keyframes float-slow {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
-        }
-        .animate-float {
-            animation: float-slow 4s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        .shimmer-effect {
-            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
+        .animate-glow { animation: glow 4s ease-in-out infinite; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
-<body class="bg-dark-950 text-gray-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white overflow-x-hidden" id="bodyElement">
+<body class="bg-gray-100 text-gray-900 dark:bg-dark-950 dark:text-gray-100 min-h-screen flex items-center justify-center selection:bg-indigo-500 selection:text-white overflow-x-hidden font-sans" id="bodyElement">
 
-    <div id="splashScreen" class="fixed inset-0 bg-dark-950 z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
-        <div class="relative flex items-center justify-center mb-6">
-            <div class="absolute w-32 h-32 bg-indigo-600 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-            <div class="relative glass-card p-6 rounded-3xl shadow-2xl z-10 flex items-center justify-center border-indigo-500/20">
-                <i class="fa-solid fa-wand-magic-sparkles text-indigo-400 text-5xl animate-float"></i>
-            </div>
-        </div>
-        <h1 class="font-extrabold text-3xl tracking-wider bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">WALLZY STUDIO</h1>
-        <p class="text-xs text-gray-400 font-medium tracking-widest uppercase">Next-Generation Wallpapers</p>
-        <div class="flex space-x-1.5 mt-6">
-            <div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
-            <div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.15s;"></div>
-            <div class="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style="animation-delay: 0.3s;"></div>
-        </div>
-    </div>
+    <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[88vh] sm:rounded-[36px] sm:border-[8px] sm:border-gray-300 dark:sm:border-gray-900 shadow-2xl overflow-hidden flex flex-col relative bg-white dark:bg-dark-950 transition-colors duration-300">
 
-    <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 sm:px-6 py-3.5 flex justify-between items-center transition-all">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <i class="fa-solid fa-bolt-lightning text-white text-sm"></i>
-            </div>
-            <div>
-                <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-gray-200 to-indigo-300 bg-clip-text text-transparent">Wallzy</span>
-                <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-bold ml-1.5 border border-indigo-500/30 uppercase">PRO</span>
-            </div>
-        </div>
-        
-        <div class="flex items-center space-x-2">
-            <button onclick="openAiPromptModal()" class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition cursor-pointer active:scale-95 border border-white/10">
-                <i class="fa-solid fa-sparkles text-amber-300"></i>
-                <span class="hidden sm:inline">AI Generator</span>
-            </button>
-            <div class="flex items-center glass-card px-3 py-1.5 rounded-xl space-x-2 border-white/10 text-xs font-medium text-gray-300">
-                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
-                <span class="hidden md:inline">Full HD / 4K</span>
-            </div>
-        </div>
-    </header>
-
-    <nav class="px-4 py-3 max-w-5xl mx-auto w-full flex space-x-2.5 overflow-x-auto scrollbar-none">
-        <button onclick="filterCategory('all')" class="cat-btn bg-indigo-600 text-white px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition shadow-md shadow-indigo-600/30 cursor-pointer border border-indigo-400/30 flex items-center space-x-2">
-            <i class="fa-solid fa-layer-group"></i>
-            <span>Tất cả</span>
-        </button>
-        <button onclick="filterCategory('anime')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
-            <i class="fa-solid fa-wand-magic"></i>
-            <span>Anime & Cyber</span>
-        </button>
-        <button onclick="filterCategory('nature')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
-            <i class="fa-solid fa-tree"></i>
-            <span>Phong cảnh</span>
-        </button>
-        <button onclick="filterCategory('minimal')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
-            <i class="fa-solid fa-cube"></i>
-            <span>Tối giản & 3D</span>
-        </button>
-        <button onclick="filterCategory('ai')" class="cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2">
-            <i class="fa-solid fa-robot text-purple-400"></i>
-            <span>Sáng tạo AI</span>
-        </button>
-    </nav>
-
-    <main class="flex-1 px-4 py-2 max-w-5xl mx-auto w-full mb-12">
-        <div id="wallpaperGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            <!-- Dynamic Grid Items -->
-        </div>
-    </main>
-
-    <div id="aiModal" class="fixed inset-0 bg-dark-950/80 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-card border border-indigo-500/30 p-6 rounded-3xl max-w-md w-full space-y-5 shadow-2xl relative overflow-hidden">
-            <div class="absolute -right-12 -top-12 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
-            <div class="flex justify-between items-center relative z-10">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </div>
-                    <h3 class="font-bold text-base text-white">Tạo Ảnh AI Độc Quyền</h3>
+        <div id="splashScreen" class="absolute inset-0 bg-white dark:bg-dark-950 z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
+            <div class="relative flex items-center justify-center mb-6">
+                <div class="absolute w-28 h-28 bg-indigo-500 rounded-full blur-2xl opacity-20 animate-glow"></div>
+                <div class="relative bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-3xl shadow-xl z-10 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-wand-magic-sparkles text-4xl animate-float"></i>
                 </div>
-                <button onclick="closeAiModal()" class="text-gray-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center glass-card transition cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
+            </div>
+            <h1 class="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent mb-1">WALLZY STUDIO</h1>
+            <p class="text-[11px] text-gray-400 font-semibold tracking-widest uppercase">Mobile Wallpaper Experience</p>
+            <div class="flex space-x-1.5 mt-6">
+                <div class="w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+                <div class="w-2 h-2 bg-purple-600 dark:bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.15s;"></div>
+                <div class="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style="animation-delay: 0.3s;"></div>
+            </div>
+        </div>
+
+        <header id="headerEl" class="sticky top-0 z-40 bg-white dark:bg-dark-900 border-b border-gray-200 dark:border-white/10 px-4 py-3 flex justify-between items-center transition-colors duration-300 flex-shrink-0">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white">
+                    <i class="fa-solid fa-bolt-lightning text-xs"></i>
+                </div>
+                <div>
+                    <span id="headerTitle" class="font-extrabold text-base tracking-tight text-gray-900 dark:text-white">Wallzy</span>
+                    <span class="text-[9px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded font-bold ml-1 border border-indigo-500/20 uppercase">Pro</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleTheme()" class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-dark-800 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-indigo-600 transition cursor-pointer border border-gray-200 dark:border-white/10 shadow-sm" title="Chuyển đổi giao diện">
+                    <i id="themeIcon" class="fa-solid fa-moon text-xs"></i>
+                </button>
+                <button onclick="openAiPromptModal()" class="flex items-center space-x-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/20 transition cursor-pointer active:scale-95">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-xs"></i>
+                    <span>Tạo AI</span>
                 </button>
             </div>
-            <p class="text-xs text-gray-400 relative z-10">Nhập ý tưởng của bạn, AI sẽ vẽ ra bức hình nền độc nhất vô nhị chỉ trong vài giây.</p>
+        </header>
+
+        <nav id="categoryNav" class="px-3 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 border-b border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-dark-900 transition-colors duration-300">
+            <button onclick="filterCategory('all', this)" class="cat-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition shadow-sm shadow-indigo-600/20 cursor-pointer flex items-center space-x-1.5">
+                <i class="fa-solid fa-layer-group text-[10px]"></i>
+                <span>Tất cả</span>
+            </button>
+            <button onclick="filterCategory('anime', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+                <i class="fa-solid fa-wand-magic text-[10px]"></i>
+                <span>Anime</span>
+            </button>
+            <button onclick="filterCategory('nature', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+                <i class="fa-solid fa-tree text-[10px]"></i>
+                <span>Phong cảnh</span>
+            </button>
+            <button onclick="filterCategory('minimal', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+                <i class="fa-solid fa-cube text-[10px]"></i>
+                <span>Tối giản</span>
+            </button>
+            <button onclick="filterCategory('ai', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+                <i class="fa-solid fa-robot text-purple-500 text-[10px]"></i>
+                <span>AI Art</span>
+            </button>
+        </nav>
+
+        <main class="flex-1 px-3 py-3 overflow-y-auto scrollbar-none bg-gray-50 dark:bg-dark-950 transition-colors duration-300">
+            <div id="storageNotice" class="hidden mb-3 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-700 dark:text-amber-300 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                    <span>Danh sách yêu thích được lưu tạm trên trình duyệt của bạn.</span>
+                </div>
+                <button onclick="dismissStorageNotice()" class="text-amber-600 dark:text-amber-400 hover:opacity-80 px-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="wallpaperGrid" class="grid grid-cols-2 gap-3 pb-6">
+                <!-- Dynamic cards populated here -->
+            </div>
+        </main>
+
+        <footer id="footerEl" class="bg-white dark:bg-dark-900 border-t border-gray-200 dark:border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300">
+            <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex flex-col items-center text-indigo-600 dark:text-indigo-400 space-y-0.5 cursor-pointer">
+                <i class="fa-solid fa-compass text-base"></i>
+                <span class="text-[10px] font-bold">Khám phá</span>
+            </button>
+            <button onclick="openAiPromptModal()" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white space-y-0.5 cursor-pointer transition">
+                <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
+                <span class="text-[10px] font-semibold">Tạo AI</span>
+            </button>
+            <button id="navFavBtn" onclick="switchMainTab('favorites', this)" class="flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white space-y-0.5 cursor-pointer transition relative">
+                <i class="fa-solid fa-heart text-base"></i>
+                <span class="text-[10px] font-semibold">Đã thích</span>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- AI Generator Modal -->
+    <div id="aiModal" class="fixed inset-0 bg-gray-950/70 backdrop-blur-md z-[1001] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl relative">
+            <div class="flex justify-between items-center relative z-10">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                    </div>
+                    <h3 class="font-bold text-sm text-gray-900 dark:text-white">AI Wallpaper Generator</h3>
+                </div>
+                <button onclick="closeAiModal()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white w-7 h-7 rounded-full flex items-center justify-center bg-gray-100 dark:bg-dark-800 transition cursor-pointer">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">Nhập mô tả ý tưởng, AI sẽ tạo hình nền chuẩn kích thước màn hình dọc điện thoại.</p>
             
-            <div class="space-y-3 relative z-10">
-                <textarea id="aiPromptInput" rows="3" placeholder="Ví dụ: Một chú mèo phi hành gia ngắm sao trên bề mặt mặt trăng, phong cách Cyberpunk 4k..." class="w-full glass-card p-3.5 rounded-2xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition border border-white/10 resize-none"></textarea>
-                <button onclick="generateAiWallpaper()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-bold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-98">
-                    <i class="fa-solid fa-bolt text-amber-300"></i>
-                    <span class="text-xs uppercase tracking-wider">Khởi Tạo Bằng AI</span>
+            <div class="space-y-3">
+                <textarea id="aiPromptInput" rows="3" placeholder="Ví dụ: Hoàng hôn cyberpunk neon trên thành phố tương lai..." class="w-full bg-gray-50 dark:bg-dark-950 p-3 rounded-xl text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition border border-gray-200 dark:border-white/10 resize-none shadow-inner"></textarea>
+                <button onclick="generateAiWallpaper()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center space-x-2 cursor-pointer active:scale-98">
+                    <i class="fa-solid fa-bolt text-amber-300 text-xs"></i>
+                    <span class="text-[11px] uppercase tracking-wider">Khởi Tạo AI</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="detailModal" class="fixed inset-0 bg-dark-950 z-50 hidden flex flex-col justify-between p-0 overflow-hidden">
+    <!-- Wallpaper Detail Preview Modal (Full Screen Overlay) -->
+    <div id="detailModal" class="fixed inset-0 bg-black z-[1002] hidden flex flex-col justify-between p-0 overflow-hidden">
         <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-black cursor-pointer" onclick="toggleFullScreenFromModal()">
-            <canvas id="imageCanvas" class="w-full h-full object-contain block"></canvas>
-            <div class="absolute inset-0 bg-gradient-to-b from-dark-950/80 via-transparent to-dark-950/90 pointer-events-none"></div>
+            <img id="detailImg" src="" alt="Wallpaper Preview" class="w-full h-full object-contain block">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/70 pointer-events-none"></div>
         </div>
 
-        <div class="relative z-10 flex justify-between items-center p-4 sm:p-6 w-full">
-            <button onclick="closeModal()" class="text-white text-sm p-3 glass-card hover:bg-dark-800 rounded-full w-11 h-11 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
+        <div class="relative z-10 flex justify-between items-center p-4 w-full">
+            <button onclick="closeModal()" class="text-white text-xs p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-xl">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <span id="modalCategory" class="text-[10px] uppercase tracking-widest glass-card text-indigo-300 px-4 py-1.5 rounded-full border border-indigo-500/30 font-bold shadow-lg">Anime</span>
-            <button onclick="toggleFullScreenFromModal()" class="text-white text-sm p-3 glass-card hover:bg-dark-800 rounded-full w-11 h-11 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xem toàn màn hình">
+            <div class="flex items-center space-x-2">
+                <button id="modalFavBtn" onclick="toggleFavoriteCurrent()" class="text-white text-xs p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-xl" title="Yêu thích">
+                    <i id="modalFavIcon" class="fa-regular fa-heart"></i>
+                </button>
+                <span id="modalCategory" class="text-[9px] uppercase tracking-widest bg-black/40 backdrop-blur-md text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/40 font-bold shadow-xl">Anime</span>
+            </div>
+            <button onclick="toggleFullScreenFromModal()" class="text-white text-xs p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-xl" title="Xem toàn màn hình">
                 <i class="fa-solid fa-expand"></i>
             </button>
         </div>
         
-        <div class="relative z-10 flex flex-col space-y-3 p-4 sm:p-6 w-full max-w-md mx-auto">
-            <div class="flex space-x-2 w-full overflow-x-auto py-1 scrollbar-none glass-card p-1.5 rounded-2xl border border-white/10">
-                <button onclick="applyFilter('normal')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-white">Gốc</button>
-                <button onclick="applyFilter('vivid')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-indigo-300">Rực Rỡ</button>
-                <button onclick="applyFilter('warm')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-amber-300">Ấm Áp</button>
-                <button onclick="applyFilter('noir')" class="flex-1 bg-white/10 hover:bg-white/20 text-xs py-2 px-3 rounded-xl whitespace-nowrap font-semibold transition cursor-pointer text-center text-gray-300">Điện Ảnh</button>
-            </div>
-
-            <button onclick="triggerDownloadWithAd()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-bold py-4 rounded-2xl shadow-2xl transition flex items-center justify-center space-x-2.5 cursor-pointer active:scale-95 border border-white/10">
-                <i class="fa-solid fa-cloud-arrow-down text-lg text-amber-300"></i>
-                <span class="text-xs uppercase tracking-wider font-extrabold">Xem QC Mở Khóa Tải Ảnh</span>
+        <div class="relative z-10 flex flex-col space-y-3 p-4 w-full max-w-sm mx-auto">
+            <button onclick="triggerDownloadWithAd()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-bold py-3.5 rounded-2xl shadow-2xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95 border border-white/20">
+                <i class="fa-solid fa-cloud-arrow-down text-base text-amber-300"></i>
+                <span class="text-[11px] uppercase tracking-wider font-extrabold">Xem QC Để Chọn Chất Lượng Tải</span>
             </button>
-            <p class="text-center text-[11px] text-gray-400">Xem quảng cáo 5 giây để lưu ảnh chất lượng gốc 4K.</p>
+            <p class="text-center text-[10px] text-gray-300 drop-shadow">Xem quảng cáo ngắn để mở khóa các tùy chọn tải chất lượng cao.</p>
         </div>
     </div>
 
-    <div id="fullscreenModal" class="fixed inset-0 bg-dark-950 z-[1000] hidden flex flex-col items-center justify-center p-0" onclick="closeFullScreen()">
-        <button class="absolute top-4 right-4 text-white text-base glass-card hover:bg-dark-800 w-11 h-11 rounded-full flex items-center justify-center z-20 transition cursor-pointer border border-white/10 shadow-2xl">
+    <!-- Fullscreen View Modal -->
+    <div id="fullscreenModal" class="fixed inset-0 bg-black z-[1050] hidden flex flex-col items-center justify-center p-0" onclick="closeFullScreen()">
+        <button class="absolute top-4 right-4 text-white text-sm bg-black/50 hover:bg-black/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center z-20 transition cursor-pointer border border-white/20 shadow-2xl">
             <i class="fa-solid fa-compress"></i>
         </button>
         <img id="fullscreenImg" src="" alt="Fullscreen" class="w-full h-full object-contain block">
     </div>
 
-    <div id="adModal" class="fixed inset-0 bg-dark-950/90 backdrop-blur-2xl z-[1050] hidden flex flex-col items-center justify-center p-6 text-center">
-        <div class="glass-card border border-indigo-500/30 p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl">
-            <div class="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto text-indigo-400 text-2xl border border-indigo-500/30 animate-pulse">
+    <!-- Ad Simulated Modal -->
+    <div id="adModal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-xl z-[1100] hidden flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-xs w-full space-y-4 shadow-2xl">
+            <div class="w-14 h-14 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-indigo-500/20 animate-pulse">
                 <i class="fa-solid fa-rectangle-ad"></i>
             </div>
             <div>
-                <h3 class="text-base font-bold text-white">Đang phát nhà tài trợ</h3>
-                <p class="text-xs text-gray-400 mt-1">Vui lòng chờ <span id="countdown" class="text-amber-400 font-extrabold text-sm">5</span> giây để chuẩn bị tải xuống.</p>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Đang phát nhà tài trợ</h3>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Đang chuẩn bị các tùy chọn chất lượng hình ảnh, vui lòng chờ <span id="countdown" class="text-indigo-600 dark:text-amber-400 font-extrabold text-xs">5</span> giây...</p>
             </div>
-            <div class="w-full bg-dark-800 h-2 rounded-full overflow-hidden border border-white/5">
+            <div class="w-full bg-gray-200 dark:bg-dark-800 h-2 rounded-full overflow-hidden border border-gray-300 dark:border-white/5">
                 <div id="adProgress" class="bg-gradient-to-r from-indigo-500 to-pink-500 h-full w-full transition-all duration-1000"></div>
             </div>
         </div>
     </div>
 
-    <div id="successModal" class="fixed inset-0 bg-dark-950/90 backdrop-blur-xl z-[1100] hidden flex flex-col items-center justify-center p-4">
-        <div class="glass-card border border-indigo-500/40 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-[0_0_50px_rgba(99,102,241,0.2)]">
-            <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg text-white text-2xl">
+    <!-- Quality Selection Modal (Appears after Ad) -->
+    <div id="qualityModal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-xl z-[1120] hidden flex flex-col items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-6 rounded-3xl max-w-xs w-full space-y-4 shadow-2xl">
+            <div class="text-center space-y-1">
+                <div class="w-12 h-12 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-lg border border-indigo-500/20 mb-2">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <h3 class="text-sm font-extrabold text-gray-900 dark:text-white">Chọn Chất Lượng Tải Về</h3>
+                <p class="text-[10px] text-gray-500 dark:text-gray-400">Đã mở khóa toàn bộ chất lượng gốc nhờ xem quảng cáo.</p>
+            </div>
+
+            <div class="space-y-2.5 pt-2">
+                <button onclick="executeDownload('hd')" class="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-dark-950 hover:border-indigo-500 border border-gray-200 dark:border-white/10 transition cursor-pointer group">
+                    <div class="text-left">
+                        <div class="text-xs font-bold text-gray-900 dark:text-white group-hover:text-indigo-600">HD Tiêu Chuẩn</div>
+                        <div class="text-[9px] text-gray-500">1080 x 1920 pixels • Nhẹ, nhanh</div>
+                    </div>
+                    <span class="text-xs bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded-lg font-bold">1080P</span>
+                </button>
+
+                <button onclick="executeDownload('2k')" class="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-dark-950 hover:border-indigo-500 border border-gray-200 dark:border-white/10 transition cursor-pointer group">
+                    <div class="text-left">
+                        <div class="text-xs font-bold text-gray-900 dark:text-white group-hover:text-indigo-600">QHD Sắc Nét</div>
+                        <div class="text-[9px] text-gray-500">1440 x 2560 pixels • Cân bằng</div>
+                    </div>
+                    <span class="text-xs bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-lg font-bold">2K</span>
+                </button>
+
+                <button onclick="executeDownload('4k')" class="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md hover:opacity-95 transition cursor-pointer">
+                    <div class="text-left">
+                        <div class="text-xs font-extrabold">Ultra HD Gốc</div>
+                        <div class="text-[9px] text-indigo-100">2160 x 3840 pixels • Siêu nét</div>
+                    </div>
+                    <span class="text-xs bg-white/20 text-white px-2 py-1 rounded-lg font-extrabold">4K</span>
+                </button>
+            </div>
+            
+            <button onclick="closeQualityModal()" class="w-full text-center text-[11px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white pt-2 cursor-pointer">
+                Hủy bỏ
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-gray-950/80 backdrop-blur-xl z-[1150] hidden flex flex-col items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-14 h-14 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg text-white text-xl">
                 <i class="fa-solid fa-check"></i>
             </div>
             <div>
-                <h3 class="text-lg font-extrabold text-white">Tải Xuống Thành Công!</h3>
-                <p class="text-xs text-gray-400 mt-1">Hình nền đã được lưu về thiết bị của bạn.</p>
+                <h3 class="text-base font-extrabold text-gray-900 dark:text-white">Tải Xuống Thành Công!</h3>
+                <p id="successDetailText" class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Hình nền chất lượng cao đã được lưu.</p>
             </div>
-            <button onclick="closeSuccessModal()" class="w-full bg-dark-800 hover:bg-dark-700 text-white font-bold py-3 rounded-xl transition text-xs cursor-pointer border border-white/10 shadow">
+            <button onclick="closeSuccessModal()" class="w-full bg-gray-100 dark:bg-dark-800 hover:bg-gray-200 dark:hover:bg-dark-700 text-gray-900 dark:text-white font-bold py-2.5 rounded-xl transition text-xs cursor-pointer border border-gray-200 dark:border-white/10 shadow">
                 Hoàn tất
             </button>
         </div>
     </div>
 
-    <div id="msgModal" class="fixed inset-0 bg-dark-950/90 backdrop-blur-xl z-[1200] hidden flex flex-col items-center justify-center p-4">
-        <div class="glass-card border border-indigo-500/30 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
-            <div class="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center mx-auto text-xl border border-indigo-500/30">
+    <!-- Message Modal -->
+    <div id="msgModal" class="fixed inset-0 bg-gray-950/80 backdrop-blur-xl z-[1200] hidden flex flex-col items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-10 h-10 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mx-auto text-lg border border-indigo-500/20">
                 <i class="fa-solid fa-circle-exclamation"></i>
             </div>
-            <p id="msgText" class="text-xs text-gray-200 font-medium"></p>
-            <button onclick="closeMsgModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition text-xs cursor-pointer shadow">
+            <p id="msgText" class="text-xs text-gray-700 dark:text-gray-200 font-medium"></p>
+            <button onclick="closeMsgModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl transition text-xs cursor-pointer shadow">
                 Đã hiểu
             </button>
         </div>
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const splashScreen = document.getElementById('splashScreen');
-            const body = document.getElementById('bodyElement');
-            
-            setTimeout(() => {
-                splashScreen.style.opacity = '0';
-                body.classList.remove('overflow-hidden');
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                }, 700);
-            }, 1500);
-        });
-
         const wallpapers = [
             { id: 1, category: 'anime', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1080&auto=format&fit=crop&q=80' },
             { id: 2, category: 'minimal', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1080&auto=format&fit=crop&q=80' },
@@ -276,9 +317,53 @@
         ];
 
         let currentSelectedWallpaper = null;
-        const canvas = document.getElementById('imageCanvas');
-        const ctx = canvas.getContext('2d');
-        let activeImage = new Image();
+        let currentTab = 'explore'; // 'explore' or 'favorites'
+        let currentCategory = 'all';
+
+        // Load favorites from localStorage
+        function getFavorites() {
+            try {
+                const favs = localStorage.getItem('wallzy_favorites');
+                return favs ? JSON.parse(favs) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveFavorites(favs) {
+            try {
+                localStorage.setItem('wallzy_favorites', JSON.stringify(favs));
+            } catch (e) {}
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splashScreen');
+            const body = document.getElementById('bodyElement');
+            
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                body.classList.remove('overflow-hidden');
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 700);
+            }, 1400);
+
+            renderWallpapers();
+        });
+
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            if (htmlEl.classList.contains('light')) {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-xs text-amber-400';
+            } else {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                themeIcon.className = 'fa-solid fa-moon text-xs text-gray-700';
+            }
+        }
 
         function showMessage(text) {
             document.getElementById('msgText').innerText = text;
@@ -289,14 +374,41 @@
             document.getElementById('msgModal').classList.add('hidden');
         }
 
+        function switchMainTab(tab, btnElement) {
+            currentTab = tab;
+            const exploreBtn = document.getElementById('navExploreBtn');
+            const favBtn = document.getElementById('navFavBtn');
+            const catNav = document.getElementById('categoryNav');
+            const storageNotice = document.getElementById('storageNotice');
+
+            exploreBtn.className = "flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white space-y-0.5 cursor-pointer transition";
+            favBtn.className = "flex flex-col items-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white space-y-0.5 cursor-pointer transition relative";
+
+            if (tab === 'explore') {
+                exploreBtn.className = "flex flex-col items-center text-indigo-600 dark:text-indigo-400 space-y-0.5 cursor-pointer";
+                catNav.style.display = 'flex';
+                storageNotice.classList.add('hidden');
+                renderWallpapers(currentCategory);
+            } else if (tab === 'favorites') {
+                favBtn.className = "flex flex-col items-center text-indigo-600 dark:text-indigo-400 space-y-0.5 cursor-pointer";
+                catNav.style.display = 'none';
+                storageNotice.classList.remove('hidden');
+                renderFavorites();
+            }
+        }
+
+        function dismissStorageNotice() {
+            document.getElementById('storageNotice').classList.add('hidden');
+        }
+
         function renderWallpapers(category = 'all') {
+            currentCategory = category;
             const grid = document.getElementById('wallpaperGrid');
             grid.innerHTML = '';
             
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 4; i++) {
                 const skeleton = document.createElement('div');
-                skeleton.className = 'glass-card rounded-2xl aspect-[9/16] animate-pulse flex flex-col justify-end p-3';
-                skeleton.innerHTML = `<div class="h-4 w-16 bg-white/10 rounded-full"></div>`;
+                skeleton.className = 'bg-gray-200 dark:bg-dark-800 rounded-2xl aspect-[9/16] animate-pulse';
                 grid.appendChild(skeleton);
             }
 
@@ -304,26 +416,110 @@
                 grid.innerHTML = '';
                 const filtered = category === 'all' ? wallpapers : wallpapers.filter(w => w.category === category);
 
+                if (filtered.length === 0) {
+                    grid.innerHTML = `<div class="col-span-2 text-center py-10 text-gray-400 text-xs font-medium">Không tìm thấy hình nền phù hợp.</div>`;
+                    return;
+                }
+
+                const favs = getFavorites();
+
                 filtered.forEach(w => {
+                    const isFav = favs.some(f => f.id === w.id);
                     const card = document.createElement('div');
-                    card.className = 'relative group rounded-2xl overflow-hidden glass-card aspect-[9/16] cursor-pointer border border-white/10 hover:border-indigo-500/50 transition-all duration-300 shadow-xl';
-                    card.onclick = () => openModal(w);
+                    card.className = 'relative group rounded-2xl overflow-hidden bg-gray-200 dark:bg-dark-800 aspect-[9/16] cursor-pointer border border-gray-200 dark:border-white/10 hover:border-indigo-500 transition-all duration-300 shadow-sm';
                     card.innerHTML = `
-                        <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-dark-950/80 via-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-3.5">
-                            <span class="text-[10px] font-bold text-white glass-card px-3 py-1 rounded-full uppercase tracking-wider border border-white/10">${w.category}</span>
+                        <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick="openModalById(${w.id})">
+                        <button onclick="event.stopPropagation(); toggleFavorite(${w.id})" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md flex items-center justify-center text-white transition border border-white/20 shadow-md">
+                            <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-xs"></i>
+                        </button>
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-3 pointer-events-none">
+                            <span class="text-[9px] font-bold text-white bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-white/20">${w.category}</span>
                         </div>
                     `;
                     grid.appendChild(card);
                 });
-            }, 400);
+            }, 200);
         }
 
-        function filterCategory(cat) {
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = 'cat-btn glass-card text-gray-400 hover:text-white hover:bg-dark-800 px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-2';
+        function renderFavorites() {
+            const grid = document.getElementById('wallpaperGrid');
+            grid.innerHTML = '';
+            const favs = getFavorites();
+
+            if (favs.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-16 text-gray-400 text-xs font-medium space-y-2">
+                    <i class="fa-regular fa-heart text-2xl text-gray-300 dark:text-gray-600 block"></i>
+                    <span>Chưa có hình nền yêu thích nào.<br>Hãy bấm vào biểu tượng trái tim để lưu lại nhé!</span>
+                </div>`;
+                return;
+            }
+
+            favs.forEach(w => {
+                const card = document.createElement('div');
+                card.className = 'relative group rounded-2xl overflow-hidden bg-gray-200 dark:bg-dark-800 aspect-[9/16] cursor-pointer border border-gray-200 dark:border-white/10 hover:border-indigo-500 transition-all duration-300 shadow-sm';
+                card.innerHTML = `
+                    <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick="openModalById(${w.id})">
+                    <button onclick="event.stopPropagation(); toggleFavorite(${w.id})" class="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md flex items-center justify-center text-white transition border border-white/20 shadow-md">
+                        <i class="fa-solid text-red-500 fa-heart text-xs"></i>
+                    </button>
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-3 pointer-events-none">
+                        <span class="text-[9px] font-bold text-white bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-white/20">${w.category}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
-            event.currentTarget.className = 'cat-btn bg-indigo-600 text-white px-5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition shadow-md shadow-indigo-600/30 cursor-pointer border border-indigo-400/30 flex items-center space-x-2';
+        }
+
+        function toggleFavorite(id) {
+            const wallpaper = wallpapers.find(w => w.id === id);
+            if (!wallpaper) return;
+
+            let favs = getFavorites();
+            const index = favs.findIndex(f => f.id === id);
+
+            if (index > -1) {
+                favs.splice(index, 1);
+            } else {
+                favs.push(wallpaper);
+            }
+
+            saveFavorites(favs);
+
+            if (currentTab === 'explore') {
+                renderWallpapers(currentCategory);
+            } else {
+                renderFavorites();
+            }
+
+            if (currentSelectedWallpaper && currentSelectedWallpaper.id === id) {
+                updateModalFavState();
+            }
+        }
+
+        function toggleFavoriteCurrent() {
+            if (!currentSelectedWallpaper) return;
+            toggleFavorite(currentSelectedWallpaper.id);
+        }
+
+        function updateModalFavState() {
+            if (!currentSelectedWallpaper) return;
+            const favs = getFavorites();
+            const isFav = favs.some(f => f.id === currentSelectedWallpaper.id);
+            const favIcon = document.getElementById('modalFavIcon');
+            if (isFav) {
+                favIcon.className = "fa-solid text-red-500 fa-heart";
+            } else {
+                favIcon.className = "fa-regular text-white fa-heart";
+            }
+        }
+
+        function filterCategory(cat, btnElement) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = 'cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10';
+            });
+            if (btnElement) {
+                btnElement.className = 'cat-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition shadow-sm shadow-indigo-600/20 cursor-pointer flex items-center space-x-1.5';
+            }
             renderWallpapers(cat);
         }
 
@@ -336,74 +532,54 @@
         }
 
         function generateAiWallpaper() {
-            const prompt = document.getElementById('aiPromptInput').value.trim();
+            const promptInput = document.getElementById('aiPromptInput');
+            const prompt = promptInput.value.trim();
             if (!prompt) {
                 showMessage('Vui lòng nhập mô tả ý tưởng hình nền!');
                 return;
             }
             closeAiModal();
+            promptInput.value = '';
             
             const aiId = wallpapers.length + 1;
-            const newAiWallpaper = {
-                id: aiId,
-                category: 'ai',
-                url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&auto=format&fit=crop&q=80'
-            };
-            wallpapers.unshift(newAiWallpaper);
-            renderWallpapers('all');
+            const aiImages = [
+                'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=1080&auto=format&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1080&auto=format&fit=crop&q=80'
+            ];
+            const randomAiUrl = aiImages[Math.floor(Math.random() * aiImages.length)];
+
+            const newWallpaper = { id: aiId, category: 'ai', url: randomAiUrl };
+            wallpapers.unshift(newWallpaper);
+            
+            if (currentTab === 'explore') {
+                renderWallpapers('ai');
+            }
+            showMessage('Tạo hình nền AI thành công!');
+        }
+
+        function openModalById(id) {
+            const wallpaper = wallpapers.find(w => w.id === id);
+            if (wallpaper) {
+                openModal(wallpaper);
+            }
         }
 
         function openModal(wallpaper) {
             currentSelectedWallpaper = wallpaper;
             document.getElementById('modalCategory').innerText = wallpaper.category;
+            document.getElementById('detailImg').src = wallpaper.url;
+            updateModalFavState();
             document.getElementById('detailModal').classList.remove('hidden');
-
-            activeImage.crossOrigin = "anonymous";
-            activeImage.src = wallpaper.url;
-            activeImage.onload = function() {
-                drawImageToCanvas('normal');
-            };
         }
 
         function closeModal() {
             document.getElementById('detailModal').classList.add('hidden');
         }
 
-        function drawImageToCanvas(filterType) {
-            canvas.width = 1080;
-            canvas.height = 1920;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            let hRatio = canvas.width / activeImage.width;
-            let vRatio = canvas.height / activeImage.height;
-            let ratio = Math.max(hRatio, vRatio);
-            
-            let centerShiftX = (canvas.width - activeImage.width * ratio) / 2;
-            let centerShiftY = (canvas.height - activeImage.height * ratio) / 2;
-
-            if (filterType === 'vivid') {
-                ctx.filter = 'contrast(1.25) saturate(1.3) brightness(1.05)';
-            } else if (filterType === 'warm') {
-                ctx.filter = 'sepia(0.3) contrast(1.1) brightness(1.05)';
-            } else if (filterType === 'noir') {
-                ctx.filter = 'grayscale(1) contrast(1.3)';
-            } else {
-                ctx.filter = 'none';
-            }
-
-            ctx.drawImage(activeImage, 0, 0, activeImage.width, activeImage.height,
-                          centerShiftX, centerShiftY, activeImage.width * ratio, activeImage.height * ratio);
-            ctx.filter = 'none';
-        }
-
-        function applyFilter(type) {
-            drawImageToCanvas(type);
-        }
-
         function toggleFullScreenFromModal() {
             const fullscreenModal = document.getElementById('fullscreenModal');
-            const fullscreenImg = document.getElementById('fullscreenImg');
-            fullscreenImg.src = canvas.toDataURL('image/jpeg', 0.98);
+            document.getElementById('fullscreenImg').src = currentSelectedWallpaper.url;
             fullscreenModal.classList.remove('hidden');
         }
 
@@ -426,39 +602,60 @@
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     adModal.classList.add('hidden');
-                    executeDownload();
+                    document.getElementById('qualityModal').classList.remove('hidden');
                 }
             }, 1000);
         }
 
-        async function executeDownload() {
+        function closeQualityModal() {
+            document.getElementById('qualityModal').classList.add('hidden');
+        }
+
+        async function executeDownload(quality) {
+            closeQualityModal();
             if (!currentSelectedWallpaper) return;
             
+            let downloadUrl = currentSelectedWallpaper.url;
+            let resolutionTag = '1080P HD';
+
+            if (downloadUrl.includes('unsplash.com')) {
+                if (quality === 'hd') {
+                    downloadUrl = downloadUrl.replace(/w=\d+/, 'w=1080').replace(/q=\d+/, 'q=85');
+                    resolutionTag = '1080P HD (1080x1920)';
+                } else if (quality === '2k') {
+                    downloadUrl = downloadUrl.replace(/w=\d+/, 'w=1440').replace(/q=\d+/, 'q=95');
+                    resolutionTag = '2K QHD (1440x2560)';
+                } else if (quality === '4k') {
+                    downloadUrl = downloadUrl.replace(/w=\d+/, 'w=3840').replace(/q=\d+/, 'q=100');
+                    resolutionTag = '4K Ultra HD (2160x3840)';
+                }
+            }
+
             try {
-                // Tải trực tiếp bằng fetch blob để tránh lỗi CORS canvas taint trên trình duyệt di động hoặc iframe
-                const response = await fetch(currentSelectedWallpaper.url);
+                const response = await fetch(downloadUrl, { mode: 'cors' });
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = `wallzy-pro-${currentSelectedWallpaper.id}.jpg`;
+                link.download = `wallzy-${quality}-${currentSelectedWallpaper.id}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
 
+                document.getElementById('successDetailText').innerText = `Đã lưu ảnh chất lượng ${resolutionTag} về thiết bị của bạn.`;
                 document.getElementById('successModal').classList.remove('hidden');
             } catch (error) {
-                // Fallback nếu fetch bị chặn bởi CORS strict
                 const link = document.createElement('a');
-                link.href = currentSelectedWallpaper.url;
+                link.href = downloadUrl;
                 link.target = '_blank';
-                link.download = `wallzy-pro-${currentSelectedWallpaper.id}.jpg`;
+                link.download = `wallzy-${quality}-${currentSelectedWallpaper.id}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
+                document.getElementById('successDetailText').innerText = `Đã mở ảnh chất lượng ${resolutionTag} ở tab mới.`;
                 document.getElementById('successModal').classList.remove('hidden');
             }
         }
@@ -466,12 +663,6 @@
         function closeSuccessModal() {
             document.getElementById('successModal').classList.add('hidden');
         }
-
-        renderWallpapers();
     </script>
 </body>
 </html>
-```
-eof
-
-I have updated the application to use a direct blob fetch download method (`fetch` + `blob`) with a secure fallback link open mechanism, which resolves download restrictions in sandboxed or cross-origin iframe environments.
