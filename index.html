@@ -2,6 +2,7 @@
 <html lang="vi" class="light">
 <head>
     <meta charset="UTF-8">
+    <!-- KHÓA HOÀN TOÀN PHÓNG TO THU NHỎ (ZOOM) TRÊN DI ĐỘNG -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wallzy Wallpaper Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -58,8 +59,44 @@
 </head>
 <body class="bg-gray-100 text-gray-900 dark:bg-dark-950 dark:text-gray-100 min-h-screen flex items-center justify-center selection:bg-indigo-500 selection:text-white overflow-x-hidden font-sans" id="bodyElement">
 
+    <!-- MÀN HÌNH KHÓA TOÀN MÀN HÌNH (NỀN ĐẶC HOÀN TOÀN, KHÔNG TRONG SUỐT) -->
+    <div id="pwaLockScreen" class="fixed inset-0 bg-[#0b0c10] z-[9999] flex flex-col items-center justify-center p-6 text-center transition-all duration-500">
+        <div class="relative flex items-center justify-center mb-6">
+            <div class="absolute w-36 h-36 bg-indigo-500 rounded-full blur-3xl opacity-30 animate-glow"></div>
+            <div class="relative bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-3xl shadow-2xl z-10 flex items-center justify-center text-white border border-white/20">
+                <i class="fa-solid fa-mobile-screen-button text-4xl animate-float"></i>
+            </div>
+        </div>
+        
+        <h2 class="text-xl font-extrabold text-white tracking-tight mb-2">Yêu Cầu Thêm Ra Màn Hình Chính</h2>
+        <p class="text-xs text-gray-300 max-w-xs leading-relaxed mb-6">
+            Ứng dụng <b>Wallzy Studio</b> chỉ hoạt động khi được cài đặt lên màn hình chính. Vui lòng thực hiện theo hướng dẫn bên dưới để tiếp tục!
+        </p>
+
+        <div class="bg-[#14161f] border border-white/10 p-4 rounded-2xl max-w-xs w-full text-left space-y-3 mb-6 shadow-xl">
+            <div class="flex items-start space-x-3">
+                <div class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</div>
+                <p class="text-[11px] text-gray-200">Nhấn vào biểu tượng <b>Chia sẻ (Share)</b> hoặc <b>Menu (3 chấm)</b> trên trình duyệt của bạn.</p>
+            </div>
+            <div class="flex items-start space-x-3">
+                <div class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
+                <p class="text-[11px] text-gray-200">Chọn mục <b>"Thêm vào Màn hình chính"</b> (Add to Home Screen).</p>
+            </div>
+            <div class="flex items-start space-x-3">
+                <div class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</div>
+                <p class="text-[11px] text-gray-200">Mở ứng dụng từ màn hình chính để bắt đầu trải nghiệm.</p>
+            </div>
+        </div>
+
+        <div class="text-[11px] text-indigo-400 font-medium">
+            <i class="fa-solid fa-lock mr-1"></i> Bắt buộc cài đặt để truy cập ứng dụng
+        </div>
+    </div>
+
+    <!-- KHUNG ỨNG DỤNG DI ĐỘNG -->
     <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[88vh] sm:rounded-[36px] sm:border-[8px] sm:border-gray-300 dark:sm:border-gray-900 shadow-2xl overflow-hidden flex flex-col relative bg-white dark:bg-dark-950 transition-colors duration-300">
 
+        <!-- MÀN HÌNH CHÀO (SPLASH SCREEN) -->
         <div id="splashScreen" class="absolute inset-0 bg-white dark:bg-dark-950 z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-in-out">
             <div class="relative flex items-center justify-center mb-6">
                 <div class="absolute w-28 h-28 bg-indigo-500 rounded-full blur-2xl opacity-20 animate-glow"></div>
@@ -76,6 +113,7 @@
             </div>
         </div>
 
+        <!-- HEADER ĐỒNG BỘ MÀU SẮC SÁNG/TỐI -->
         <header id="headerEl" class="sticky top-0 z-40 bg-white dark:bg-dark-900 border-b border-gray-200 dark:border-white/10 px-4 py-3 flex justify-between items-center transition-colors duration-300 flex-shrink-0">
             <div class="flex items-center space-x-2.5">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white">
@@ -98,42 +136,46 @@
             </div>
         </header>
 
-        <nav id="categoryNav" class="px-3 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 border-b border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-dark-900 transition-colors duration-300">
+        <!-- THANH DANH MỤC -->
+        <nav id="categoryNav" class="px-3 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 border-b border-gray-200 dark:border-white/5 bg-white dark:bg-dark-900 transition-colors duration-300">
             <button onclick="filterCategory('all', this)" class="cat-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition shadow-sm shadow-indigo-600/20 cursor-pointer flex items-center space-x-1.5">
                 <i class="fa-solid fa-layer-group text-[10px]"></i>
                 <span>Tất cả</span>
             </button>
-            <button onclick="filterCategory('anime', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+            <button onclick="filterCategory('anime', this)" class="cat-btn bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
                 <i class="fa-solid fa-wand-magic text-[10px]"></i>
                 <span>Anime</span>
             </button>
-            <button onclick="filterCategory('nature', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+            <button onclick="filterCategory('nature', this)" class="cat-btn bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
                 <i class="fa-solid fa-tree text-[10px]"></i>
                 <span>Phong cảnh</span>
             </button>
-            <button onclick="filterCategory('minimal', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+            <button onclick="filterCategory('minimal', this)" class="cat-btn bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
                 <i class="fa-solid fa-cube text-[10px]"></i>
                 <span>Tối giản</span>
             </button>
-            <button onclick="filterCategory('ai', this)" class="cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
+            <button onclick="filterCategory('ai', this)" class="cat-btn bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10">
                 <i class="fa-solid fa-robot text-purple-500 text-[10px]"></i>
                 <span>AI Art</span>
             </button>
         </nav>
 
+        <!-- KHU VỰC HIỂN THỊ NỘI DUNG CHÍNH -->
         <main class="flex-1 px-3 py-3 overflow-y-auto scrollbar-none bg-gray-50 dark:bg-dark-950 transition-colors duration-300">
             <div id="storageNotice" class="hidden mb-3 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-700 dark:text-amber-300 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
                     <span>Danh sách yêu thích được lưu tạm trên trình duyệt của bạn.</span>
                 </div>
-                <button onclick="dismissStorageNotice()" class="text-amber-600 dark:text-amber-400 hover:opacity-80 px-1"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="dismissStorageNotice()" class="text-amber-600 dark:text-amber-400 hover:opacity-80 px-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            
             <div id="wallpaperGrid" class="grid grid-cols-2 gap-3 pb-6">
-                <!-- Dynamic cards populated here -->
+                <!-- Các thẻ hình nền sẽ được render bằng JavaScript -->
             </div>
         </main>
 
+        <!-- FOOTER ĐỒNG BỘ MÀU SẮC SÁNG/TỐI -->
         <footer id="footerEl" class="bg-white dark:bg-dark-900 border-t border-gray-200 dark:border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300">
             <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex flex-col items-center text-indigo-600 dark:text-indigo-400 space-y-0.5 cursor-pointer">
                 <i class="fa-solid fa-compass text-base"></i>
@@ -151,7 +193,7 @@
 
     </div>
 
-    <!-- AI Generator Modal -->
+    <!-- MODAL TẠO AI -->
     <div id="aiModal" class="fixed inset-0 bg-gray-950/70 backdrop-blur-md z-[1001] hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl relative">
             <div class="flex justify-between items-center relative z-10">
@@ -177,7 +219,7 @@
         </div>
     </div>
 
-    <!-- Wallpaper Detail Preview Modal (Full Screen Overlay) -->
+    <!-- MODAL XEM CHI TIẾT ẢNH -->
     <div id="detailModal" class="fixed inset-0 bg-black z-[1002] hidden flex flex-col justify-between p-0 overflow-hidden">
         <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-black cursor-pointer" onclick="toggleFullScreenFromModal()">
             <img id="detailImg" src="" alt="Wallpaper Preview" class="w-full h-full object-contain block">
@@ -208,7 +250,7 @@
         </div>
     </div>
 
-    <!-- Fullscreen View Modal -->
+    <!-- MODAL TOÀN MÀN HÌNH -->
     <div id="fullscreenModal" class="fixed inset-0 bg-black z-[1050] hidden flex flex-col items-center justify-center p-0" onclick="closeFullScreen()">
         <button class="absolute top-4 right-4 text-white text-sm bg-black/50 hover:bg-black/80 backdrop-blur-md w-10 h-10 rounded-full flex items-center justify-center z-20 transition cursor-pointer border border-white/20 shadow-2xl">
             <i class="fa-solid fa-compress"></i>
@@ -216,7 +258,7 @@
         <img id="fullscreenImg" src="" alt="Fullscreen" class="w-full h-full object-contain block">
     </div>
 
-    <!-- Ad Simulated Modal -->
+    <!-- MODAL QUẢNG CÁO -->
     <div id="adModal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-xl z-[1100] hidden flex flex-col items-center justify-center p-6 text-center">
         <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-xs w-full space-y-4 shadow-2xl">
             <div class="w-14 h-14 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto text-xl border border-indigo-500/20 animate-pulse">
@@ -232,7 +274,7 @@
         </div>
     </div>
 
-    <!-- Quality Selection Modal (Appears after Ad) -->
+    <!-- MODAL CHỌN CHẤT LƯỢNG ẢNH SAU QUẢNG CÁO -->
     <div id="qualityModal" class="fixed inset-0 bg-gray-950/85 backdrop-blur-xl z-[1120] hidden flex flex-col items-center justify-center p-4">
         <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-6 rounded-3xl max-w-xs w-full space-y-4 shadow-2xl">
             <div class="text-center space-y-1">
@@ -275,7 +317,7 @@
         </div>
     </div>
 
-    <!-- Success Modal -->
+    <!-- MODAL THÀNH CÔNG -->
     <div id="successModal" class="fixed inset-0 bg-gray-950/80 backdrop-blur-xl z-[1150] hidden flex flex-col items-center justify-center p-4">
         <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <div class="w-14 h-14 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg text-white text-xl">
@@ -291,7 +333,7 @@
         </div>
     </div>
 
-    <!-- Message Modal -->
+    <!-- MODAL THÔNG BÁO CHUNG -->
     <div id="msgModal" class="fixed inset-0 bg-gray-950/80 backdrop-blur-xl z-[1200] hidden flex flex-col items-center justify-center p-4">
         <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-white/10 p-5 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <div class="w-10 h-10 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mx-auto text-lg border border-indigo-500/20">
@@ -304,6 +346,7 @@
         </div>
     </div>
 
+    <!-- MÃ JAVASCRIPT XỬ LÝ ỨNG DỤNG -->
     <script>
         const wallpapers = [
             { id: 1, category: 'anime', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1080&auto=format&fit=crop&q=80' },
@@ -317,10 +360,24 @@
         ];
 
         let currentSelectedWallpaper = null;
-        let currentTab = 'explore'; // 'explore' or 'favorites'
+        let currentTab = 'explore';
         let currentCategory = 'all';
 
-        // Load favorites from localStorage
+        // Kiểm tra chế độ Standalone (Bắt buộc phải thêm ra màn hình chính)
+        function checkPwaLockState() {
+            const lockScreen = document.getElementById('pwaLockScreen');
+            const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+            if (isInStandaloneMode) {
+                lockScreen.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { lockScreen.style.display = 'none'; }, 500);
+            } else {
+                lockScreen.classList.remove('opacity-0', 'pointer-events-none');
+                lockScreen.style.display = 'flex';
+            }
+        }
+
+        // Lấy danh sách yêu thích từ localStorage
         function getFavorites() {
             try {
                 const favs = localStorage.getItem('wallzy_favorites');
@@ -337,6 +394,8 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            checkPwaLockState();
+
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
             
@@ -515,7 +574,7 @@
 
         function filterCategory(cat, btnElement) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = 'cat-btn bg-white dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10';
+                btn.className = 'cat-btn bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center space-x-1.5 border border-gray-200 dark:border-white/10';
             });
             if (btnElement) {
                 btnElement.className = 'cat-btn bg-indigo-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition shadow-sm shadow-indigo-600/20 cursor-pointer flex items-center space-x-1.5';
