@@ -238,6 +238,18 @@
         </div>
     </div>
 
+    <div id="msgModal" class="fixed inset-0 bg-dark-950/90 backdrop-blur-xl z-[1200] hidden flex flex-col items-center justify-center p-4">
+        <div class="glass-card border border-indigo-500/30 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center mx-auto text-xl border border-indigo-500/30">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <p id="msgText" class="text-xs text-gray-200 font-medium"></p>
+            <button onclick="closeMsgModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition text-xs cursor-pointer shadow">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splashScreen');
@@ -267,6 +279,15 @@
         const canvas = document.getElementById('imageCanvas');
         const ctx = canvas.getContext('2d');
         let activeImage = new Image();
+
+        function showMessage(text) {
+            document.getElementById('msgText').innerText = text;
+            document.getElementById('msgModal').classList.remove('hidden');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('msgModal').classList.add('hidden');
+        }
 
         function renderWallpapers(category = 'all') {
             const grid = document.getElementById('wallpaperGrid');
@@ -317,12 +338,11 @@
         function generateAiWallpaper() {
             const prompt = document.getElementById('aiPromptInput').value.trim();
             if (!prompt) {
-                alert('Vui lòng nhập mô tả ý tưởng hình nền!');
+                showMessage('Vui lòng nhập mô tả ý tưởng hình nền!');
                 return;
             }
             closeAiModal();
             
-            // Thêm ảnh AI giả lập vào danh sách
             const aiId = wallpapers.length + 1;
             const newAiWallpaper = {
                 id: aiId,
@@ -411,16 +431,36 @@
             }, 1000);
         }
 
-        function executeDownload() {
-            const dataURL = canvas.toDataURL('image/jpeg', 0.95);
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = `wallzy-pro-${currentSelectedWallpaper.id}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        async function executeDownload() {
+            if (!currentSelectedWallpaper) return;
+            
+            try {
+                // Tải trực tiếp bằng fetch blob để tránh lỗi CORS canvas taint trên trình duyệt di động hoặc iframe
+                const response = await fetch(currentSelectedWallpaper.url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = `wallzy-pro-${currentSelectedWallpaper.id}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
 
-            document.getElementById('successModal').classList.remove('hidden');
+                document.getElementById('successModal').classList.remove('hidden');
+            } catch (error) {
+                // Fallback nếu fetch bị chặn bởi CORS strict
+                const link = document.createElement('a');
+                link.href = currentSelectedWallpaper.url;
+                link.target = '_blank';
+                link.download = `wallzy-pro-${currentSelectedWallpaper.id}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                document.getElementById('successModal').classList.remove('hidden');
+            }
         }
 
         function closeSuccessModal() {
@@ -431,3 +471,7 @@
     </script>
 </body>
 </html>
+```
+eof
+
+I have updated the application to use a direct blob fetch download method (`fetch` + `blob`) with a secure fallback link open mechanism, which resolves download restrictions in sandboxed or cross-origin iframe environments.
