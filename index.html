@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallzy - Minimalist Wallpaper Studio</title>
+    <title>Wallzy Studio - Minimalist Wallpaper Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,41 +21,27 @@
             from { opacity: 0; transform: scale(0.98); }
             to { opacity: 1; transform: scale(1); }
         }
-        .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     </style>
 </head>
-<body id="bodyElement" class="min-h-screen flex flex-col selection:bg-white selection:text-black">
+<body class="min-h-screen flex flex-col selection:bg-white selection:text-black">
 
     <header class="sticky top-0 z-40 bg-[#0b0b0e]/90 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 flex justify-between items-center">
         <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchTab('explore')">
             <div class="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center font-bold text-sm shadow-md">W</div>
-            <span class="font-bold text-sm tracking-tight text-white">Wallzy</span>
+            <span class="font-bold text-sm tracking-tight text-white">Wallzy Studio</span>
         </div>
         
         <div class="flex items-center space-x-2">
-            <!-- Nút Cài đặt Firebase Config -->
-            <button onclick="openConfigModal()" class="w-9 h-9 rounded-xl bg-[#16161a] hover:bg-[#222228] text-amber-400 flex items-center justify-center border border-white/10 transition cursor-pointer" title="Cấu hình Firebase">
-                <i class="fa-solid fa-gear text-xs"></i>
-            </button>
-
-            <!-- Trạng thái đăng nhập -->
             <div id="authContainer">
-                <button onclick="handleGoogleLogin()" class="bg-white hover:bg-gray-100 text-gray-900 text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-2 shadow-md transition cursor-pointer active:scale-95">
-                    <i class="fa-brands fa-google text-red-500"></i>
+                <button onclick="handleGoogleLogin()" class="bg-white hover:bg-gray-100 text-gray-900 text-xs font-semibold px-3 py-2 rounded-xl flex items-center space-x-1.5 shadow-md transition cursor-pointer active:scale-95">
+                    <i class="fa-brands fa-google text-xs"></i>
                     <span>Đăng nhập</span>
                 </button>
             </div>
-
-            <div id="userProfileBadge" class="hidden items-center space-x-2 bg-[#16161a] border border-white/10 px-3 py-1.5 rounded-xl">
-                <img id="userAvatar" src="" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-white/20">
-                <span id="userNameDisplay" class="text-xs text-white font-medium max-w-[80px] truncate">User</span>
-                <button onclick="handleLogout()" class="text-gray-400 hover:text-red-400 text-xs ml-1 transition cursor-pointer" title="Đăng xuất">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
-            </div>
-
-            <button onclick="switchTab('admin')" class="w-9 h-9 rounded-xl bg-[#16161a] hover:bg-[#222228] text-gray-300 hover:text-white flex items-center justify-center border border-white/10 transition cursor-pointer" title="Đăng ảnh lên Database">
+            <button onclick="switchTab('admin')" class="bg-[#16161a] hover:bg-[#222228] text-white text-xs font-semibold px-3.5 py-2 rounded-xl border border-white/10 flex items-center space-x-2 shadow-md transition cursor-pointer active:scale-95">
                 <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+                <span>Đăng ảnh</span>
             </button>
         </div>
     </header>
@@ -66,7 +52,7 @@
         <section id="exploreTab" class="space-y-4">
             <div class="relative w-full">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
-                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm hình nền từ Database..." class="w-full bg-[#121216] border border-white/10 text-white text-xs rounded-2xl pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition placeholder-gray-500 shadow-inner">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm hình nền..." class="w-full bg-[#121216] border border-white/10 text-white text-xs rounded-2xl pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition placeholder-gray-500 shadow-inner">
             </div>
 
             <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-none">
@@ -76,15 +62,14 @@
                 <button onclick="filterCategory('scenery')" id="cat-scenery" class="category-btn bg-[#16161a] hover:bg-[#222228] text-gray-300 text-xs font-semibold px-4 py-2 rounded-xl border border-white/10 transition cursor-pointer whitespace-nowrap">Phong cảnh</button>
             </div>
 
-            <!-- Lưới hình nền (100% dữ liệu thực tế, không có ảnh mẫu tĩnh) -->
             <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
 
         <!-- Tab Yêu thích -->
         <section id="favoritesTab" class="space-y-4 hidden">
             <div class="space-y-1">
-                <h2 class="text-sm font-bold text-white tracking-wide">Bộ sưu tập yêu thích</h2>
-                <p class="text-xs text-gray-400">Các hình nền bạn đã lưu.</p>
+                <h2 class="text-sm font-bold text-white tracking-wide">Yêu thích</h2>
+                <p class="text-xs text-gray-400">Hình nền bạn đã lưu.</p>
             </div>
             <div id="favoritesGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
@@ -93,7 +78,7 @@
         <section id="gradientTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Gradient Studio</h2>
-                <p class="text-xs text-gray-400">Tạo gradient và đẩy lên Database chung.</p>
+                <p class="text-xs text-gray-400">Tạo gradient và thêm vào bộ sưu tập.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl">
@@ -116,28 +101,23 @@
                     </div>
                 </div>
 
-                <button onclick="saveCustomGradientToCloud()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl text-xs transition shadow-md cursor-pointer flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-                    <span>Đẩy Gradient lên Database</span>
+                <button onclick="saveCustomGradient()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl text-xs transition shadow-md cursor-pointer flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Thêm Gradient vào Kho</span>
                 </button>
             </div>
         </section>
 
-        <!-- Tab Quản trị / Tải ảnh lên -->
+        <!-- Tab Tải ảnh lên -->
         <section id="adminTab" class="space-y-4 hidden">
             <div class="space-y-1">
-                <h2 class="text-sm font-bold text-white tracking-wide">Đăng Ảnh Lên Database</h2>
-                <p class="text-xs text-gray-400">Tải ảnh từ thiết bị lưu vào Database chung.</p>
+                <h2 class="text-sm font-bold text-white tracking-wide">Đăng Ảnh Mới</h2>
+                <p class="text-xs text-gray-400">Tải ảnh lên Database chung.</p>
             </div>
 
-            <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl relative">
-                <div id="uploadLoadingOverlay" class="absolute inset-0 bg-black/80 backdrop-blur-sm rounded-2xl z-10 hidden flex flex-col items-center justify-center space-y-3">
-                    <div class="w-9 h-9 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    <span class="text-xs text-white font-medium" id="uploadLoadingText">Đang tải ảnh lên Database...</span>
-                </div>
-
+            <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl">
                 <div class="space-y-1">
-                    <label class="text-[11px] text-gray-400 font-medium">Chọn danh mục</label>
+                    <label class="text-[11px] text-gray-400 font-medium">Danh mục</label>
                     <select id="uploadCategory" class="w-full bg-[#16161a] border border-white/10 text-white text-xs rounded-xl p-3 focus:outline-none">
                         <option value="gradient">Gradient</option>
                         <option value="anime">Anime</option>
@@ -146,13 +126,13 @@
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-[11px] text-gray-400 font-medium">Chọn tệp ảnh</label>
+                    <label class="text-[11px] text-gray-400 font-medium">Tệp ảnh</label>
                     <input type="file" id="imageFileInput" accept="image/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#16161a] file:text-white cursor-pointer border border-white/10 rounded-xl p-2 bg-[#16161a]">
                 </div>
 
-                <button onclick="uploadImageToCloudDatabase()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl text-xs transition shadow-md cursor-pointer flex items-center justify-center space-x-2">
+                <button onclick="uploadImageToCloud()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl text-xs transition shadow-md cursor-pointer flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-                    <span>Tải lên Database ngay</span>
+                    <span>Tải lên Database chung</span>
                 </button>
             </div>
         </section>
@@ -174,38 +154,15 @@
         </button>
     </nav>
 
-    <!-- Modal Cấu hình Firebase -->
-    <div id="configModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[2000] hidden flex items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[#121216] border border-white/10 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center">
-                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Cấu hình Firebase</h3>
-                <button onclick="closeConfigModal()" class="text-gray-400 hover:text-white text-xs"><i class="fa-solid fa-xmark text-base"></i></button>
-            </div>
-            <p class="text-[11px] text-gray-400">Dán đoạn mã Firebase Config của bạn (nếu có) để kết nối Database riêng:</p>
-            <textarea id="firebaseConfigInput" rows="6" class="w-full bg-[#16161a] border border-white/10 text-white text-xs font-mono rounded-xl p-3 focus:outline-none focus:border-white/30" placeholder='{
-  "apiKey": "AIza...",
-  "authDomain": "...",
-  "projectId": "...",
-  "storageBucket": "...",
-  "messagingSenderId": "...",
-  "appId": "..."
-}'></textarea>
-            <div class="flex space-x-2">
-                <button onclick="saveFirebaseConfig()" class="flex-1 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-2.5 rounded-xl text-xs transition cursor-pointer">Lưu & Kết nối</button>
-                <button onclick="closeConfigModal()" class="bg-[#16161a] hover:bg-[#222228] text-gray-300 font-semibold px-4 py-2.5 rounded-xl text-xs transition cursor-pointer border border-white/10">Hủy</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Chi tiết ảnh -->
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
         <div class="flex justify-between items-center relative z-10">
             <button onclick="closeModal()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <span class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10" id="modalCategory">Database</span>
+            <span class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10" id="modalCategory">Wallpaper</span>
             <div class="flex items-center space-x-2">
-                <button id="modalDeleteBtn" onclick="deleteCurrentDatabaseImage()" class="text-red-400 text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xóa ảnh">
+                <button onclick="deleteCurrentImage()" class="text-red-400 text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xóa ảnh">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
                 <button onclick="toggleFavoriteCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
@@ -219,7 +176,7 @@
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-5 w-full max-w-sm mx-auto">
-            <button onclick="executeActualDownload()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
+            <button onclick="downloadCurrentImage()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
                 <i class="fa-solid fa-download text-xs"></i>
                 <span class="text-[11px] uppercase tracking-wider font-semibold">Tải ảnh về máy</span>
             </button>
@@ -233,154 +190,106 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, setDoc, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-v7';
-        let customConfig = localStorage.getItem('wallzy_custom_firebase_config_v7');
-        let firebaseConfig = customConfig ? JSON.parse(customConfig) : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-studio-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "mock-api-key",
+            authDomain: "mock-app.firebaseapp.com",
+            projectId: "mock-project"
+        };
 
         let app, db, auth;
         let currentUser = null;
-        let databaseWallpapers = JSON.parse(localStorage.getItem('wallzy_cache_wallpapers_v7') || '[]');
-        let favorites = JSON.parse(localStorage.getItem('wallzy_cache_favorites_v7') || '[]');
+        let wallpapers = [];
+        let favorites = JSON.parse(localStorage.getItem('wallzy_favorites_v3') || '[]');
         let currentCategory = 'all';
         let searchQuery = '';
         let currentSelectedWallpaper = null;
 
-        function initFirebase() {
-            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'mock') {
-                console.log("Chưa có cấu hình Firebase thật. Chạy ở chế độ bộ nhớ cục bộ.");
-                updateWallpapersList();
-                return;
-            }
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
 
-                onAuthStateChanged(auth, (user) => {
-                    currentUser = user;
-                    updateAuthUI(user);
+            const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+            if (token) {
+                signInWithCustomToken(auth, token).catch(() => signInAnonymously(auth));
+            } else {
+                signInAnonymously(auth).catch(() => {});
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                updateAuthUI();
+            });
+
+            // Lắng nghe dữ liệu thời gian thực từ Firestore
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'wallpapers');
+            onSnapshot(colRef, (snapshot) => {
+                wallpapers = [];
+                snapshot.forEach(docSnap => {
+                    wallpapers.push(docSnap.data());
                 });
+                // Sắp xếp mới nhất lên đầu
+                wallpapers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                updateGrid();
+            }, (error) => {
+                console.log("Firestore sync notice:", error);
+                loadLocalFallback();
+            });
 
-                getRedirectResult(auth).then((result) => {
-                    if (result && result.user) {
-                        showMessage("Đăng nhập Google thành công!");
-                    }
-                }).catch((error) => {
-                    console.error("Lỗi Redirect Auth:", error);
-                });
-
-                setupCloudListeners();
-            } catch (e) {
-                console.error("Lỗi kết nối Firebase:", e);
-                updateWallpapersList();
-            }
+        } catch (e) {
+            console.log("Offline mode initialized");
+            loadLocalFallback();
         }
 
-        window.openConfigModal = function() {
-            const current = localStorage.getItem('wallzy_custom_firebase_config_v7') || '';
-            document.getElementById('firebaseConfigInput').value = current;
-            document.getElementById('configModal').classList.remove('hidden');
-        }
-
-        window.closeConfigModal = function() {
-            document.getElementById('configModal').classList.add('hidden');
-        }
-
-        window.saveFirebaseConfig = function() {
-            const val = document.getElementById('firebaseConfigInput').value.trim();
-            try {
-                const parsed = JSON.parse(val);
-                if (!parsed.apiKey || !parsed.projectId) {
-                    throw new Error("Thiếu apiKey hoặc projectId");
-                }
-                localStorage.setItem('wallzy_custom_firebase_config_v7', val);
-                firebaseConfig = parsed;
-                closeConfigModal();
-                showMessage("Đã lưu cấu hình! Đang kết nối lại...");
-                setTimeout(() => window.location.reload(), 1000);
-            } catch (e) {
-                showMessage("JSON không hợp lệ! Vui lòng kiểm tra lại cấu hình.");
-            }
+        function loadLocalFallback() {
+            wallpapers = JSON.parse(localStorage.getItem('wallzy_wallpapers_v3') || '[]');
+            updateGrid();
         }
 
         window.handleGoogleLogin = async function() {
-            if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'mock') {
-                openConfigModal();
-                showMessage("Vui lòng cấu hình Firebase API Key thật trước khi đăng nhập Google.");
-                return;
-            }
-            if (!auth) {
-                initFirebase();
-            }
-            const provider = new GoogleAuthProvider();
             try {
-                await signInWithPopup(auth, provider);
-                showMessage("Đăng nhập Google thành công!");
-            } catch (error) {
-                console.error("Lỗi popup, thử chuyển hướng...", error);
-                try {
-                    await signInWithRedirect(auth, provider);
-                } catch (err2) {
-                    console.error("Lỗi đăng nhập Google:", err2);
-                    showMessage("Lỗi đăng nhập. Kiểm tra Authorized domains trên Firebase.");
+                if (firebaseConfig.apiKey === "mock-api-key") {
+                    showToast("Đang chạy chế độ mô phỏng. Vui lòng cấu hình Firebase thật để đăng nhập Google.");
+                    return;
                 }
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                showToast("Đăng nhập thành công!");
+            } catch (err) {
+                console.error(err);
+                showToast("Đăng nhập thất bại. Vui lòng thử lại.");
             }
         }
 
         window.handleLogout = async function() {
-            if (!auth) return;
             try {
                 await signOut(auth);
-                currentUser = null;
-                updateAuthUI(null);
-                showMessage("Đã đăng xuất.");
-            } catch (e) {
-                showMessage("Lỗi đăng xuất.");
-            }
+                showToast("Đã đăng xuất.");
+            } catch (e) {}
         }
 
-        function updateAuthUI(user) {
-            const authContainer = document.getElementById('authContainer');
-            const userProfileBadge = document.getElementById('userProfileBadge');
-            const userAvatar = document.getElementById('userAvatar');
-            const userNameDisplay = document.getElementById('userNameDisplay');
+        function updateAuthUI() {
+            const container = document.getElementById('authContainer');
+            if (!container) return;
 
-            if (user) {
-                if (authContainer) authContainer.style.display = 'none';
-                if (userProfileBadge) {
-                    userProfileBadge.style.display = 'flex';
-                    userAvatar.src = user.photoURL || 'https://placehold.co/100x100/16161a/ffffff?text=U';
-                    userNameDisplay.innerText = user.displayName || 'Thành viên';
-                }
+            if (currentUser && !currentUser.isAnonymous && currentUser.email) {
+                container.innerHTML = `
+                    <div class="flex items-center space-x-2 bg-[#16161a] border border-white/10 px-3 py-1.5 rounded-xl">
+                        <span class="text-[11px] text-gray-300 font-medium truncate max-w-[100px]">${currentUser.email}</span>
+                        <button onclick="handleLogout()" class="text-red-400 text-xs hover:text-red-300 cursor-pointer" title="Đăng xuất">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                    </div>`;
             } else {
-                if (authContainer) authContainer.style.display = 'block';
-                if (userProfileBadge) userProfileBadge.style.display = 'none';
-            }
-        }
-
-        function setupCloudListeners() {
-            if (!db) return;
-            try {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v7');
-                onSnapshot(q, (snapshot) => {
-                    const loadedImages = [];
-                    snapshot.forEach((docSnap) => {
-                        loadedImages.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    if (loadedImages.length > 0 || databaseWallpapers.length === 0) {
-                        databaseWallpapers = loadedImages;
-                        localStorage.setItem('wallzy_cache_wallpapers_v7', JSON.stringify(databaseWallpapers));
-                        updateWallpapersList();
-                    }
-                }, (error) => {
-                    console.error("Lỗi sync Firestore:", error);
-                    updateWallpapersList();
-                });
-            } catch (e) {
-                updateWallpapersList();
+                container.innerHTML = `
+                    <button onclick="handleGoogleLogin()" class="bg-white hover:bg-gray-100 text-gray-900 text-xs font-semibold px-3 py-2 rounded-xl flex items-center space-x-1.5 shadow-md transition cursor-pointer active:scale-95">
+                        <i class="fa-brands fa-google text-xs"></i>
+                        <span>Đăng nhập</span>
+                    </button>`;
             }
         }
 
@@ -414,19 +323,19 @@
             if (activeBtn) {
                 activeBtn.className = "category-btn bg-white text-black text-xs font-semibold px-4 py-2 rounded-xl transition cursor-pointer whitespace-nowrap shadow-sm";
             }
-            updateWallpapersList();
+            updateGrid();
         }
 
         window.handleSearch = function() {
             searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
-            updateWallpapersList();
+            updateGrid();
         }
 
-        function updateWallpapersList() {
+        function updateGrid() {
             const grid = document.getElementById('wallpaperGrid');
             if (!grid) return;
 
-            let list = [...databaseWallpapers];
+            let list = [...wallpapers];
             if (currentCategory !== 'all') {
                 list = list.filter(w => w.category === currentCategory);
             }
@@ -436,21 +345,22 @@
 
             if (list.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-2 text-center py-12 space-y-3 bg-[#121216] border border-white/10 rounded-2xl p-6">
-                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-500"></i>
-                        <p class="text-xs text-gray-400">Database chưa có ảnh nào.</p>
+                    <div class="col-span-2 text-center py-16 space-y-3 bg-[#121216] border border-white/10 rounded-2xl p-6">
+                        <i class="fa-solid fa-image text-3xl text-gray-600"></i>
+                        <p class="text-xs text-gray-400">Chưa có hình nền nào trên Database.</p>
                         <button onclick="switchTab('admin')" class="bg-white text-gray-900 font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm cursor-pointer inline-block">
-                            Đăng ảnh lên ngay
+                            Đăng ảnh ngay
                         </button>
                     </div>`;
+                updateFavoritesGrid();
                 return;
             }
 
             grid.innerHTML = list.map(w => `
-                <div onclick="openModalById('${w.id}')" class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#16161a] border border-white/10 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <div onclick="openModal('${w.id}')" class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#16161a] border border-white/10 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.02]">
                     <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                        <span class="text-[10px] uppercase font-bold tracking-widest text-white/90">${w.category || 'Database'}</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-white/90">${w.category}</span>
                     </div>
                 </div>
             `).join('');
@@ -458,47 +368,29 @@
             updateFavoritesGrid();
         }
 
-        window.openModalById = function(id) {
-            let wallpaper = databaseWallpapers.find(w => w.id === id);
-            if (wallpaper) openModal(wallpaper);
-        }
-
-        function openModal(wallpaper) {
+        window.openModal = function(id) {
+            let wallpaper = wallpapers.find(w => w.id === id);
+            if (!wallpaper) return;
             currentSelectedWallpaper = wallpaper;
-            document.getElementById('modalCategory').innerText = wallpaper.category || 'Database';
+            document.getElementById('modalCategory').innerText = wallpaper.category;
             document.getElementById('detailImg').src = wallpaper.url;
             updateModalFavState();
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        window.closeModal = function() { 
+        window.closeModal = function() {
             document.getElementById('detailModal').classList.add('hidden');
         }
 
-        async function executeActualDownload() {
+        window.downloadCurrentImage = function() {
             if (!currentSelectedWallpaper) return;
-            try {
-                const response = await fetch(currentSelectedWallpaper.url);
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = `wallzy-${currentSelectedWallpaper.id}.jpg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-                showMessage("Đã tải ảnh về thành công!");
-            } catch (e) {
-                const link = document.createElement('a');
-                link.href = currentSelectedWallpaper.url;
-                link.target = '_blank';
-                link.download = `wallzy-${currentSelectedWallpaper.id}.jpg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showMessage("Đã tải ảnh về thành công!");
-            }
+            const link = document.createElement('a');
+            link.href = currentSelectedWallpaper.url;
+            link.download = `wallzy-${currentSelectedWallpaper.id}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Đã tải ảnh về thành công!");
         }
 
         window.toggleFavoriteCurrent = function() {
@@ -506,12 +398,12 @@
             const index = favorites.findIndex(f => f.id === currentSelectedWallpaper.id);
             if (index > -1) {
                 favorites.splice(index, 1);
-                showMessage("Đã xóa khỏi yêu thích.");
+                showToast("Đã xóa khỏi yêu thích.");
             } else {
                 favorites.push(currentSelectedWallpaper);
-                showMessage("Đã thêm vào yêu thích!");
+                showToast("Đã thêm vào yêu thích!");
             }
-            localStorage.setItem('wallzy_cache_favorites_v7', JSON.stringify(favorites));
+            localStorage.setItem('wallzy_favorites_v3', JSON.stringify(favorites));
             updateModalFavState();
             updateFavoritesGrid();
         }
@@ -531,11 +423,11 @@
             const grid = document.getElementById('favoritesGrid');
             if (!grid) return;
             if (favorites.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-xs text-gray-500">Chưa có hình nền yêu thích nào.</div>`;
+                grid.innerHTML = `<div class="col-span-2 text-center py-16 text-xs text-gray-500">Chưa có hình nền yêu thích nào.</div>`;
                 return;
             }
             grid.innerHTML = favorites.map(w => `
-                <div onclick="openModalById('${w.id}')" class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#16161a] border border-white/10 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                <div onclick="openModal('${w.id}')" class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#16161a] border border-white/10 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.02]">
                     <img src="${w.url}" alt="Favorite" class="w-full h-full object-cover" loading="lazy">
                 </div>
             `).join('');
@@ -549,113 +441,97 @@
             document.getElementById('gradientPreviewBox').style.background = `linear-gradient(135deg, ${c1}, ${c2})`;
         }
 
-        window.saveCustomGradientToCloud = async function() {
+        window.saveCustomGradient = async function() {
             const c1 = document.getElementById('gradColor1').value;
             const c2 = document.getElementById('gradColor2').value;
             const gradUrl = `https://placehold.co/1080x1920/${c1.replace('#','')}/${c2.replace('#','')}/?text=Gradient`;
 
-            const uniqueId = 'grad-' + Date.now();
             const newWallpaper = {
-                id: uniqueId,
+                id: 'grad-' + Date.now(),
                 url: gradUrl,
                 category: 'gradient',
-                createdAt: new Date().toISOString()
+                createdAt: Date.now()
             };
 
             try {
                 if (db) {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v7', uniqueId), newWallpaper);
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'wallpapers', newWallpaper.id), newWallpaper);
+                } else {
+                    throw new Error();
                 }
             } catch (e) {
-                console.error("Lỗi ghi Gradient:", e);
+                wallpapers.unshift(newWallpaper);
+                localStorage.setItem('wallzy_wallpapers_v3', JSON.stringify(wallpapers));
+                updateGrid();
             }
 
-            if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
-                databaseWallpapers.unshift(newWallpaper);
-            }
-            localStorage.setItem('wallzy_cache_wallpapers_v7', JSON.stringify(databaseWallpapers));
-            updateWallpapersList();
-            showMessage("Đã đẩy Gradient lên Database!");
+            showToast("Đã thêm Gradient thành công!");
             switchTab('explore');
         }
 
-        window.uploadImageToCloudDatabase = async function() {
+        window.uploadImageToCloud = async function() {
             const fileInput = document.getElementById('imageFileInput');
             const cat = document.getElementById('uploadCategory').value;
 
             if (!fileInput.files || fileInput.files.length === 0) {
-                showMessage("Vui lòng chọn một tệp ảnh.");
+                showToast("Vui lòng chọn một tệp ảnh.");
                 return;
             }
 
             const file = fileInput.files[0];
             const reader = new FileReader();
 
-            const uploadOverlay = document.getElementById('uploadLoadingOverlay');
-            const uploadLoadingText = document.getElementById('uploadLoadingText');
-            if (uploadOverlay) uploadOverlay.classList.remove('hidden');
-            if (uploadLoadingText) uploadLoadingText.innerText = "Đang xử lý ảnh...";
-
             reader.onload = async function(e) {
-                const base64Url = e.target.result;
-                if (uploadLoadingText) uploadLoadingText.innerText = "Đang đồng bộ lên Database...";
-
-                const uniqueId = 'upload-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
                 const newWallpaper = {
-                    id: uniqueId,
-                    url: base64Url,
+                    id: 'img-' + Date.now(),
+                    url: e.target.result,
                     category: cat,
-                    createdAt: new Date().toISOString()
+                    createdAt: Date.now()
                 };
 
                 try {
                     if (db) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v7', uniqueId), newWallpaper);
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'wallpapers', newWallpaper.id), newWallpaper);
+                    } else {
+                        throw new Error();
                     }
-                } catch (err) {
-                    console.error("Lỗi ghi ảnh:", err);
+                    showToast("Đăng ảnh lên Database thành công!");
+                } catch (e) {
+                    wallpapers.unshift(newWallpaper);
+                    localStorage.setItem('wallzy_wallpapers_v3', JSON.stringify(wallpapers));
+                    updateGrid();
+                    showToast("Đã lưu ảnh cục bộ thành công!");
                 }
 
-                if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
-                    databaseWallpapers.unshift(newWallpaper);
-                }
-                localStorage.setItem('wallzy_cache_wallpapers_v7', JSON.stringify(databaseWallpapers));
-                updateWallpapersList();
-
-                if (uploadOverlay) uploadOverlay.classList.add('hidden');
-                showMessage("Tải lên Database thành công!");
                 fileInput.value = '';
                 switchTab('explore');
             };
 
             reader.onerror = function() {
-                if (uploadOverlay) uploadOverlay.classList.add('hidden');
-                showMessage("Lỗi đọc tệp ảnh.");
+                showToast("Lỗi đọc tệp ảnh.");
             };
 
             reader.readAsDataURL(file);
         }
 
-        window.deleteCurrentDatabaseImage = async function() {
+        window.deleteCurrentImage = async function() {
             if (!currentSelectedWallpaper) return;
-            if (!confirm("Bạn có chắc chắn muốn xóa hình nền này?")) return;
-
             try {
                 if (db) {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v7', currentSelectedWallpaper.id));
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'wallpapers', currentSelectedWallpaper.id));
                 }
-            } catch (e) {
-                console.error("Lỗi xóa:", e);
-            }
+            } catch (e) {}
 
-            databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
-            localStorage.setItem('wallzy_cache_wallpapers_v7', JSON.stringify(databaseWallpapers));
-            updateWallpapersList();
+            wallpapers = wallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
+            favorites = favorites.filter(f => f.id !== currentSelectedWallpaper.id);
+            localStorage.setItem('wallzy_wallpapers_v3', JSON.stringify(wallpapers));
+            localStorage.setItem('wallzy_favorites_v3', JSON.stringify(favorites));
+            updateGrid();
             closeModal();
-            showMessage("Đã xóa hình nền thành công!");
+            showToast("Đã xóa ảnh thành công!");
         }
 
-        function showMessage(text) {
+        function showToast(text) {
             const box = document.getElementById('messageBox');
             const textEl = document.getElementById('messageText');
             textEl.innerText = text;
@@ -664,8 +540,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            updateWallpapersList();
-            initFirebase();
+            updateGrid();
         });
     </script>
 </body>
