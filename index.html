@@ -42,7 +42,7 @@
         }
     </style>
 </head>
-<body id="bodyElement" class="min-h-screen flex flex-col selection:bg-white selection:text-black overflow-hidden">
+<body id="bodyElement" class="min-h-screen flex flex-col selection:bg-white selection:text-black">
 
     <div id="splashScreen" class="fixed inset-0 bg-[#0b0b0e] z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative flex items-center justify-center mb-4">
@@ -51,7 +51,7 @@
             </div>
         </div>
         <h1 class="text-sm font-semibold tracking-widest text-white/90 uppercase">Wallzy Studio</h1>
-        <p class="text-[11px] text-gray-500 mt-1">Đang khởi tạo hệ thống & đồng bộ Database chung...</p>
+        <p class="text-[11px] text-gray-500 mt-1">Đang đồng bộ Database chung từ mây...</p>
     </div>
 
     <header class="sticky top-0 z-40 bg-[#0b0b0e]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 flex justify-between items-center">
@@ -63,11 +63,11 @@
         </div>
         
         <div class="flex items-center space-x-2">
-            <!-- Khu vực tài khoản người dùng / Đăng nhập Google -->
+            <!-- Khu vực Đăng nhập Google thực tế -->
             <div id="authContainer" class="flex items-center space-x-2">
                 <button onclick="handleGoogleLogin()" class="bg-[#16161a] hover:bg-[#222228] text-gray-200 text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 flex items-center space-x-2 shadow-sm transition cursor-pointer">
                     <i class="fa-brands fa-google text-red-400"></i>
-                    <span id="loginBtnText">Đăng nhập Google</span>
+                    <span>Đăng nhập Google</span>
                 </button>
             </div>
 
@@ -79,7 +79,7 @@
                 </button>
             </div>
 
-            <button onclick="switchTab('admin')" class="w-9 h-9 rounded-xl bg-[#16161a] hover:bg-[#222228] text-gray-300 hover:text-white flex items-center justify-center border border-white/10 transition cursor-pointer" title="Đăng ảnh chung">
+            <button onclick="switchTab('admin')" class="w-9 h-9 rounded-xl bg-[#16161a] hover:bg-[#222228] text-gray-300 hover:text-white flex items-center justify-center border border-white/10 transition cursor-pointer" title="Đăng ảnh lên Database chung">
                 <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
             </button>
         </div>
@@ -92,7 +92,7 @@
             
             <div class="relative w-full">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
-                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm hình nền chung, màu sắc, chủ đề..." class="w-full bg-[#121216] border border-white/10 text-white text-xs rounded-2xl pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition placeholder-gray-500 shadow-inner">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm hình nền chung từ Database..." class="w-full bg-[#121216] border border-white/10 text-white text-xs rounded-2xl pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition placeholder-gray-500 shadow-inner">
             </div>
 
             <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-none">
@@ -102,13 +102,14 @@
                 <button onclick="filterCategory('scenery')" id="cat-scenery" class="category-btn bg-[#16161a] hover:bg-[#222228] text-gray-300 text-xs font-semibold px-4 py-2 rounded-xl border border-white/10 transition cursor-pointer whitespace-nowrap">Phong cảnh</button>
             </div>
 
+            <!-- Khung đánh giá cộng đồng -->
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-3 shadow-xl">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
                         <i class="fa-solid fa-star text-amber-400 text-xs"></i>
                         <span>Đánh giá trải nghiệm chung</span>
                     </h3>
-                    <span class="text-[10px] text-emerald-400 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">Công khai</span>
+                    <span class="text-[10px] text-emerald-400 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">Database công khai</span>
                 </div>
                 
                 <div id="reviewInputBox" class="space-y-2.5">
@@ -128,20 +129,19 @@
                 </div>
 
                 <div id="reviewsList" class="space-y-2 pt-2 border-t border-white/5 max-h-40 overflow-y-auto">
-                    <div class="text-center py-2 text-[11px] text-gray-500">Đang tải đánh giá từ database chung...</div>
+                    <div class="text-center py-2 text-[11px] text-gray-500">Đang tải đánh giá từ Database...</div>
                 </div>
             </div>
 
-            <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
-                <!-- Danh sách hình nền -->
-            </div>
+            <!-- Lưới hình nền chuẩn 100% từ Database -->
+            <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
 
         <!-- Tab Yêu thích -->
         <section id="favoritesTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Bộ sưu tập yêu thích</h2>
-                <p class="text-xs text-gray-400">Các hình nền bạn đã thả tim trên thiết bị hoặc tài khoản.</p>
+                <p class="text-xs text-gray-400">Các hình nền bạn đã thả tim trên tài khoản.</p>
             </div>
             <div id="favoritesGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
@@ -150,7 +150,7 @@
         <section id="gradientTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Gradient Studio</h2>
-                <p class="text-xs text-gray-400">Pha trộn màu sắc tạo hình nền đẩy lên database chung.</p>
+                <p class="text-xs text-gray-400">Pha trộn màu sắc tạo hình nền đẩy lên Database chung.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl">
@@ -194,13 +194,13 @@
         <section id="adminTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Đăng Ảnh Lên Database Chung</h2>
-                <p class="text-xs text-gray-400">Tải ảnh từ thiết bị để hiển thị ngay lập tức cho tất cả mọi người.</p>
+                <p class="text-xs text-gray-400">Tải ảnh từ thiết bị để lưu thẳng vào Database công khai cho tất cả mọi người cùng thấy.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl relative">
                 <div id="uploadLoadingOverlay" class="absolute inset-0 bg-black/80 backdrop-blur-sm rounded-2xl z-10 hidden flex flex-col items-center justify-center space-y-3">
                     <div class="w-9 h-9 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    <span class="text-xs text-white font-medium" id="uploadLoadingText">Đang tải ảnh lên database chung...</span>
+                    <span class="text-xs text-white font-medium" id="uploadLoadingText">Đang tải ảnh lên Database...</span>
                 </div>
 
                 <div class="space-y-1">
@@ -251,7 +251,7 @@
                 <span class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10" id="modalCategory">Database</span>
             </div>
             <div class="flex items-center space-x-2">
-                <button id="modalDeleteBtn" onclick="deleteCurrentDatabaseImage()" class="text-red-400 text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 hidden items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xóa ảnh khỏi database chung">
+                <button id="modalDeleteBtn" onclick="deleteCurrentDatabaseImage()" class="text-red-400 text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xóa ảnh khỏi Database chung">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
                 <button onclick="toggleFavoriteCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
@@ -293,21 +293,21 @@
     </div>
 
     <!-- Hộp thông báo nổi -->
-    <div id="messageBox" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#18181b] border border-white/10 text-white text-xs px-4 py-3 rounded-2xl shadow-2xl z-[2000] hidden transition-all duration-300">
+    <div id="messageBox" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#18181b] border border-white/10 text-white text-xs px-4 py-3 rounded-2xl shadow-2xl z-[2000] hidden transition-all duration-300">
         <span id="messageText">Thông báo hệ thống</span>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, setDoc, doc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-app';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "mock", authDomain: "mock", projectId: "mock" };
 
         let app, db, auth;
         let currentUser = null;
-        let cloudUploadedImages = [];
+        let databaseWallpapers = [];
         let favorites = [];
         let reviews = [];
         let currentCategory = 'all';
@@ -317,38 +317,21 @@
         let countdownTimer = null;
         let isSkeletonActive = true;
 
-        const sampleWallpapers = [
-            { id: 'sample-1', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80', category: 'gradient' },
-            { id: 'sample-2', url: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1000&q=80', category: 'gradient' },
-            { id: 'sample-3', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1000&q=80', category: 'anime' },
-            { id: 'sample-4', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80', category: 'anime' },
-            { id: 'sample-5', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80', category: 'scenery' },
-            { id: 'sample-6', url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1000&q=80', category: 'scenery' }
-        ];
-
         function initFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
-                if (token) {
-                    signInWithCustomToken(auth, token).catch(() => signInAnonymously(auth));
-                } else {
-                    signInAnonymously(auth);
-                }
-
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     updateAuthUI(user);
-                    if (user) {
-                        setupCloudListeners();
-                        setupReviewsListener();
-                    }
                 });
+
+                setupCloudListeners();
+                setupReviewsListener();
             } catch (e) {
-                cloudUploadedImages = [...sampleWallpapers];
+                databaseWallpapers = [];
                 updateWallpapersList();
                 renderReviews();
             }
@@ -366,13 +349,7 @@
                 updateAuthUI(currentUser);
                 showMessage("Đăng nhập Google thành công!");
             } catch (error) {
-                // Nếu popup bị chặn, fallback tự động sang đăng nhập ẩn danh để app vẫn dùng mượt mà
-                try {
-                    await signInAnonymously(auth);
-                    showMessage("Đã đồng bộ phiên làm việc thành công!");
-                } catch (err) {
-                    showMessage("Không thể đăng nhập. Vui lòng thử lại.");
-                }
+                showMessage("Đăng nhập bị từ chối hoặc bị chặn cửa sổ pop-up.");
             }
         }
 
@@ -380,7 +357,8 @@
             if (!auth) return;
             try {
                 await signOut(auth);
-                await signInAnonymously(auth);
+                currentUser = null;
+                updateAuthUI(null);
                 showMessage("Đã đăng xuất tài khoản.");
             } catch (e) {
                 showMessage("Lỗi đăng xuất.");
@@ -393,12 +371,12 @@
             const userAvatar = document.getElementById('userAvatar');
             const userNameDisplay = document.getElementById('userNameDisplay');
 
-            if (user && !user.isAnonymous && user.displayName) {
+            if (user) {
                 if (authContainer) authContainer.style.display = 'none';
                 if (userProfileBadge) {
                     userProfileBadge.style.display = 'flex';
                     userAvatar.src = user.photoURL || 'https://placehold.co/100x100/16161a/ffffff?text=U';
-                    userNameDisplay.innerText = user.displayName;
+                    userNameDisplay.innerText = user.displayName || 'Thành viên';
                 }
             } else {
                 if (authContainer) authContainer.style.display = 'flex';
@@ -415,21 +393,14 @@
                     snapshot.forEach((docSnap) => {
                         loadedImages.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    
-                    const map = new Map();
-                    loadedImages.forEach(item => map.set(item.id, item));
-                    sampleWallpapers.forEach(item => { if (!map.has(item.id)) map.set(item.id, item); });
-                    
-                    cloudUploadedImages = Array.from(map.values());
+                    databaseWallpapers = loadedImages;
                     updateWallpapersList();
                 }, (error) => {
-                    if (cloudUploadedImages.length === 0) {
-                        cloudUploadedImages = [...sampleWallpapers];
-                        updateWallpapersList();
-                    }
+                    databaseWallpapers = [];
+                    updateWallpapersList();
                 });
             } catch (e) {
-                cloudUploadedImages = [...sampleWallpapers];
+                databaseWallpapers = [];
                 updateWallpapersList();
             }
         }
@@ -471,7 +442,7 @@
                 showMessage("Vui lòng nhập nội dung đánh giá của bạn.");
                 return;
             }
-            const authorName = (currentUser && !currentUser.isAnonymous && currentUser.displayName) ? currentUser.displayName : 'Thành viên Wallzy';
+            const authorName = (currentUser && currentUser.displayName) ? currentUser.displayName : 'Khách Wallzy';
             const newRev = {
                 userName: authorName,
                 rating: currentRating,
@@ -481,13 +452,14 @@
 
             try {
                 if (db) {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'shared_reviews'), newRev);
+                    const revId = 'rev-' + Date.now();
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_reviews', revId), newRev);
                 } else {
                     reviews.unshift(newRev);
                     renderReviews();
                 }
                 document.getElementById('reviewComment').value = '';
-                showMessage("Đã gửi đánh giá lên database chung!");
+                showMessage("Đã gửi đánh giá lên Database chung!");
             } catch (e) {
                 reviews.unshift(newRev);
                 renderReviews();
@@ -500,7 +472,7 @@
             const listEl = document.getElementById('reviewsList');
             if (!listEl) return;
             if (reviews.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-2 text-[11px] text-gray-500">Chưa có đánh giá nào. Hãy là người đầu tiên!</div>`;
+                listEl.innerHTML = `<div class="text-center py-2 text-[11px] text-gray-500">Chưa có đánh giá nào trên Database. Hãy là người đầu tiên!</div>`;
                 return;
             }
             listEl.innerHTML = reviews.map(r => `
@@ -566,11 +538,11 @@
                 setTimeout(() => {
                     isSkeletonActive = false;
                     updateWallpapersList();
-                }, 1200);
+                }, 800);
                 return;
             }
 
-            let list = cloudUploadedImages.length > 0 ? [...cloudUploadedImages] : [...sampleWallpapers];
+            let list = [...databaseWallpapers];
             if (currentCategory !== 'all') {
                 list = list.filter(w => w.category === currentCategory);
             }
@@ -579,7 +551,14 @@
             }
 
             if (list.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-xs text-gray-500">Không tìm thấy hình nền phù hợp.</div>`;
+                grid.innerHTML = `
+                    <div class="col-span-2 text-center py-12 space-y-3 bg-[#121216] border border-white/10 rounded-2xl p-6">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-500"></i>
+                        <p class="text-xs text-gray-400">Database chung hiện chưa có hình nền nào.</p>
+                        <button onclick="switchTab('admin')" class="bg-white text-gray-900 font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm cursor-pointer inline-block">
+                            Đăng ảnh lên Database ngay
+                        </button>
+                    </div>`;
                 return;
             }
 
@@ -587,7 +566,7 @@
                 <div onclick="openModalById('${w.id}')" class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#16161a] border border-white/10 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.02]">
                     <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/600x1067/16161a/ffffff?text=Wallzy+Studio'">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                        <span class="text-[10px] uppercase font-bold tracking-widest text-white/90">${w.category || 'Wallpaper'}</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-white/90">${w.category || 'Database'}</span>
                     </div>
                 </div>
             `).join('');
@@ -596,7 +575,7 @@
         }
 
         window.openModalById = function(id) {
-            let wallpaper = cloudUploadedImages.find(w => w.id === id) || sampleWallpapers.find(w => w.id === id);
+            let wallpaper = databaseWallpapers.find(w => w.id === id);
             if (wallpaper) openModal(wallpaper);
         }
 
@@ -745,8 +724,9 @@
             const dir = document.getElementById('gradDirection').value;
             const gradUrl = `https://placehold.co/1080x1920/${c1.replace('#','')}/${c2.replace('#','')}/?text=Gradient`;
 
+            const uniqueId = 'grad-' + Date.now();
             const newWallpaper = {
-                id: 'grad-' + Date.now(),
+                id: uniqueId,
                 url: gradUrl,
                 category: 'gradient',
                 createdAt: new Date().toISOString()
@@ -754,15 +734,15 @@
 
             try {
                 if (db) {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers'), newWallpaper);
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', uniqueId), newWallpaper);
                 }
             } catch (e) {}
 
-            if (!cloudUploadedImages.some(w => w.id === newWallpaper.id)) {
-                cloudUploadedImages.unshift(newWallpaper);
+            if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
+                databaseWallpapers.unshift(newWallpaper);
             }
             updateWallpapersList();
-            showMessage("Đã đẩy Gradient lên database chung thành công!");
+            showMessage("Đã đẩy Gradient lên Database chung thành công!");
             switchTab('explore');
         }
 
@@ -785,7 +765,7 @@
 
             reader.onload = async function(e) {
                 const base64Url = e.target.result;
-                if (uploadLoadingText) uploadLoadingText.innerText = "Đang đồng bộ lên database chung...";
+                if (uploadLoadingText) uploadLoadingText.innerText = "Đang đồng bộ lên Database chung...";
 
                 const uniqueId = 'upload-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
                 const newWallpaper = {
@@ -797,17 +777,17 @@
 
                 try {
                     if (db) {
-                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers'), newWallpaper);
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', uniqueId), newWallpaper);
                     }
                 } catch (err) {}
 
-                if (!cloudUploadedImages.some(w => w.id === newWallpaper.id)) {
-                    cloudUploadedImages.unshift(newWallpaper);
+                if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
+                    databaseWallpapers.unshift(newWallpaper);
                 }
                 updateWallpapersList();
 
                 if (uploadOverlay) uploadOverlay.classList.add('hidden');
-                showMessage("Tải lên database chung thành công!");
+                showMessage("Tải lên Database chung thành công!");
                 fileInput.value = '';
                 switchTab('explore');
             };
@@ -822,18 +802,18 @@
 
         window.deleteCurrentDatabaseImage = async function() {
             if (!currentSelectedWallpaper) return;
-            if (!confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hình nền này khỏi database chung không?")) return;
+            if (!confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hình nền này khỏi Database chung không?")) return;
 
             try {
-                if (db && !currentSelectedWallpaper.id.startsWith('sample-')) {
+                if (db) {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', currentSelectedWallpaper.id));
                 }
-                cloudUploadedImages = cloudUploadedImages.filter(w => w.id !== currentSelectedWallpaper.id);
+                databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
                 updateWallpapersList();
                 closeModal();
                 showMessage("Đã xóa hình nền thành công!");
             } catch (e) {
-                cloudUploadedImages = cloudUploadedImages.filter(w => w.id !== currentSelectedWallpaper.id);
+                databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
                 updateWallpapersList();
                 closeModal();
                 showMessage("Đã xóa hình nền thành công!");
@@ -854,7 +834,7 @@
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
             
-            cloudUploadedImages = [...sampleWallpapers];
+            databaseWallpapers = [];
             updateWallpapersList();
 
             initFirebase();
