@@ -64,15 +64,15 @@
         
         <div class="flex items-center space-x-2">
             <div id="authContainer" class="flex items-center space-x-2">
-                <button onclick="handleGoogleLogin()" class="bg-[#16161a] hover:bg-[#222228] text-gray-200 text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 flex items-center space-x-2 shadow-sm transition cursor-pointer">
-                    <i class="fa-brands fa-google text-red-400"></i>
-                    <span>Đăng nhập Google</span>
+                <button onclick="handleGoogleLogin()" class="bg-white hover:bg-gray-100 text-gray-900 text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-2 shadow-md transition cursor-pointer active:scale-95">
+                    <i class="fa-brands fa-google text-red-500"></i>
+                    <span>Đăng nhập</span>
                 </button>
             </div>
 
             <div id="userProfileBadge" class="hidden items-center space-x-2 bg-[#16161a] border border-white/10 px-3 py-1.5 rounded-xl">
                 <img id="userAvatar" src="" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-white/20">
-                <span id="userNameDisplay" class="text-xs text-white font-medium max-w-[100px] truncate">User</span>
+                <span id="userNameDisplay" class="text-xs text-white font-medium max-w-[90px] truncate">User</span>
                 <button onclick="handleLogout()" class="text-gray-400 hover:text-red-400 text-xs ml-1 transition cursor-pointer" title="Đăng xuất">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
@@ -132,7 +132,7 @@
                 </div>
             </div>
 
-            <!-- Lưới hình nền -->
+            <!-- Lưới hình nền (100% từ database, không có ảnh mẫu bên ngoài) -->
             <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
 
@@ -274,7 +274,6 @@
         </div>
     </div>
 
-    <!-- Modal đếm ngược khi tải ảnh -->
     <div id="countdownModal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1500] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
         <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-white text-2xl font-bold" id="countdownNumber">
@@ -290,27 +289,24 @@
         </div>
     </div>
 
-    <!-- Hộp thông báo nổi -->
     <div id="messageBox" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#18181b] border border-white/10 text-white text-xs px-4 py-3 rounded-2xl shadow-2xl z-[2000] hidden transition-all duration-300">
         <span id="messageText">Thông báo hệ thống</span>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, setDoc, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-app-v2';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-app-v3';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "mock", authDomain: "mock", projectId: "mock" };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
 
         let app, db, auth;
         let currentUser = null;
         
-        // Đã loại bỏ hoàn toàn các ảnh mẫu bên ngoài (sample wallpapers)
-        let databaseWallpapers = JSON.parse(localStorage.getItem('wallzy_cache_wallpapers') || '[]');
-        let favorites = JSON.parse(localStorage.getItem('wallzy_cache_favorites') || '[]');
-        let reviews = JSON.parse(localStorage.getItem('wallzy_cache_reviews') || '[]');
+        let databaseWallpapers = JSON.parse(localStorage.getItem('wallzy_cache_wallpapers_v3') || '[]');
+        let favorites = JSON.parse(localStorage.getItem('wallzy_cache_favorites_v3') || '[]');
+        let reviews = JSON.parse(localStorage.getItem('wallzy_cache_reviews_v3') || '[]');
         let currentCategory = 'all';
         let searchQuery = '';
         let currentSelectedWallpaper = null;
@@ -323,10 +319,15 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
+                try {
+                    const redirectResult = await getRedirectResult(auth);
+                    if (redirectResult && redirectResult.user) {
+                        currentUser = redirectResult.user;
+                        updateAuthUI(currentUser);
+                        showMessage("Đăng nhập Google thành công!");
+                    }
+                } catch (err) {
+                    console.warn("Không có kết quả chuyển hướng đăng nhập:", err);
                 }
 
                 onAuthStateChanged(auth, (user) => {
@@ -337,7 +338,7 @@
                 setupCloudListeners();
                 setupReviewsListener();
             } catch (e) {
-                console.warn("Lỗi kết nối Firebase, chuyển sang chế độ Local Cache.", e);
+                console.warn("Lỗi kết nối Firebase, chạy ở chế độ cục bộ.", e);
                 updateWallpapersList();
                 renderReviews();
             }
@@ -350,12 +351,16 @@
             }
             const provider = new GoogleAuthProvider();
             try {
-                const result = await signInWithPopup(auth, provider);
-                currentUser = result.user;
-                updateAuthUI(currentUser);
+                // Thử dùng Popup trước, nếu bị chặn trình duyệt sẽ tự động fallback sang Redirect
+                await signInWithPopup(auth, provider);
                 showMessage("Đăng nhập Google thành công!");
             } catch (error) {
-                showMessage("Đăng nhập bị từ chối hoặc bị chặn cửa sổ pop-up.");
+                console.warn("Popup bị chặn, chuyển sang chế độ Redirect...", error);
+                try {
+                    await signInWithRedirect(auth, provider);
+                } catch (redirectError) {
+                    showMessage("Không thể đăng nhập. Vui lòng kiểm tra lại cấu hình Domain trên Firebase.");
+                }
             }
         }
 
@@ -377,7 +382,7 @@
             const userAvatar = document.getElementById('userAvatar');
             const userNameDisplay = document.getElementById('userNameDisplay');
 
-            if (user && !user.isAnonymous) {
+            if (user) {
                 if (authContainer) authContainer.style.display = 'none';
                 if (userProfileBadge) {
                     userProfileBadge.style.display = 'flex';
@@ -393,17 +398,17 @@
         function setupCloudListeners() {
             if (!db) return;
             try {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers');
+                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v3');
                 onSnapshot(q, (snapshot) => {
                     const loadedImages = [];
                     snapshot.forEach((docSnap) => {
                         loadedImages.push({ id: docSnap.id, ...docSnap.data() });
                     });
                     databaseWallpapers = loadedImages;
-                    localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
+                    localStorage.setItem('wallzy_cache_wallpapers_v3', JSON.stringify(databaseWallpapers));
                     updateWallpapersList();
                 }, (error) => {
-                    console.error("Lỗi đồng bộ Firestore:", error);
+                    console.error("Lỗi Firestore sync:", error);
                     updateWallpapersList();
                 });
             } catch (e) {
@@ -414,7 +419,7 @@
         function setupReviewsListener() {
             if (!db) return;
             try {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_reviews');
+                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_reviews_v3');
                 onSnapshot(q, (snapshot) => {
                     const loadedReviews = [];
                     snapshot.forEach((docSnap) => {
@@ -422,7 +427,7 @@
                     });
                     if (loadedReviews.length > 0) {
                         reviews = loadedReviews;
-                        localStorage.setItem('wallzy_cache_reviews', JSON.stringify(reviews));
+                        localStorage.setItem('wallzy_cache_reviews_v3', JSON.stringify(reviews));
                     }
                     renderReviews();
                 }, (error) => {
@@ -452,7 +457,7 @@
                 showMessage("Vui lòng nhập nội dung đánh giá của bạn.");
                 return;
             }
-            const authorName = (currentUser && currentUser.displayName && !currentUser.isAnonymous) ? currentUser.displayName : 'Khách Wallzy';
+            const authorName = (currentUser && currentUser.displayName) ? currentUser.displayName : 'Khách Wallzy';
             const newRev = {
                 userName: authorName,
                 rating: currentRating,
@@ -463,12 +468,12 @@
             try {
                 if (db) {
                     const revId = 'rev-' + Date.now();
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_reviews', revId), newRev);
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_reviews_v3', revId), newRev);
                 }
             } catch (e) {}
 
             reviews.unshift(newRev);
-            localStorage.setItem('wallzy_cache_reviews', JSON.stringify(reviews));
+            localStorage.setItem('wallzy_cache_reviews_v3', JSON.stringify(reviews));
             renderReviews();
             document.getElementById('reviewComment').value = '';
             showMessage("Đã gửi đánh giá lên Database chung!");
@@ -548,7 +553,7 @@
                 grid.innerHTML = `
                     <div class="col-span-2 text-center py-12 space-y-3 bg-[#121216] border border-white/10 rounded-2xl p-6">
                         <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-500"></i>
-                        <p class="text-xs text-gray-400">Database chung hiện chưa có hình nền nào.</p>
+                        <p class="text-xs text-gray-400">Database chung hiện đang trống.</p>
                         <button onclick="switchTab('admin')" class="bg-white text-gray-900 font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm cursor-pointer inline-block">
                             Đăng ảnh lên Database ngay
                         </button>
@@ -674,7 +679,7 @@
                 favorites.push(currentSelectedWallpaper);
                 showMessage("Đã thêm vào danh sách yêu thích!");
             }
-            localStorage.setItem('wallzy_cache_favorites', JSON.stringify(favorites));
+            localStorage.setItem('wallzy_cache_favorites_v3', JSON.stringify(favorites));
             updateModalFavState();
             updateFavoritesGrid();
         }
@@ -729,7 +734,7 @@
 
             try {
                 if (db) {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', uniqueId), newWallpaper);
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v3', uniqueId), newWallpaper);
                 }
             } catch (e) {
                 console.error("Lỗi ghi Gradient:", e);
@@ -738,7 +743,7 @@
             if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
                 databaseWallpapers.unshift(newWallpaper);
             }
-            localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
+            localStorage.setItem('wallzy_cache_wallpapers_v3', JSON.stringify(databaseWallpapers));
             updateWallpapersList();
             showMessage("Đã đẩy Gradient lên Database chung thành công!");
             switchTab('explore');
@@ -775,7 +780,7 @@
 
                 try {
                     if (db) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', uniqueId), newWallpaper);
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v3', uniqueId), newWallpaper);
                     }
                 } catch (err) {
                     console.error("Lỗi ghi ảnh lên Database:", err);
@@ -784,7 +789,7 @@
                 if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
                     databaseWallpapers.unshift(newWallpaper);
                 }
-                localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
+                localStorage.setItem('wallzy_cache_wallpapers_v3', JSON.stringify(databaseWallpapers));
                 updateWallpapersList();
 
                 if (uploadOverlay) uploadOverlay.classList.add('hidden');
@@ -807,14 +812,14 @@
 
             try {
                 if (db) {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', currentSelectedWallpaper.id));
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers_v3', currentSelectedWallpaper.id));
                 }
             } catch (e) {
                 console.error("Lỗi xóa ảnh:", e);
             }
 
             databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
-            localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
+            localStorage.setItem('wallzy_cache_wallpapers_v3', JSON.stringify(databaseWallpapers));
             updateWallpapersList();
             closeModal();
             showMessage("Đã xóa hình nền thành công!");
