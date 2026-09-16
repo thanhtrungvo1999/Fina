@@ -275,19 +275,7 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // Check redirect result from Google sign-in
-                try {
-                    const result = await getRedirectResult(auth);
-                    if (result && result.user) {
-                        currentUser = result.user;
-                        userId = result.user.uid;
-                        updateAuthUIState(currentUser);
-                        setupCloudListeners();
-                    }
-                } catch (redirectErr) {
-                    console.error("Redirect auth error:", redirectErr);
-                }
-
+                // Kiểm tra trạng thái đăng nhập hiện tại
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUser = user;
@@ -308,10 +296,18 @@
         window.loginWithGoogleReal = async function() {
             try {
                 const provider = new GoogleAuthProvider();
-                // Dùng signInWithRedirect để hoạt động chuẩn xác 100% trong môi trường production / iframe thực tế
-                await signInWithRedirect(auth, provider);
+                // Sử dụng signInWithPopup thay vì Redirect để chạy cực mượt trên Vercel không bị lỗi chuyển hướng miền
+                const result = await signInWithPopup(auth, provider);
+                if (result && result.user) {
+                    currentUser = result.user;
+                    userId = result.user.uid;
+                    updateAuthUIState(currentUser);
+                    setupCloudListeners();
+                    closeAuthModal();
+                    showMessage("Đăng nhập Google thành công!");
+                }
             } catch (e) {
-                showMessage("Lỗi đăng nhập Google thực tế: " + e.message);
+                showMessage("Lỗi đăng nhập Google: " + e.message);
             }
         }
 
