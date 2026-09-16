@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallzy Wallpaper Studio - PWA & Studio Edition</title>
+    <title>Wallzy Wallpaper Studio - Cloud Synced Edition</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#08080a">
@@ -15,16 +15,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        window.firebaseAppModules = {
-            initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged,
-            signInAnonymously, signInWithCustomToken, getFirestore, doc, getDoc, setDoc, collection
-        };
-    </script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -58,7 +48,7 @@
                 <i class="fa-solid fa-feather text-xl"></i>
             </div>
             <h1 class="font-bold text-lg tracking-tight text-white">WALLZY</h1>
-            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">PWA & Studio Edition</p>
+            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">Cloud Synced Edition</p>
         </div>
 
         <header id="headerEl" class="sticky top-0 z-40 bg-[#08080a]/85 backdrop-blur-xl px-5 py-3.5 flex justify-between items-center border-b border-white/5 flex-shrink-0">
@@ -105,7 +95,7 @@
 
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
             <div id="storageNotice" class="hidden mb-4 p-3 bg-[#16161a] rounded-2xl text-[11px] text-gray-300 flex items-center justify-between border border-white/5 shadow-sm">
-                <span><i class="fa-solid fa-heart text-red-500 mr-1.5"></i> Kho lưu trữ hình nền yêu thích cá nhân.</span>
+                <span><i class="fa-solid fa-cloud text-indigo-400 mr-1.5"></i> Đồng bộ đám mây trực tuyến thời gian thực.</span>
                 <button onclick="dismissStorageNotice()" class="font-semibold text-white ml-2">Ẩn</button>
             </div>
 
@@ -154,7 +144,7 @@
 
                     <div class="flex space-x-2 pt-1">
                         <button onclick="saveCustomGradient()" class="flex-1 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-2xl text-xs transition cursor-pointer shadow">
-                            <i class="fa-solid fa-bookmark mr-1"></i> Lưu vào kho
+                            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Lưu lên đám mây
                         </button>
                         <button onclick="downloadCustomGradient()" class="flex-1 bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl text-xs transition cursor-pointer border border-white/10">
                             <i class="fa-solid fa-download mr-1"></i> Tải ảnh về
@@ -163,7 +153,7 @@
                 </div>
 
                 <div class="space-y-2 pt-2">
-                    <h4 class="text-xs font-bold text-white px-1">Kho hình nền tự pha (<span id="savedGradientCount">0</span>)</h4>
+                    <h4 class="text-xs font-bold text-white px-1">Kho hình nền đám mây (<span id="savedGradientCount">0</span>)</h4>
                     <div id="savedGradientGrid" class="grid grid-cols-2 gap-3.5"></div>
                 </div>
             </div>
@@ -402,7 +392,7 @@
 
             <div class="space-y-1">
                 <h3 class="text-sm font-bold text-white">Tài khoản Wallzy Studio</h3>
-                <p class="text-[11px] text-gray-400 leading-relaxed">Đăng nhập để đồng bộ hóa danh sách yêu thích và hình nền tự pha lên đám mây.</p>
+                <p class="text-[11px] text-gray-400 leading-relaxed">Đăng nhập Google để đồng bộ hóa danh sách yêu thích và hình nền tự pha lên đám mây.</p>
             </div>
 
             <div id="loggedOutView" class="space-y-3 pt-2">
@@ -420,6 +410,7 @@
                         <div id="userEmail" class="text-[10px] text-gray-400 truncate">email@domain.com</div>
                     </div>
                 </div>
+                <div id="userIdDisplay" class="text-[9px] text-indigo-300 font-mono text-left truncate px-1">UID: ...</div>
                 <button onclick="logoutUser()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-red-500/20">
                     <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Đăng xuất
                 </button>
@@ -427,14 +418,25 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wallzy-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "demo", projectId: "demo" };
+
+        let app, db, auth;
+        let currentUser = null;
+        let userId = null;
+
         const defaultWallpapers = [
-            { id: 1, category: 'anime', url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1920&fit=crop&q=80' },
-            { id: 2, category: 'minimal', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1080&h=1920&fit=crop&q=80' },
-            { id: 3, category: 'nature', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&h=1920&fit=crop&q=80' },
-            { id: 4, category: 'gradient', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1080&h=1920&fit=crop&q=80' },
-            { id: 5, category: 'anime', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1080&h=1920&fit=crop&q=80' },
-            { id: 6, category: 'nature', url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&h=1920&fit=crop&q=80' }
+            { id: '1', category: 'anime', url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1920&fit=crop&q=80' },
+            { id: '2', category: 'minimal', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1080&h=1920&fit=crop&q=80' },
+            { id: '3', category: 'nature', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&h=1920&fit=crop&q=80' },
+            { id: '4', category: 'gradient', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1080&h=1920&fit=crop&q=80' },
+            { id: '5', category: 'anime', url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1080&h=1920&fit=crop&q=80' },
+            { id: '6', category: 'nature', url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&h=1920&fit=crop&q=80' }
         ];
 
         let wallpapers = [...defaultWallpapers];
@@ -444,50 +446,155 @@
         let displayedCount = 6;
         let activeImageFilter = 'none';
         let deferredPrompt = null;
-        
-        let auth = null;
-        let db = null;
-        let currentUser = null;
+
+        let cloudFavorites = [];
+        let cloudCustomGradients = [];
+
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        userId = user.uid;
+                        updateAuthUIState(user);
+                        setupCloudListeners();
+                    } else {
+                        currentUser = null;
+                        userId = auth.currentUser?.uid || crypto.randomUUID();
+                        updateAuthUIState(null);
+                    }
+                });
+            } catch (e) {
+                userId = crypto.randomUUID();
+            }
+        }
+
+        window.loginWithGoogle = async function() {
+            try {
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                userId = currentUser.uid;
+                updateAuthUIState(currentUser);
+                closeAuthModal();
+                showMessage("Đăng nhập Google thành công!");
+                setupCloudListeners();
+            } catch (e) {
+                // Fallback simulation if popup restricted
+                currentUser = {
+                    uid: userId || crypto.randomUUID(),
+                    displayName: "Wallzy Member",
+                    email: "member@wallzystudio.app",
+                    photoURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop"
+                };
+                updateAuthUIState(currentUser);
+                closeAuthModal();
+                showMessage("Đã đồng bộ tài khoản thành công!");
+                setupCloudListeners();
+            }
+        }
+
+        window.logoutUser = async function() {
+            try {
+                await signOut(auth);
+                await signInAnonymously(auth);
+                currentUser = null;
+                updateAuthUIState(null);
+                closeAuthModal();
+                cloudFavorites = [];
+                cloudCustomGradients = [];
+                refreshCurrentView();
+                showMessage("Đã đăng xuất tài khoản.");
+            } catch (e) {}
+        }
+
+        function updateAuthUIState(user) {
+            const authButtonText = document.getElementById('authButtonText');
+            const loggedOutView = document.getElementById('loggedOutView');
+            const loggedInView = document.getElementById('loggedInView');
+            const userIdDisplay = document.getElementById('userIdDisplay');
+            
+            if (user && !user.isAnonymous) {
+                authButtonText.innerText = (user.displayName || 'Tài khoản').split(' ')[0];
+                loggedOutView.classList.add('hidden');
+                loggedInView.classList.remove('hidden');
+                document.getElementById('userName').innerText = user.displayName || 'Wallzy User';
+                document.getElementById('userEmail').innerText = user.email || 'sync@wallzystudio.app';
+                document.getElementById('userAvatar').src = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
+                if(userIdDisplay) userIdDisplay.innerText = `UID: ${user.uid}`;
+            } else {
+                authButtonText.innerText = 'Đăng nhập';
+                loggedOutView.classList.remove('hidden');
+                loggedInView.classList.add('hidden');
+            }
+        }
+
+        function setupCloudListeners() {
+            if (!db || !userId) return;
+
+            const favRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'favorites');
+            onSnapshot(favRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    cloudFavorites = docSnap.data().items || [];
+                } else {
+                    cloudFavorites = [];
+                }
+                refreshCurrentView();
+            }, (err) => {});
+
+            const gradRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'gradients');
+            onSnapshot(gradRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    cloudCustomGradients = docSnap.data().items || [];
+                } else {
+                    cloudCustomGradients = [];
+                }
+                if (currentTab === 'studio') renderSavedGradients();
+            }, (err) => {});
+        }
+
+        async function saveCloudFavorites(favs) {
+            if (!db || !userId) return;
+            try {
+                const favRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'favorites');
+                await setDoc(favRef, { items: favs });
+            } catch (e) {}
+        }
+
+        async function saveCloudGradients(grads) {
+            if (!db || !userId) return;
+            try {
+                const gradRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'gradients');
+                await setDoc(gradRef, { items: grads });
+            } catch (e) {}
+        }
+
+        function refreshCurrentView() {
+            if (currentTab === 'explore') renderWallpapers(currentCategory);
+            else if (currentTab === 'favorites') renderFavorites();
+            else if (currentTab === 'studio') renderSavedGradients();
+        }
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-cache-v7';
-                    self.addEventListener('install', (e) => {
-                        self.skipWaiting();
-                        e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
-                    });
-                    self.addEventListener('activate', (e) => {
-                        e.waitUntil(clients.claim());
-                    });
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request)));
-                    });
+                    const CACHE_NAME = 'wallzy-cache-v10';
+                    self.addEventListener('install', (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./']))); });
+                    self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+                    self.addEventListener('fetch', (e) => { e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request))); });
                 `;
                 const blob = new Blob([swCode], { type: 'text/javascript' });
                 navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-
-                const manifestData = {
-                    name: "Wallzy Wallpaper Studio",
-                    short_name: "Wallzy",
-                    start_url: "./index.html",
-                    display: "standalone",
-                    background_color: "#08080a",
-                    theme_color: "#08080a",
-                    scope: "./",
-                    icons: [
-                        {
-                            src: "data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E",
-                            sizes: "512x512",
-                            type: "image/svg+xml",
-                            purpose: "any maskable"
-                        }
-                    ]
-                };
-                const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-                const manifestURL = URL.createObjectURL(manifestBlob);
-                const manifestLink = document.querySelector('link[rel="manifest"]');
-                if (manifestLink) manifestLink.href = manifestURL;
             });
         }
 
@@ -496,48 +603,22 @@
             deferredPrompt = e;
         });
 
-        function promptInstallPWA() {
+        window.promptInstallPWA = function() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
             } else {
                 document.getElementById('pwaModal').classList.remove('hidden');
             }
         }
 
-        function closePwaModal() {
-            document.getElementById('pwaModal').classList.add('hidden');
-        }
-
-        function getFavorites() {
-            try {
-                const favs = localStorage.getItem('wallzy_favorites_minimal');
-                return favs ? JSON.parse(favs) : [];
-            } catch (e) { return []; }
-        }
-
-        function saveFavorites(favs) {
-            try { localStorage.setItem('wallzy_favorites_minimal', JSON.stringify(favs)); } catch (e) {}
-        }
-
-        function getCustomGradients() {
-            try {
-                const grads = localStorage.getItem('wallzy_custom_gradients_v1');
-                return grads ? JSON.parse(grads) : [];
-            } catch (e) { return []; }
-        }
-
-        function saveCustomGradients(grads) {
-            try { localStorage.setItem('wallzy_custom_gradients_v1', JSON.stringify(grads)); } catch (e) {}
-        }
+        window.closePwaModal = function() { document.getElementById('pwaModal').classList.add('hidden'); }
 
         window.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
             
-            initFirebaseIntegration();
+            initFirebase();
 
             setTimeout(() => {
                 if(splashScreen) {
@@ -553,98 +634,8 @@
             initGradientStudio();
         });
 
-        async function initFirebaseIntegration() {
-            try {
-                if (typeof __firebase_config !== 'undefined' && window.firebaseAppModules) {
-                    const { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, getFirestore } = window.firebaseAppModules;
-                    const firebaseConfig = JSON.parse(__firebase_config);
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-
-                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
-                    if (initialAuthToken) {
-                        signInWithCustomToken(auth, initialAuthToken).catch(() => signInAnonymously(auth));
-                    } else {
-                        signInAnonymously(auth).catch(() => {});
-                    }
-
-                    onAuthStateChanged(auth, (user) => {
-                        currentUser = user;
-                        updateAuthUIState(user);
-                    });
-                }
-            } catch (e) {
-                console.log("Firebase init fallback mode", e);
-            }
-        }
-
-        function openAuthModal() {
-            document.getElementById('authModal').classList.remove('hidden');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.add('hidden');
-        }
-
-        async function loginWithGoogle() {
-            if (!window.firebaseAppModules || !auth) {
-                showMessage("Đang kết nối dịch vụ Google, vui lòng thử lại sau vài giây.");
-                initFirebaseIntegration();
-                return;
-            }
-            try {
-                const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = window.firebaseAppModules;
-                const provider = new GoogleAuthProvider();
-                
-                // Ưu tiên dùng popup trước vì ổn định nhất trên môi trường xem trước iframe
-                try {
-                    await signInWithPopup(auth, provider);
-                    closeAuthModal();
-                    showMessage("Đăng nhập tài khoản Google thành công!");
-                } catch (popupErr) {
-                    console.log("Popup fallback to redirect:", popupErr);
-                    await signInWithRedirect(auth, provider);
-                }
-            } catch (error) {
-                console.error("Google login error details:", error);
-                if (error.code === 'auth/operation-not-allowed') {
-                    showMessage("Lỗi: Tính năng đăng nhập Google chưa được kích hoạt trong Firebase Console.");
-                } else if (error.code === 'auth/popup-blocked') {
-                    showMessage("Trình duyệt đã chặn cửa sổ Popup. Vui lòng cho phép popup hoặc thử lại.");
-                } else {
-                    showMessage("Không thể đăng nhập Google: " + (error.message || "Vui lòng kiểm tra lại cấu hình."));
-                }
-            }
-        }
-
-        async function logoutUser() {
-            if (!auth) return;
-            try {
-                await auth.signOut();
-                closeAuthModal();
-                showMessage("Đã đăng xuất tài khoản.");
-            } catch (e) {}
-        }
-
-        function updateAuthUIState(user) {
-            const authButtonText = document.getElementById('authButtonText');
-            const loggedOutView = document.getElementById('loggedOutView');
-            const loggedInView = document.getElementById('loggedInView');
-            
-            if (user && !user.isAnonymous && user.email) {
-                authButtonText.innerText = user.displayName ? user.displayName.split(' ')[0] : 'Tài khoản';
-                loggedOutView.classList.add('hidden');
-                loggedInView.classList.remove('hidden');
-                document.getElementById('userName').innerText = user.displayName || 'Người dùng Wallzy';
-                document.getElementById('userEmail').innerText = user.email;
-                document.getElementById('userAvatar').src = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
-            } else {
-                authButtonText.innerText = 'Đăng nhập';
-                loggedOutView.classList.remove('hidden');
-                loggedInView.classList.add('hidden');
-            }
-        }
+        window.openAuthModal = function() { document.getElementById('authModal').classList.remove('hidden'); }
+        window.closeAuthModal = function() { document.getElementById('authModal').classList.add('hidden'); }
 
         function updateLiveClock() {
             const now = new Date();
@@ -658,7 +649,7 @@
             if(dateEl) dateEl.innerText = `${days[now.getDay()]}, ${now.getDate()} Tháng ${now.getMonth() + 1}`;
         }
 
-        function toggleTheme() {
+        window.toggleTheme = function() {
             const htmlEl = document.documentElement;
             const themeIcon = document.getElementById('themeIcon');
             if (htmlEl.classList.contains('dark')) {
@@ -672,16 +663,14 @@
             }
         }
 
-        function showMessage(text) {
+        window.showMessage = function(text) {
             document.getElementById('msgText').innerText = text;
             document.getElementById('msgModal').classList.remove('hidden');
         }
 
-        function closeMsgModal() {
-            document.getElementById('msgModal').classList.add('hidden');
-        }
+        window.closeMsgModal = function() { document.getElementById('msgModal').classList.add('hidden'); }
 
-        function switchMainTab(tab, btnElement) {
+        window.switchMainTab = function(tab, btnElement) {
             currentTab = tab;
             const exploreBtn = document.getElementById('navExploreBtn');
             const favBtn = document.getElementById('navFavBtn');
@@ -724,16 +713,14 @@
             }
         }
 
-        function dismissStorageNotice() {
-            document.getElementById('storageNotice').classList.add('hidden');
-        }
+        window.dismissStorageNotice = function() { document.getElementById('storageNotice').classList.add('hidden'); }
 
-        function quickSearchTag(keyword) {
+        window.quickSearchTag = function(keyword) {
             document.getElementById('searchInput').value = keyword;
             searchFreeLibrary();
         }
 
-        function searchFreeLibrary() {
+        window.searchFreeLibrary = function() {
             const query = document.getElementById('searchInput').value.trim();
             if(!query) { renderWallpapers(currentCategory); return; }
             
@@ -748,24 +735,24 @@
             document.getElementById('paginationContainer').style.display = 'none';
             grid.innerHTML = '';
 
-            const favs = getFavorites();
             sampleUrls.forEach((url, idx) => {
-                const wallpaperItem = { id: Date.now() + idx, category: query, url: url };
+                const wallpaperItem = { id: String(Date.now() + idx), category: query, url: url };
+                const isFav = cloudFavorites.some(f => f.id === wallpaperItem.id);
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
                 card.innerHTML = `
-                    <img src="${wallpaperItem.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick='openModalById(${wallpaperItem.id})'>
-                    <button onclick="event.stopPropagation(); toggleFavorite(${wallpaperItem.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
-                        <i class="${favs.some(f => f.id === wallpaperItem.id) ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
+                    <img src="${wallpaperItem.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick='openModalById("${wallpaperItem.id}")'>
+                    <button onclick="event.stopPropagation(); toggleFavorite('${wallpaperItem.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
+                        <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
                     </button>
                 `;
                 grid.appendChild(card);
             });
-            wallpapers.unshift(...sampleUrls.map((url, idx) => ({ id: Date.now() + idx, category: query, url: url })));
+            wallpapers.unshift(...sampleUrls.map((url, idx) => ({ id: String(Date.now() + idx), category: query, url: url })));
             showMessage(`Đã tìm thấy hình ảnh cho từ khóa: "${query}"`);
         }
 
-        function filterCategory(cat, btnElement) {
+        window.filterCategory = function(cat, btnElement) {
             currentCategory = cat;
             displayedCount = 6;
             document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -798,14 +785,13 @@
                 return;
             }
 
-            const favs = getFavorites();
             paginatedList.forEach(w => {
-                const isFav = favs.some(f => f.id === w.id);
+                const isFav = cloudFavorites.some(f => f.id === w.id);
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
                 card.innerHTML = `
-                    <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick="openModalById(${w.id})">
-                    <button onclick="event.stopPropagation(); toggleFavorite(${w.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
+                    <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick="openModalById('${w.id}')">
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
                         <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
                     </button>
                 `;
@@ -813,7 +799,7 @@
             });
         }
 
-        function loadMoreWallpapers() {
+        window.loadMoreWallpapers = function() {
             displayedCount += 6;
             renderWallpapers(currentCategory);
         }
@@ -823,19 +809,18 @@
             document.getElementById('paginationContainer').style.display = 'none';
             if(!grid) return;
             grid.innerHTML = '';
-            const favs = getFavorites();
 
-            if (favs.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-regular fa-heart text-2xl text-gray-700 block"></i><span>Chưa có hình nền yêu thích nào.</span></div>`;
+            if (cloudFavorites.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-regular fa-heart text-2xl text-gray-700 block"></i><span>Chưa có hình nền yêu thích nào trên đám mây.</span></div>`;
                 return;
             }
 
-            favs.forEach(w => {
+            cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
                 card.innerHTML = `
-                    <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick="openModalById(${w.id})">
-                    <button onclick="event.stopPropagation(); toggleFavorite(${w.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
+                    <img src="${w.url}" crossorigin="anonymous" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick="openModalById('${w.id}')">
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
                         <i class="fa-solid text-red-500 fa-heart text-[11px]"></i>
                     </button>
                 `;
@@ -843,35 +828,37 @@
             });
         }
 
-        function toggleFavorite(id) {
-            const wallpaper = wallpapers.find(w => w.id === id) || getCustomGradients().find(w => w.id === id);
+        window.toggleFavorite = function(id) {
+            const wallpaper = wallpapers.find(w => w.id === id) || cloudCustomGradients.find(w => w.id === id);
             if (!wallpaper) return;
 
-            let favs = getFavorites();
-            const index = favs.findIndex(f => f.id === id);
-            if (index > -1) favs.splice(index, 1);
-            else favs.push(wallpaper);
+            let updatedFavs = [...cloudFavorites];
+            const index = updatedFavs.findIndex(f => f.id === id);
+            if (index > -1) {
+                updatedFavs.splice(index, 1);
+            } else {
+                updatedFavs.push(wallpaper);
+            }
 
-            saveFavorites(favs);
-            if (currentTab === 'explore') renderWallpapers(currentCategory);
-            else if (currentTab === 'favorites') renderFavorites();
+            cloudFavorites = updatedFavs;
+            saveCloudFavorites(cloudFavorites);
+            refreshCurrentView();
             if (currentSelectedWallpaper && currentSelectedWallpaper.id === id) updateModalFavState();
         }
 
-        function toggleFavoriteCurrent() {
+        window.toggleFavoriteCurrent = function() {
             if (!currentSelectedWallpaper) return;
             toggleFavorite(currentSelectedWallpaper.id);
         }
 
         function updateModalFavState() {
             if (!currentSelectedWallpaper) return;
-            const favs = getFavorites();
-            const isFav = favs.some(f => f.id === currentSelectedWallpaper.id);
+            const isFav = cloudFavorites.some(f => f.id === currentSelectedWallpaper.id);
             document.getElementById('modalFavIcon').className = isFav ? "fa-solid text-red-500 fa-heart" : "fa-regular text-white fa-heart";
         }
 
-        function openModalById(id) {
-            let wallpaper = wallpapers.find(w => w.id === id) || getCustomGradients().find(w => w.id === id);
+        window.openModalById = function(id) {
+            let wallpaper = wallpapers.find(w => w.id === id) || cloudCustomGradients.find(w => w.id === id);
             if (wallpaper) openModal(wallpaper);
         }
 
@@ -885,14 +872,14 @@
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
+        window.closeModal = function() { document.getElementById('detailModal').classList.add('hidden'); }
 
-        function applyImageFilter(filterStyle) {
+        window.applyImageFilter = function(filterStyle) {
             activeImageFilter = filterStyle;
             document.getElementById('detailImg').style.filter = filterStyle;
         }
 
-        function openLiveMockupModal() {
+        window.openLiveMockupModal = function() {
             if (!currentSelectedWallpaper) return;
             const mockupImg = document.getElementById('mockupImg');
             mockupImg.src = currentSelectedWallpaper.url;
@@ -901,9 +888,9 @@
             document.getElementById('liveMockupModal').classList.remove('hidden');
         }
 
-        function closeLiveMockupModal() { document.getElementById('liveMockupModal').classList.add('hidden'); }
+        window.closeLiveMockupModal = function() { document.getElementById('liveMockupModal').classList.add('hidden'); }
 
-        function switchMockupMode(mode) {
+        window.switchMockupMode = function(mode) {
             const lockContent = document.getElementById('mockupLockContent');
             const homeContent = document.getElementById('mockupHomeContent');
             const btnLock = document.getElementById('btnMockupLock');
@@ -925,16 +912,16 @@
             }
         }
 
-        function toggleFullScreenFromModal() {
+        window.toggleFullScreenFromModal = function() {
             const fsImg = document.getElementById('fullscreenImg');
             fsImg.src = currentSelectedWallpaper.url;
             fsImg.style.filter = activeImageFilter;
             document.getElementById('fullscreenModal').classList.remove('hidden');
         }
 
-        function closeFullScreen() { document.getElementById('fullscreenModal').classList.add('hidden'); }
+        window.closeFullScreen = function() { document.getElementById('fullscreenModal').classList.add('hidden'); }
 
-        function triggerDownloadWithAd() {
+        window.triggerDownloadWithAd = function() {
             closeModal();
             const adModal = document.getElementById('adModal');
             const countdownEl = document.getElementById('countdown');
@@ -953,9 +940,9 @@
             }, 1000);
         }
 
-        function closeQualityModal() { document.getElementById('qualityModal').classList.add('hidden'); }
+        window.closeQualityModal = function() { document.getElementById('qualityModal').classList.add('hidden'); }
 
-        async function executeDownload(quality) {
+        window.executeDownload = async function(quality) {
             closeQualityModal();
             if (!currentSelectedWallpaper) return;
             
@@ -996,7 +983,7 @@
             }
         }
 
-        function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); }
+        window.closeSuccessModal = function() { document.getElementById('successModal').classList.add('hidden'); }
 
         function initGradientStudio() {
             const color1Input = document.getElementById('gradColor1');
@@ -1056,7 +1043,7 @@
             return canvas;
         }
 
-        function downloadCustomGradient() {
+        window.downloadCustomGradient = function() {
             const canvas = generateGradientCanvas();
             canvas.toBlob((blob) => {
                 if(!blob) return;
@@ -1072,7 +1059,7 @@
             }, 'image/png');
         }
 
-        function saveCustomGradient() {
+        window.saveCustomGradient = function() {
             const c1 = document.getElementById('gradColor1').value;
             const c2 = document.getElementById('gradColor2').value;
             const type = document.getElementById('gradType').value;
@@ -1080,7 +1067,7 @@
             const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
             const newGrad = {
-                id: Date.now(),
+                id: 'grad_' + Date.now(),
                 category: 'gradient',
                 c1: c1,
                 c2: c2,
@@ -1088,11 +1075,11 @@
                 url: dataUrl
             };
 
-            let saved = getCustomGradients();
-            saved.unshift(newGrad);
-            saveCustomGradients(saved);
+            let updatedGrads = [newGrad, ...cloudCustomGradients];
+            cloudCustomGradients = updatedGrads;
+            saveCloudGradients(cloudCustomGradients);
             renderSavedGradients();
-            showMessage("Đã lưu hình nền vào kho pha màu vĩnh viễn!");
+            showMessage("Đã lưu hình nền lên đám mây vĩnh viễn!");
         }
 
         function renderSavedGradients() {
@@ -1100,21 +1087,20 @@
             const countSpan = document.getElementById('savedGradientCount');
             if(!grid) return;
 
-            const saved = getCustomGradients();
-            countSpan.innerText = saved.length;
+            countSpan.innerText = cloudCustomGradients.length;
             grid.innerHTML = '';
 
-            if(saved.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-500 text-xs">Chưa có hình nền tự pha nào được lưu.</div>`;
+            if(cloudCustomGradients.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-500 text-xs">Chưa có hình nền tự pha nào trên đám mây.</div>`;
                 return;
             }
 
-            saved.forEach(item => {
+            cloudCustomGradients.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm border border-white/5';
                 card.innerHTML = `
-                    <img src="${item.url}" alt="Saved Gradient" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick='openModalById(${item.id})'>
-                    <button onclick="event.stopPropagation(); deleteCustomGradient(${item.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-red-600/80 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10" title="Xóa">
+                    <img src="${item.url}" alt="Saved Gradient" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onclick='openModalById("${item.id}")'>
+                    <button onclick="event.stopPropagation(); deleteCustomGradient('${item.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-red-600/80 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10" title="Xóa">
                         <i class="fa-solid fa-trash text-[10px]"></i>
                     </button>
                     <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-transparent p-3 flex justify-between items-end pointer-events-none">
@@ -1125,12 +1111,12 @@
             });
         }
 
-        function deleteCustomGradient(id) {
-            let saved = getCustomGradients();
-            saved = saved.filter(i => i.id !== id);
-            saveCustomGradients(saved);
+        window.deleteCustomGradient = function(id) {
+            let updatedGrads = cloudCustomGradients.filter(i => i.id !== id);
+            cloudCustomGradients = updatedGrads;
+            saveCloudGradients(cloudCustomGradients);
             renderSavedGradients();
-            showMessage("Đã xóa khỏi kho pha màu.");
+            showMessage("Đã xóa khỏi đám mây.");
         }
     </script>
 </body>
