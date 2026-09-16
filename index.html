@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wallzy Wallpaper Studio - PWA & Studio Edition</title>
     
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Wallzy%20Wallpaper%20Studio%22%2C%22short_name%22%3A%22Wallzy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2308080a%22%2C%22theme_color%22%3A%22%2308080a%22%2C%22scope%22%3A%22.%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Butf%2C%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#08080a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -397,7 +397,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-cache-v2';
+                    const CACHE_NAME = 'wallzy-cache-v4';
                     self.addEventListener('install', (e) => {
                         self.skipWaiting();
                         e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
@@ -411,6 +411,29 @@
                 `;
                 const blob = new Blob([swCode], { type: 'text/javascript' });
                 navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+
+                // Create dynamic manifest.json blob URL to fix Android browser standalone PWA launch
+                const manifestData = {
+                    name: "Wallzy Wallpaper Studio",
+                    short_name: "Wallzy",
+                    start_url: "./index.html",
+                    display: "standalone",
+                    background_color: "#08080a",
+                    theme_color: "#08080a",
+                    scope: "./",
+                    icons: [
+                        {
+                            src: "data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E",
+                            sizes: "512x512",
+                            type: "image/svg+xml",
+                            purpose: "any maskable"
+                        }
+                    ]
+                };
+                const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+                const manifestURL = URL.createObjectURL(manifestBlob);
+                const manifestLink = document.querySelector('link[rel="manifest"]');
+                if (manifestLink) manifestLink.href = manifestURL;
             });
         }
 
