@@ -452,7 +452,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-cache-v4';
+                    const CACHE_NAME = 'wallzy-cache-v5';
                     self.addEventListener('install', (e) => {
                         self.skipWaiting();
                         e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
@@ -598,7 +598,8 @@
 
         async function loginWithGoogle() {
             if (!window.firebaseAppModules || !auth) {
-                showMessage("Đăng nhập Google yêu cầu cấu hình Firebase đầy đủ.");
+                showMessage("Đang kết nối dịch vụ Google, vui lòng thử lại sau vài giây.");
+                initFirebaseIntegration();
                 return;
             }
             try {
@@ -608,7 +609,7 @@
             } catch (error) {
                 console.error("Google login error details:", error);
                 if (error.code === 'auth/operation-not-allowed') {
-                    showMessage("Lỗi: Tính năng đăng nhập Google chưa được kích hoạt trong trang quản trị Firebase Console.");
+                    showMessage("Lỗi: Tính năng đăng nhập Google chưa được kích hoạt trong Firebase Console.");
                 } else {
                     showMessage("Không thể chuyển hướng đăng nhập: " + (error.message || "Vui lòng thử lại."));
                 }
@@ -644,7 +645,25 @@
         }
 
         function updateLiveClock() {
-            const now = new Date();
+        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#121216]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
+            <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex items-center space-x-1.5 text-white cursor-pointer transition">
+                <i class="fa-regular fa-compass text-sm"></i>
+                <span class="text-[10px] font-semibold">Khám phá</span>
+            </button>
+            <div class="w-[1px] h-4 bg-white/10"></div>
+            <button id="navFavBtn" onclick="switchMainTab('favorites', this)" class="flex items-center space-x-1.5 text-gray-400 hover:text-white cursor-pointer transition">
+                <i class="fa-regular fa-heart text-sm"></i>
+                <span class="text-[10px] font-semibold">Yêu thích</span>
+            </button>
+            <div class="w-[1px] h-4 bg-white/10"></div>
+            <button id="navStudioBtn" onclick="switchMainTab('studio', this)" class="flex items-center space-x-1.5 text-gray-400 hover:text-white cursor-pointer transition">
+                <i class="fa-solid fa-palette text-sm"></i>
+                <span class="text-[10px] font-semibold">Pha màu</span>
+            </button>
+        </footer>
+
+    </div>
+
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const timeEl = document.getElementById('mockupTime');
