@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wallzy Wallpaper Studio - PWA & Studio Edition</title>
     
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Wallzy%20Wallpaper%20Studio%22%2C%22short_name%22%3A%22Wallzy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2308080a%22%2C%22theme_color%22%3A%22%2308080a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Butf%2C%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Wallzy%20Wallpaper%20Studio%22%2C%22short_name%22%3A%22Wallzy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2308080a%22%2C%22theme_color%22%3A%22%2308080a%22%2C%22scope%22%3A%22.%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Butf%2C%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     <meta name="theme-color" content="#08080a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,17 +41,17 @@
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans" id="bodyElement">
 
-    <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[90vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#08080a] transition-colors duration-500">
+    <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#08080a] transition-colors duration-500">
 
         <div id="splashScreen" class="absolute inset-0 bg-[#08080a] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
             <div class="w-16 h-16 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl mb-4">
                 <i class="fa-solid fa-feather text-xl"></i>
             </div>
             <h1 class="font-bold text-lg tracking-tight text-white">WALLZY</h1>
-            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">PWA & Minimal Studio</p>
+            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">PWA & Studio Edition</p>
         </div>
 
-        <header id="headerEl" class="sticky top-0 z-40 bg-[#08080a]/80 backdrop-blur-xl px-5 py-4 flex justify-between items-center border-b border-white/5 flex-shrink-0">
+        <header id="headerEl" class="sticky top-0 z-40 bg-[#08080a]/85 backdrop-blur-xl px-5 py-3.5 flex justify-between items-center border-b border-white/5 flex-shrink-0">
             <div class="flex items-center space-x-2">
                 <span class="font-bold text-lg tracking-tight text-white">Wallzy.</span>
             </div>
@@ -65,8 +66,8 @@
             </div>
         </header>
 
-        <nav id="categoryNav" class="px-5 py-3 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 bg-transparent">
-            <button onclick="filterCategory('all', this)" class="cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Tất cả</button>
+        <nav id="categoryNav" class="px-5 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 bg-transparent">
+            <button onclick="filterCategory('all', this)" class="cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm">Tất cả</button>
             <button onclick="filterCategory('gradient', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Gradient</button>
             <button onclick="filterCategory('anime', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Anime</button>
             <button onclick="filterCategory('nature', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Phong cảnh</button>
@@ -88,8 +89,8 @@
             </div>
         </div>
 
-        <main class="flex-1 px-5 py-2 pb-32 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
-            <div id="storageNotice" class="hidden mb-4 p-3 bg-[#16161a] rounded-2xl text-[11px] text-gray-300 flex items-center justify-between border border-white/5">
+        <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
+            <div id="storageNotice" class="hidden mb-4 p-3 bg-[#16161a] rounded-2xl text-[11px] text-gray-300 flex items-center justify-between border border-white/5 shadow-sm">
                 <span><i class="fa-solid fa-heart text-red-500 mr-1.5"></i> Kho lưu trữ hình nền yêu thích cá nhân.</span>
                 <button onclick="dismissStorageNotice()" class="font-semibold text-white ml-2">Ẩn</button>
             </div>
@@ -98,7 +99,7 @@
             <div id="wallpaperGridContainer">
                 <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
                 <div id="paginationContainer" class="py-6 text-center">
-                    <button id="loadMoreBtn" onclick="loadMoreWallpapers()" class="w-full py-3 bg-[#16161a] hover:bg-[#222228] text-gray-200 rounded-2xl text-xs font-semibold transition cursor-pointer">
+                    <button id="loadMoreBtn" onclick="loadMoreWallpapers()" class="w-full py-3 bg-[#16161a] hover:bg-[#222228] text-gray-200 rounded-2xl text-xs font-semibold transition cursor-pointer shadow-sm">
                         Khám phá thêm (<span id="remainingCount">0</span>)
                     </button>
                 </div>
@@ -154,7 +155,7 @@
             </div>
         </main>
 
-        <footer id="footerEl" class="absolute bottom-5 inset-x-6 bg-[#121216]/80 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-lg">
+        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#121216]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
             <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex items-center space-x-1.5 text-white cursor-pointer transition">
                 <i class="fa-regular fa-compass text-sm"></i>
                 <span class="text-[10px] font-semibold">Khám phá</span>
@@ -171,40 +172,6 @@
             </button>
         </footer>
 
-    </div>
-
-    <div id="pwaGatewayModal" class="fixed inset-0 bg-[#08080a] z-[2000] flex flex-col items-center justify-between p-6 text-center animate-fade-in hidden">
-        <div class="w-full flex justify-end"></div>
-
-        <div class="my-auto space-y-6 max-w-xs w-full">
-            <div class="w-20 h-20 rounded-3xl bg-white text-gray-900 flex items-center justify-center shadow-2xl mx-auto">
-                <i class="fa-solid fa-feather text-3xl"></i>
-            </div>
-            <div class="space-y-2">
-                <h2 class="text-base font-bold text-white tracking-tight">Cài đặt Wallzy Studio</h2>
-                <p class="text-xs text-gray-400 leading-relaxed">Để tiếp tục sử dụng ứng dụng và kho hình nền, vui lòng thêm ứng dụng ra Màn hình chính.</p>
-            </div>
-
-            <div class="bg-[#121216] border border-white/10 p-4 rounded-3xl text-left text-[11px] text-gray-300 space-y-3 shadow-xl">
-                <div class="flex items-start space-x-2.5">
-                    <i class="fa-brands fa-apple text-base mt-0.5 text-white"></i>
-                    <div><b>iOS (Safari):</b> Bấm nút Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket mx-0.5"></i> rồi chọn <b>"Thêm vào Màn hình chính"</b>.</div>
-                </div>
-                <div class="flex items-start space-x-2.5">
-                    <i class="fa-brands fa-android text-base mt-0.5 text-white"></i>
-                    <div><b>Android (Chrome):</b> Bấm menu <i class="fa-solid fa-ellipsis-vertical mx-0.5"></i> rồi chọn <b>"Thêm vào màn hình chính"</b>.</div>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <button onclick="promptInstallPWAFromGateway()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3.5 rounded-2xl shadow-lg transition text-xs cursor-pointer flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-arrow-down text-xs"></i>
-                    <span>Thêm ra màn hình chính</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="text-[10px] text-gray-600">Wallzy PWA Studio Edition</div>
     </div>
 
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
@@ -256,11 +223,11 @@
             </div>
             <div>
                 <h3 class="text-sm font-bold text-white">Thêm ra Màn hình chính</h3>
-                <p class="text-[11px] text-gray-400 mt-1.5 leading-relaxed">Trải nghiệm ứng dụng toàn màn hình bằng cách thêm vào thiết bị:</p>
+                <p class="text-[11px] text-gray-400 mt-1.5 leading-relaxed">Để chạy ở chế độ toàn màn hình ứng dụng PWA độc lập:</p>
             </div>
             <div class="bg-[#08080a] p-3 rounded-2xl text-left text-[11px] text-gray-300 space-y-2 border border-white/5">
-                <div class="flex items-center space-x-2"><i class="fa-brands fa-apple text-sm"></i><span><b>iOS:</b> Bấm Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket"></i> chọn <b>"Thêm vào Màn hình chính"</b>.</span></div>
-                <div class="flex items-center space-x-2"><i class="fa-brands fa-android text-sm"></i><span><b>Android:</b> Bấm menu <i class="fa-solid fa-ellipsis-vertical"></i> chọn <b>"Thêm vào màn hình chính"</b>.</span></div>
+                <div class="flex items-center space-x-2"><i class="fa-brands fa-android text-sm text-green-400"></i><span><b>Android Chrome:</b> Bấm menu ba chấm <i class="fa-solid fa-ellipsis-vertical"></i> và chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào màn hình chính"</b>.</span></div>
+                <div class="flex items-center space-x-2"><i class="fa-brands fa-apple text-sm"></i><span><b>iOS Safari:</b> Bấm Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket"></i> chọn <b>"Thêm vào Màn hình chính"</b>.</span></div>
             </div>
             <button onclick="closePwaModal()" class="w-full bg-white text-gray-900 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer">
                 Đã hiểu
@@ -430,9 +397,13 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-cache-v1';
+                    const CACHE_NAME = 'wallzy-cache-v2';
                     self.addEventListener('install', (e) => {
+                        self.skipWaiting();
                         e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
+                    });
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(clients.claim());
                     });
                     self.addEventListener('fetch', (e) => {
                         e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request)));
@@ -448,42 +419,10 @@
             deferredPrompt = e;
         });
 
-        // Tự động kiểm tra: nếu chưa cài đặt PWA (standalone) và chưa lưu trạng thái xác nhận thì bật thông báo, nếu đã thêm rồi thì tự động ẩn ngay
-        function checkPwaInstalledStatus() {
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            const gatewayModal = document.getElementById('pwaGatewayModal');
-            const hasInstalledLocally = localStorage.getItem('wallzy_pwa_installed') === 'true';
-
-            if (isStandalone || hasInstalledLocally) {
-                if (gatewayModal) gatewayModal.classList.add('hidden');
-            } else {
-                if (gatewayModal) gatewayModal.classList.remove('hidden');
-            }
-        }
-
         function promptInstallPWA() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('wallzy_pwa_installed', 'true');
-                        checkPwaInstalledStatus();
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                document.getElementById('pwaModal').classList.remove('hidden');
-            }
-        }
-
-        function promptInstallPWAFromGateway() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('wallzy_pwa_installed', 'true');
-                        checkPwaInstalledStatus();
-                    }
                     deferredPrompt = null;
                 });
             } else {
@@ -493,8 +432,6 @@
 
         function closePwaModal() {
             document.getElementById('pwaModal').classList.add('hidden');
-            localStorage.setItem('wallzy_pwa_installed', 'true');
-            checkPwaInstalledStatus();
         }
 
         function getFavorites() {
@@ -520,8 +457,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            checkPwaInstalledStatus();
-
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
             
@@ -531,7 +466,7 @@
                     body.classList.remove('overflow-hidden');
                     setTimeout(() => { splashScreen.style.display = 'none'; }, 700);
                 }
-            }, 1000);
+            }, 800);
 
             updateLiveClock();
             setInterval(updateLiveClock, 10000);
@@ -671,7 +606,7 @@
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = 'cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer';
             });
-            if (btnElement) btnElement.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer';
+            if (btnElement) btnElement.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm';
             renderWallpapers(cat);
         }
 
@@ -855,7 +790,6 @@
 
         function closeQualityModal() { document.getElementById('qualityModal').classList.add('hidden'); }
 
-        // --- BLOB PURE DOWNLOAD HANDLER ---
         async function executeDownload(quality) {
             closeQualityModal();
             if (!currentSelectedWallpaper) return;
@@ -899,7 +833,6 @@
 
         function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); }
 
-        // --- GRADIENT STUDIO ---
         function initGradientStudio() {
             const color1Input = document.getElementById('gradColor1');
             const color2Input = document.getElementById('gradColor2');
