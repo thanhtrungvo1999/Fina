@@ -243,11 +243,21 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wallzy-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "demo", projectId: "demo" };
+        
+        // Sử dụng thông số cấu hình Firebase thực tế của bạn
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHOQSdlPxPstS3cTzAgg43qIK-HjGrZxI",
+            authDomain: "quan-ly-tai-chinh-d0bf1.firebaseapp.com",
+            projectId: "quan-ly-tai-chinh-d0bf1",
+            storageBucket: "quan-ly-tai-chinh-d0bf1.firebasestorage.app",
+            messagingSenderId: "1054695985785",
+            appId: "1:1054695985785:web:c24cfb396738010438baa8",
+            measurementId: "G-H9E9B4NLYJ"
+        };
 
         let app, db, auth;
         let currentUser = null;
@@ -275,7 +285,6 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // Kiểm tra trạng thái đăng nhập hiện tại
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUser = user;
@@ -296,7 +305,7 @@
         window.loginWithGoogleReal = async function() {
             try {
                 const provider = new GoogleAuthProvider();
-                // Sử dụng signInWithPopup thay vì Redirect để chạy cực mượt trên Vercel không bị lỗi chuyển hướng miền
+                // Sử dụng popup thật 100% trên Vercel
                 const result = await signInWithPopup(auth, provider);
                 if (result && result.user) {
                     currentUser = result.user;
@@ -729,5 +738,3 @@
             });
         }
     </script>
-</body>
-</html>
