@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wallzy - Minimalist Wallpaper Studio</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -17,7 +14,6 @@
             color: #f3f4f6;
             overflow-x: hidden;
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -28,7 +24,6 @@
             background: #27272a;
             border-radius: 3px;
         }
-        /* Skeleton wave shimmer animation */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -47,7 +42,7 @@
         }
     </style>
 </head>
-<body id="bodyElement" class="min-h-screen flex flex-col selection:bg-white selection:text-black">
+<body id="bodyElement" class="min-h-screen flex flex-col selection:bg-white selection:text-black overflow-hidden">
 
     <div id="splashScreen" class="fixed inset-0 bg-[#0b0b0e] z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="relative flex items-center justify-center mb-4">
@@ -56,7 +51,7 @@
             </div>
         </div>
         <h1 class="text-sm font-semibold tracking-widest text-white/90 uppercase">Wallzy Studio</h1>
-        <p class="text-[11px] text-gray-500 mt-1">Đang khởi tạo cơ sở dữ liệu đám mây...</p>
+        <p class="text-[11px] text-gray-500 mt-1">Đang khởi tạo hệ thống & đồng bộ Database chung...</p>
     </div>
 
     <header class="sticky top-0 z-40 bg-[#0b0b0e]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 flex justify-between items-center">
@@ -68,11 +63,23 @@
         </div>
         
         <div class="flex items-center space-x-2">
-            <button id="authBtn" onclick="handleAuthClick()" class="bg-[#16161a] hover:bg-[#222228] text-white text-xs font-semibold px-3.5 py-2 rounded-xl border border-white/10 transition flex items-center space-x-2 cursor-pointer shadow-sm">
-                <i class="fa-solid fa-user text-xs"></i>
-                <span id="authBtnText">Đăng nhập</span>
-            </button>
-            <button onclick="switchTab('admin')" class="w-9 h-9 rounded-xl bg-[#16161a] hover:bg-[#222228] text-gray-300 hover:text-white flex items-center justify-center border border-white/10 transition cursor-pointer" title="Trang Quản Trị">
+            <!-- Khu vực tài khoản người dùng / Đăng nhập Google -->
+            <div id="authContainer" class="flex items-center space-x-2">
+                <button onclick="handleGoogleLogin()" class="bg-[#16161a] hover:bg-[#222228] text-gray-200 text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 flex items-center space-x-2 shadow-sm transition cursor-pointer">
+                    <i class="fa-brands fa-google text-red-400"></i>
+                    <span id="loginBtnText">Đăng nhập Google</span>
+                </button>
+            </div>
+
+            <div id="userProfileBadge" class="hidden items-center space-x-2 bg-[#16161a] border border-white/10 px-3 py-1.5 rounded-xl">
+                <img id="userAvatar" src="" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-white/20">
+                <span id="userNameDisplay" class="text-xs text-white font-medium max-w-[100px] truncate">User</span>
+                <button onclick="handleLogout()" class="text-gray-400 hover:text-red-400 text-xs ml-1 transition cursor-pointer" title="Đăng xuất">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+
+            <button onclick="switchTab('admin')" class="w-9 h-9 rounded-xl bg-[#16161a] hover:bg-[#222228] text-gray-300 hover:text-white flex items-center justify-center border border-white/10 transition cursor-pointer" title="Đăng ảnh chung">
                 <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
             </button>
         </div>
@@ -85,7 +92,7 @@
             
             <div class="relative w-full">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
-                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm hình nền, màu sắc, chủ đề..." class="w-full bg-[#121216] border border-white/10 text-white text-xs rounded-2xl pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition placeholder-gray-500 shadow-inner">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm hình nền chung, màu sắc, chủ đề..." class="w-full bg-[#121216] border border-white/10 text-white text-xs rounded-2xl pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition placeholder-gray-500 shadow-inner">
             </div>
 
             <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-none">
@@ -99,9 +106,9 @@
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
                         <i class="fa-solid fa-star text-amber-400 text-xs"></i>
-                        <span>Đánh giá trải nghiệm trang web</span>
+                        <span>Đánh giá trải nghiệm chung</span>
                     </h3>
-                    <span class="text-[10px] text-gray-400 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">Yêu cầu đăng nhập</span>
+                    <span class="text-[10px] text-emerald-400 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">Công khai</span>
                 </div>
                 
                 <div id="reviewInputBox" class="space-y-2.5">
@@ -113,37 +120,37 @@
                         <i class="fa-solid fa-star cursor-pointer hover:scale-110 transition" onclick="setRating(5)"></i>
                         <span class="text-[11px] text-gray-400 ml-2 font-medium" id="ratingText">(Chọn 5 sao)</span>
                     </div>
-                    <textarea id="reviewComment" rows="2" placeholder="Chia sẻ cảm nhận của bạn về ứng dụng..." class="w-full bg-[#16161a] border border-white/10 text-white text-xs rounded-xl p-3 focus:outline-none focus:border-white/30 transition placeholder-gray-500 resize-none"></textarea>
+                    <textarea id="reviewComment" rows="2" placeholder="Chia sẻ cảm nhận của bạn với cộng đồng..." class="w-full bg-[#16161a] border border-white/10 text-white text-xs rounded-xl p-3 focus:outline-none focus:border-white/30 transition placeholder-gray-500 resize-none"></textarea>
                     <button onclick="submitReview()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-2.5 rounded-xl text-xs transition shadow-sm cursor-pointer flex items-center justify-center space-x-1.5">
                         <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                        <span>Gửi đánh giá cộng đồng</span>
+                        <span>Gửi đánh giá chung</span>
                     </button>
                 </div>
 
                 <div id="reviewsList" class="space-y-2 pt-2 border-t border-white/5 max-h-40 overflow-y-auto">
-                    <div class="text-center py-2 text-[11px] text-gray-500">Đang tải đánh giá từ cơ sở dữ liệu...</div>
+                    <div class="text-center py-2 text-[11px] text-gray-500">Đang tải đánh giá từ database chung...</div>
                 </div>
             </div>
 
             <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
-                <!-- Sẽ được điền bằng JavaScript -->
+                <!-- Danh sách hình nền -->
             </div>
         </section>
 
-        <!-- Tab Yêu Thích -->
+        <!-- Tab Yêu thích -->
         <section id="favoritesTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Bộ sưu tập yêu thích</h2>
-                <p class="text-xs text-gray-400">Các hình nền bạn đã thả tim trên đám mây.</p>
+                <p class="text-xs text-gray-400">Các hình nền bạn đã thả tim trên thiết bị hoặc tài khoản.</p>
             </div>
             <div id="favoritesGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
 
-        <!-- Tab Pha Màu Gradient -->
+        <!-- Tab Pha màu Gradient -->
         <section id="gradientTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Gradient Studio</h2>
-                <p class="text-xs text-gray-400">Tự do pha trộn màu sắc tạo hình nền độc quyền.</p>
+                <p class="text-xs text-gray-400">Pha trộn màu sắc tạo hình nền đẩy lên database chung.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl">
@@ -183,17 +190,17 @@
             </div>
         </section>
 
-        <!-- Tab Quản Trị & Upload Ảnh -->
+        <!-- Tab Quản trị / Tải ảnh lên -->
         <section id="adminTab" class="space-y-4 hidden">
             <div class="space-y-1">
-                <h2 class="text-sm font-bold text-white tracking-wide">Trang Quản Trị & Đăng Ảnh</h2>
-                <p class="text-xs text-gray-400">Tải lên hình nền từ thiết bị để lưu trữ lên Cloud Database.</p>
+                <h2 class="text-sm font-bold text-white tracking-wide">Đăng Ảnh Lên Database Chung</h2>
+                <p class="text-xs text-gray-400">Tải ảnh từ thiết bị để hiển thị ngay lập tức cho tất cả mọi người.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl relative">
-                <div id="uploadLoadingOverlay" class="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-2xl z-10 hidden flex flex-col items-center justify-center space-y-2">
-                    <div class="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    <span class="text-xs text-white font-medium" id="uploadLoadingText">Đang tải ảnh lên Cloud...</span>
+                <div id="uploadLoadingOverlay" class="absolute inset-0 bg-black/80 backdrop-blur-sm rounded-2xl z-10 hidden flex flex-col items-center justify-center space-y-3">
+                    <div class="w-9 h-9 border-3 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    <span class="text-xs text-white font-medium" id="uploadLoadingText">Đang tải ảnh lên database chung...</span>
                 </div>
 
                 <div class="space-y-1">
@@ -206,13 +213,13 @@
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-[11px] text-gray-400 font-medium">Tải tệp ảnh từ máy</label>
+                    <label class="text-[11px] text-gray-400 font-medium">Tải tệp ảnh từ thiết bị</label>
                     <input type="file" id="imageFileInput" accept="image/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#16161a] file:text-white hover:file:bg-[#222228] cursor-pointer border border-white/10 rounded-xl p-2 bg-[#16161a]">
                 </div>
 
                 <button onclick="uploadImageToCloudDatabase()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl text-xs transition shadow-md cursor-pointer flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
-                    <span>Tải lên Database chung</span>
+                    <span>Tải lên Database chung ngay</span>
                 </button>
             </div>
         </section>
@@ -234,6 +241,7 @@
         </button>
     </nav>
 
+    <!-- Modal chi tiết ảnh -->
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
         <div class="flex justify-between items-center relative z-10">
             <button onclick="closeModal()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
@@ -243,7 +251,7 @@
                 <span class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10" id="modalCategory">Database</span>
             </div>
             <div class="flex items-center space-x-2">
-                <button id="modalDeleteBtn" onclick="deleteCurrentDatabaseImage()" class="text-red-400 text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 hidden items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xóa ảnh này khỏi DB">
+                <button id="modalDeleteBtn" onclick="deleteCurrentDatabaseImage()" class="text-red-400 text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 hidden items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Xóa ảnh khỏi database chung">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
                 <button onclick="toggleFavoriteCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
@@ -268,15 +276,15 @@
         </div>
     </div>
 
-    <!-- Countdown Modal -->
+    <!-- Modal đếm ngược khi tải ảnh -->
     <div id="countdownModal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1500] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
         <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-white text-2xl font-bold" id="countdownNumber">
                 3
             </div>
             <div class="space-y-1">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Đang hiển thị quảng cáo tài trợ</h3>
-                <p class="text-[11px] text-gray-400">Vui lòng xem trong 3 giây để mở khóa link tải ảnh gốc...</p>
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Đang chuẩn bị file tải về</h3>
+                <p class="text-[11px] text-gray-400">Vui lòng đợi 3 giây để mở khóa link tải ảnh gốc...</p>
             </div>
             <button onclick="cancelCountdown()" class="w-full bg-[#16161a] hover:bg-[#222228] text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/10">
                 Hủy bỏ
@@ -284,17 +292,17 @@
         </div>
     </div>
 
-    <!-- Notification Message Box -->
+    <!-- Hộp thông báo nổi -->
     <div id="messageBox" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#18181b] border border-white/10 text-white text-xs px-4 py-3 rounded-2xl shadow-2xl z-[2000] hidden transition-all duration-300">
         <span id="messageText">Thông báo hệ thống</span>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-default-app-id';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-app';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "mock", authDomain: "mock", projectId: "mock" };
 
         let app, db, auth;
@@ -333,60 +341,89 @@
 
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
-                    updateAuthUIState(user);
+                    updateAuthUI(user);
                     if (user) {
                         setupCloudListeners();
+                        setupReviewsListener();
                     }
                 });
             } catch (e) {
                 cloudUploadedImages = [...sampleWallpapers];
                 updateWallpapersList();
+                renderReviews();
             }
         }
 
-        function updateAuthUIState(user) {
-            const btnText = document.getElementById('authBtnText');
-            if (user && !user.isAnonymous) {
-                btnText.innerText = user.displayName ? user.displayName.split(' ')[0] : 'Tài khoản';
-            } else {
-                btnText.innerText = 'Đăng nhập';
+        window.handleGoogleLogin = async function() {
+            if (!auth) {
+                showMessage("Hệ thống xác thực chưa sẵn sàng.");
+                return;
+            }
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                updateAuthUI(currentUser);
+                showMessage("Đăng nhập Google thành công!");
+            } catch (error) {
+                // Nếu popup bị chặn, fallback tự động sang đăng nhập ẩn danh để app vẫn dùng mượt mà
+                try {
+                    await signInAnonymously(auth);
+                    showMessage("Đã đồng bộ phiên làm việc thành công!");
+                } catch (err) {
+                    showMessage("Không thể đăng nhập. Vui lòng thử lại.");
+                }
             }
         }
 
-        window.handleAuthClick = function() {
+        window.handleLogout = async function() {
             if (!auth) return;
-            if (currentUser && !currentUser.isAnonymous) {
-                signOut(auth).then(() => showMessage("Đã đăng xuất tài khoản."));
+            try {
+                await signOut(auth);
+                await signInAnonymously(auth);
+                showMessage("Đã đăng xuất tài khoản.");
+            } catch (e) {
+                showMessage("Lỗi đăng xuất.");
+            }
+        }
+
+        function updateAuthUI(user) {
+            const authContainer = document.getElementById('authContainer');
+            const userProfileBadge = document.getElementById('userProfileBadge');
+            const userAvatar = document.getElementById('userAvatar');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+
+            if (user && !user.isAnonymous && user.displayName) {
+                if (authContainer) authContainer.style.display = 'none';
+                if (userProfileBadge) {
+                    userProfileBadge.style.display = 'flex';
+                    userAvatar.src = user.photoURL || 'https://placehold.co/100x100/16161a/ffffff?text=U';
+                    userNameDisplay.innerText = user.displayName;
+                }
             } else {
-                const provider = new GoogleAuthProvider();
-                signInWithPopup(auth, provider).then(() => {
-                    showMessage("Đăng nhập Google thành công!");
-                }).catch(() => {
-                    showMessage("Đăng nhập thất bại hoặc bị hủy.");
-                });
+                if (authContainer) authContainer.style.display = 'flex';
+                if (userProfileBadge) userProfileBadge.style.display = 'none';
             }
         }
 
         function setupCloudListeners() {
             if (!db) return;
             try {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'wallpapers');
+                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers');
                 onSnapshot(q, (snapshot) => {
                     const loadedImages = [];
                     snapshot.forEach((docSnap) => {
                         loadedImages.push({ id: docSnap.id, ...docSnap.data() });
                     });
-                    if (loadedImages.length > 0) {
-                        // Kết hợp ảnh từ cloud và loại bỏ trùng lặp id
-                        const map = new Map();
-                        loadedImages.forEach(item => map.set(item.id, item));
-                        cloudUploadedImages = Array.from(map.values());
-                    } else {
-                        cloudUploadedImages = [...sampleWallpapers];
-                    }
+                    
+                    const map = new Map();
+                    loadedImages.forEach(item => map.set(item.id, item));
+                    sampleWallpapers.forEach(item => { if (!map.has(item.id)) map.set(item.id, item); });
+                    
+                    cloudUploadedImages = Array.from(map.values());
                     updateWallpapersList();
                 }, (error) => {
-                    if(cloudUploadedImages.length === 0) {
+                    if (cloudUploadedImages.length === 0) {
                         cloudUploadedImages = [...sampleWallpapers];
                         updateWallpapersList();
                     }
@@ -397,10 +434,10 @@
             }
         }
 
-        window.setupReviewsListener = function() {
+        function setupReviewsListener() {
             if (!db) return;
             try {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'reviews');
+                const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_reviews');
                 onSnapshot(q, (snapshot) => {
                     reviews = [];
                     snapshot.forEach((docSnap) => {
@@ -429,18 +466,14 @@
         }
 
         window.submitReview = async function() {
-            if (!currentUser || currentUser.isAnonymous) {
-                showMessage("Vui lòng đăng nhập Google để đánh giá trang web!");
-                return;
-            }
             const comment = document.getElementById('reviewComment').value.trim();
             if (!comment) {
                 showMessage("Vui lòng nhập nội dung đánh giá của bạn.");
                 return;
             }
+            const authorName = (currentUser && !currentUser.isAnonymous && currentUser.displayName) ? currentUser.displayName : 'Thành viên Wallzy';
             const newRev = {
-                userName: currentUser.displayName || 'Thành viên Wallzy',
-                userPhoto: currentUser.photoURL || '',
+                userName: authorName,
                 rating: currentRating,
                 comment: comment,
                 createdAt: new Date().toISOString()
@@ -448,13 +481,13 @@
 
             try {
                 if (db) {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'reviews'), newRev);
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'shared_reviews'), newRev);
                 } else {
                     reviews.unshift(newRev);
                     renderReviews();
                 }
                 document.getElementById('reviewComment').value = '';
-                showMessage("Đã gửi đánh giá thành công!");
+                showMessage("Đã gửi đánh giá lên database chung!");
             } catch (e) {
                 reviews.unshift(newRev);
                 renderReviews();
@@ -465,6 +498,7 @@
 
         function renderReviews() {
             const listEl = document.getElementById('reviewsList');
+            if (!listEl) return;
             if (reviews.length === 0) {
                 listEl.innerHTML = `<div class="text-center py-2 text-[11px] text-gray-500">Chưa có đánh giá nào. Hãy là người đầu tiên!</div>`;
                 return;
@@ -532,7 +566,7 @@
                 setTimeout(() => {
                     isSkeletonActive = false;
                     updateWallpapersList();
-                }, 3000);
+                }, 1200);
                 return;
             }
 
@@ -597,7 +631,7 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                showMessage("Đã sao chép link riêng của ảnh! Gửi cho bạn bè.");
+                showMessage("Đã sao chép link chia sẻ ảnh thành công!");
             } catch (err) {
                 showMessage("Không thể sao chép link.");
             }
@@ -644,7 +678,7 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
-                showMessage("Tải ảnh thành công!");
+                showMessage("Tải ảnh thành công về thiết bị!");
             } catch (e) {
                 const link = document.createElement('a');
                 link.href = currentSelectedWallpaper.url;
@@ -653,7 +687,7 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                showMessage("Tải ảnh thành công!");
+                showMessage("Tải ảnh thành công về thiết bị!");
             }
         }
 
@@ -720,7 +754,7 @@
 
             try {
                 if (db) {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'wallpapers'), newWallpaper);
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers'), newWallpaper);
                 }
             } catch (e) {}
 
@@ -728,7 +762,7 @@
                 cloudUploadedImages.unshift(newWallpaper);
             }
             updateWallpapersList();
-            showMessage("Đã đẩy Gradient lên Database chung thành công!");
+            showMessage("Đã đẩy Gradient lên database chung thành công!");
             switchTab('explore');
         }
 
@@ -751,7 +785,7 @@
 
             reader.onload = async function(e) {
                 const base64Url = e.target.result;
-                if (uploadLoadingText) uploadLoadingText.innerText = "Đang đồng bộ lên Database đám mây...";
+                if (uploadLoadingText) uploadLoadingText.innerText = "Đang đồng bộ lên database chung...";
 
                 const uniqueId = 'upload-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
                 const newWallpaper = {
@@ -763,18 +797,17 @@
 
                 try {
                     if (db) {
-                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'wallpapers'), newWallpaper);
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers'), newWallpaper);
                     }
                 } catch (err) {}
 
-                // Kiểm tra kỹ không để bị trùng id trước khi unshift
                 if (!cloudUploadedImages.some(w => w.id === newWallpaper.id)) {
                     cloudUploadedImages.unshift(newWallpaper);
                 }
                 updateWallpapersList();
 
                 if (uploadOverlay) uploadOverlay.classList.add('hidden');
-                showMessage("Tải lên Database thành công!");
+                showMessage("Tải lên database chung thành công!");
                 fileInput.value = '';
                 switchTab('explore');
             };
@@ -789,11 +822,11 @@
 
         window.deleteCurrentDatabaseImage = async function() {
             if (!currentSelectedWallpaper) return;
-            if (!confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hình nền này khỏi Database chung không?")) return;
+            if (!confirm("Bạn có chắc chắn muốn xóa vĩnh viễn hình nền này khỏi database chung không?")) return;
 
             try {
                 if (db && !currentSelectedWallpaper.id.startsWith('sample-')) {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'wallpapers', currentSelectedWallpaper.id));
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', currentSelectedWallpaper.id));
                 }
                 cloudUploadedImages = cloudUploadedImages.filter(w => w.id !== currentSelectedWallpaper.id);
                 updateWallpapersList();
@@ -825,15 +858,13 @@
             updateWallpapersList();
 
             initFirebase();
-            setupReviewsListener();
-            updateAuthUIState(null);
 
             const urlParams = new URLSearchParams(window.location.search);
             const imgParam = urlParams.get('img');
             if (imgParam) {
                 setTimeout(() => {
                     openModalById(imgParam);
-                }, 1200);
+                }, 1000);
             }
 
             setTimeout(() => {
@@ -842,7 +873,7 @@
                     body.classList.remove('overflow-hidden');
                     setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
                 }
-            }, 600);
+            }, 800);
         });
     </script>
 </body>
