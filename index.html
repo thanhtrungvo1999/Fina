@@ -215,13 +215,17 @@
 
             <div class="space-y-1">
                 <h3 class="text-sm font-bold text-white">Tài khoản Wallzy Studio</h3>
-                <p class="text-[11px] text-gray-400 leading-relaxed">Đăng nhập tài khoản Google để đồng bộ dữ liệu đám mây thực tế.</p>
+                <p class="text-[11px] text-gray-400 leading-relaxed">Đăng nhập tài khoản Google thực tế.</p>
             </div>
 
             <div id="loggedOutView" class="space-y-2.5 pt-1">
                 <button onclick="loginWithGoogleReal()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 px-4 rounded-2xl shadow-md transition flex items-center justify-center space-x-2.5 text-xs cursor-pointer">
                     <i class="fa-brands fa-google text-sm text-red-500"></i>
-                    <span>Đăng nhập với Google (Real)</span>
+                    <span>Đăng nhập với Google (Popup)</span>
+                </button>
+                <button onclick="loginWithGoogleRedirectReal()" class="w-full bg-[#16161a] hover:bg-[#222228] text-gray-200 font-semibold py-2.5 px-4 rounded-2xl border border-white/10 transition flex items-center justify-center space-x-2 text-[11px] cursor-pointer">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Đăng nhập bằng Redirect</span>
                 </button>
             </div>
 
@@ -243,12 +247,12 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wallzy-app-id';
         
-        // Sử dụng thông số cấu hình Firebase thực tế của bạn
+        // Cấu hình Firebase thực tế chính xác của bạn
         const firebaseConfig = {
             apiKey: "AIzaSyDHOQSdlPxPstS3cTzAgg43qIK-HjGrZxI",
             authDomain: "quan-ly-tai-chinh-d0bf1.firebaseapp.com",
@@ -285,6 +289,15 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
+                // Kiểm tra kết quả trả về khi dùng Redirect
+                getRedirectResult(auth).then((result) => {
+                    if (result && result.user) {
+                        showMessage("Đăng nhập Google thành công qua Redirect!");
+                    }
+                }).catch((error) => {
+                    console.error("Redirect login error:", error);
+                });
+
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUser = user;
@@ -299,13 +312,14 @@
                 });
             } catch (e) {
                 console.error("Firebase init failed:", e);
+                showMessage("Lỗi khởi tạo Firebase: " + e.message);
             }
         }
 
         window.loginWithGoogleReal = async function() {
             try {
                 const provider = new GoogleAuthProvider();
-                // Sử dụng popup thật 100% trên Vercel
+                provider.setCustomParameters({ prompt: 'select_account' });
                 const result = await signInWithPopup(auth, provider);
                 if (result && result.user) {
                     currentUser = result.user;
@@ -316,7 +330,24 @@
                     showMessage("Đăng nhập Google thành công!");
                 }
             } catch (e) {
-                showMessage("Lỗi đăng nhập Google: " + e.message);
+                console.error("Popup Login Error code:", e.code, "message:", e.message);
+                let errDesc = e.message;
+                if (e.code === 'auth/unauthorized-domain') {
+                    errDesc = "Tên miền hiện tại chưa được thêm vào mục Authorized domains trong Firebase Console!";
+                } else if (e.code === 'auth/popup-closed-by-user') {
+                    errDesc = "Cửa sổ đăng nhập đã bị đóng trước khi hoàn tất.";
+                }
+                showMessage("Lỗi đăng nhập: " + errDesc);
+            }
+        }
+
+        window.loginWithGoogleRedirectReal = async function() {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithRedirect(auth, provider);
+            } catch (e) {
+                console.error("Redirect Login Error:", e);
+                showMessage("Lỗi chuyển hướng đăng nhập: " + e.message);
             }
         }
 
@@ -686,7 +717,7 @@
 
         window.saveCustomGradient = function() {
             if (!userId) {
-                showMessage("Vui lòng đăng nhập Google thực tế để lưu lên đám mây!");
+                showMessage("Vui lòng đăng nhập Google để lưu lên đám mây!");
                 openAuthModal();
                 return;
             }
@@ -738,3 +769,5 @@
             });
         }
     </script>
+</body>
+</html>
