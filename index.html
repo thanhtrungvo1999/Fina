@@ -17,11 +17,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         window.firebaseAppModules = {
-            initializeApp, getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged,
+            initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
             signInAnonymously, signInWithCustomToken, getFirestore, doc, getDoc, setDoc, collection
         };
     </script>
@@ -556,7 +556,7 @@
         async function initFirebaseIntegration() {
             try {
                 if (typeof __firebase_config !== 'undefined' && window.firebaseAppModules) {
-                    const { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, getFirestore, getRedirectResult } = window.firebaseAppModules;
+                    const { initializeApp, getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, getFirestore } = window.firebaseAppModules;
                     const firebaseConfig = JSON.parse(__firebase_config);
                     const app = initializeApp(firebaseConfig);
                     auth = getAuth(app);
@@ -567,15 +567,6 @@
                         signInWithCustomToken(auth, initialAuthToken).catch(() => signInAnonymously(auth));
                     } else {
                         signInAnonymously(auth).catch(() => {});
-                    }
-
-                    try {
-                        const result = await getRedirectResult(auth);
-                        if (result && result.user) {
-                            showMessage("Đăng nhập tài khoản Google thành công!");
-                        }
-                    } catch (redirectErr) {
-                        console.log("Redirect result notice:", redirectErr);
                     }
 
                     onAuthStateChanged(auth, (user) => {
@@ -603,15 +594,19 @@
                 return;
             }
             try {
-                const { GoogleAuthProvider, signInWithRedirect } = window.firebaseAppModules;
+                const { GoogleAuthProvider, signInWithPopup } = window.firebaseAppModules;
                 const provider = new GoogleAuthProvider();
-                await signInWithRedirect(auth, provider);
+                await signInWithPopup(auth, provider);
+                closeAuthModal();
+                showMessage("Đăng nhập tài khoản Google thành công!");
             } catch (error) {
                 console.error("Google login error details:", error);
-                if (error.code === 'auth/operation-not-allowed') {
-                    showMessage("Lỗi: Tính năng đăng nhập Google chưa được kích hoạt trong Firebase Console.");
+                if (error.code === 'auth/popup-blocked') {
+                    showMessage("Trình duyệt đã chặn cửa sổ pop-up. Vui lòng cho phép pop-up cho trang web này.");
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    showMessage("Lỗi: Tên miền này chưa được cấu hình trong Firebase Console (Authorized Domains).");
                 } else {
-                    showMessage("Không thể chuyển hướng đăng nhập: " + (error.message || "Vui lòng thử lại."));
+                    showMessage("Lỗi đăng nhập: " + (error.message || "Vui lòng thử lại."));
                 }
             }
         }
@@ -645,25 +640,7 @@
         }
 
         function updateLiveClock() {
-        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#121216]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
-            <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex items-center space-x-1.5 text-white cursor-pointer transition">
-                <i class="fa-regular fa-compass text-sm"></i>
-                <span class="text-[10px] font-semibold">Khám phá</span>
-            </button>
-            <div class="w-[1px] h-4 bg-white/10"></div>
-            <button id="navFavBtn" onclick="switchMainTab('favorites', this)" class="flex items-center space-x-1.5 text-gray-400 hover:text-white cursor-pointer transition">
-                <i class="fa-regular fa-heart text-sm"></i>
-                <span class="text-[10px] font-semibold">Yêu thích</span>
-            </button>
-            <div class="w-[1px] h-4 bg-white/10"></div>
-            <button id="navStudioBtn" onclick="switchMainTab('studio', this)" class="flex items-center space-x-1.5 text-gray-400 hover:text-white cursor-pointer transition">
-                <i class="fa-solid fa-palette text-sm"></i>
-                <span class="text-[10px] font-semibold">Pha màu</span>
-            </button>
-        </footer>
-
-    </div>
-
+            const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const timeEl = document.getElementById('mockupTime');
