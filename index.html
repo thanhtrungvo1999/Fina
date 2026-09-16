@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallzy Wallpaper Studio - Public Cloud Database</title>
+    <title>Wallzy Wallpaper Studio - Cloud Database</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#08080a">
@@ -35,7 +35,17 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 3px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+        @keyframes shimmerWave {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-wave {
+            background: linear-gradient(90deg, #121216 25%, #22222b 50%, #121216 75%);
+            background-size: 200% 100%;
+            animation: shimmerWave 1.8s infinite linear;
+        }
     </style>
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
@@ -43,16 +53,16 @@
     <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#08080a] transition-colors duration-500">
 
         <!-- Splash Screen -->
-        <div id="splashScreen" class="absolute inset-0 bg-[#08080a] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
-            <div class="w-16 h-16 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl mb-4 animate-bounce">
+        <div id="splashScreen" class="absolute inset-0 bg-[#08080a] z-[999] flex flex-col items-center justify-center transition-all duration-500 ease-out">
+            <div class="w-16 h-16 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl mb-4">
                 <i class="fa-solid fa-cloud text-xl text-gray-900"></i>
             </div>
             <h1 class="font-bold text-lg tracking-tight text-white">WALLZY</h1>
-            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">Realtime Cloud DB</p>
+            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">Cloud Database</p>
         </div>
 
         <!-- Header -->
-        <header id="headerEl" class="sticky top-0 z-40 bg-[#08080a]/85 backdrop-blur-xl px-5 py-3.5 flex justify-between items-center border-b border-white/5 flex-shrink-0">
+        <header id="headerEl" class="sticky top-0 z-40 bg-[#08080a]/90 backdrop-blur-xl px-5 py-3.5 flex justify-between items-center border-b border-white/5 flex-shrink-0">
             <div class="flex items-center space-x-2">
                 <span class="font-bold text-lg tracking-tight text-white">Wallzy DB.</span>
             </div>
@@ -68,13 +78,14 @@
             </div>
         </header>
 
-        <!-- Category Navigation -->
+        <!-- Category Nav -->
         <nav id="categoryNav" class="px-5 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 bg-transparent">
             <button onclick="filterCategory('all', this)" class="cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm">Tất cả ảnh</button>
-            <button onclick="filterCategory('gradient', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Gradient</button>
+            <button onclick="filterCategory('Gradient', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Gradient</button>
+            <button onclick="filterCategory('Ảnh chụp', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Ảnh chụp</button>
         </nav>
 
-        <!-- Search bar -->
+        <!-- Search Bar -->
         <div id="searchBarContainer" class="px-5 pb-2 flex-shrink-0">
             <div class="relative flex items-center">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs"></i>
@@ -86,14 +97,14 @@
         </div>
 
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
-            <div id="storageNotice" class="mb-4 p-3 bg-[#16161a] rounded-2xl text-[11px] text-gray-300 flex items-center justify-between border border-white/5 shadow-sm">
-                <span><i class="fa-solid fa-database text-white mr-1.5"></i> Kho lưu trữ Cloud công khai. Ai tải lên cũng hiển thị cho tất cả mọi người xem.</span>
-                <button onclick="dismissStorageNotice()" class="font-semibold text-white ml-2">Ẩn</button>
-            </div>
-
             <!-- Wallpaper Grid Container -->
             <div id="wallpaperGridContainer">
-                <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
+                <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                </div>
                 <div id="paginationContainer" class="py-6 text-center hidden">
                     <button id="loadMoreBtn" onclick="loadMoreWallpapers()" class="w-full py-3 bg-[#16161a] hover:bg-[#222228] text-gray-200 rounded-2xl text-xs font-semibold transition cursor-pointer shadow-sm">
                         Khám phá thêm (<span id="remainingCount">0</span>)
@@ -101,13 +112,13 @@
                 </div>
             </div>
 
-            <!-- Cloud Database Uploader Studio Container -->
+            <!-- Cloud Uploader Container -->
             <div id="cloudUploaderContainer" class="hidden space-y-4">
                 <div class="bg-[#121216] border border-white/10 p-5 rounded-3xl space-y-4 shadow-xl text-center">
                     <div class="flex items-center justify-between text-left">
                         <div>
-                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Cơ Sở Dữ Liệu Ảnh Đám Mây</h3>
-                            <p class="text-[10px] text-gray-400 mt-0.5">Tải ảnh lên kho chung lưu vĩnh viễn</p>
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Database Ảnh Đám Mây</h3>
+                            <p class="text-[10px] text-gray-400 mt-0.5">Tải ảnh lên kho chung vĩnh viễn</p>
                         </div>
                         <span id="cloudStorageCountBadge" class="bg-white/10 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">0 ảnh</span>
                     </div>
@@ -117,15 +128,15 @@
                             <i class="fa-solid fa-cloud-arrow-up text-lg text-white"></i>
                         </div>
                         <span class="text-xs font-semibold text-white">Chọn ảnh đẩy lên Đám Mây Chung</span>
-                        <span class="text-[10px] text-gray-400 mt-1">Định dạng JPG, PNG, WEBP (Tự động nén tối ưu)</span>
+                        <span class="text-[10px] text-gray-400 mt-1">Định dạng JPG, PNG, WEBP</span>
                         <input type="file" id="localImageInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
                     </label>
                 </div>
 
                 <div class="space-y-2 pt-2">
                     <div class="flex items-center justify-between px-1">
-                        <h4 class="text-xs font-bold text-white">Kho Ảnh Đám Mây Chung (Tất cả cùng thấy)</h4>
-                        <span class="text-[10px] text-gray-400">Đồng bộ Firebase Firestore</span>
+                        <h4 class="text-xs font-bold text-white">Kho Ảnh Đám Mây Chung</h4>
+                        <span class="text-[10px] text-gray-400">Firebase Firestore</span>
                     </div>
                     <div id="uploadedImagesGrid" class="grid grid-cols-2 gap-3.5"></div>
                 </div>
@@ -181,6 +192,7 @@
             </div>
         </main>
 
+        <!-- Footer Navigation -->
         <footer id="footerEl" class="absolute bottom-12 inset-x-4 bg-[#121216]/90 backdrop-blur-xl border border-white/10 py-2.5 px-3 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
             <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex flex-col items-center space-y-0.5 text-white cursor-pointer transition">
                 <i class="fa-regular fa-compass text-xs text-white"></i>
@@ -263,9 +275,25 @@
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-5 w-full max-w-sm mx-auto">
-            <button onclick="triggerDownloadDirect()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
+            <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
                 <i class="fa-solid fa-download text-xs text-gray-900"></i>
-                <span class="text-[11px] uppercase tracking-wider font-semibold">Tải về chuẩn gốc</span>
+                <span class="text-[11px] uppercase tracking-wider font-semibold">Tải về chuẩn gốc (Đợi 5s)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 5s Countdown Waiting Modal -->
+    <div id="countdownModal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1500] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
+        <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-white text-2xl font-bold" id="countdownNumber">
+                5
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Đang chuẩn bị ảnh gốc</h3>
+                <p class="text-[11px] text-gray-400">Vui lòng đợi 5 giây để hệ thống tối ưu liên kết tải xuống...</p>
+            </div>
+            <button onclick="cancelCountdown()" class="w-full bg-[#16161a] hover:bg-[#222228] text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/10">
+                Hủy bỏ
             </button>
         </div>
     </div>
@@ -293,7 +321,7 @@
 
             <div class="space-y-1">
                 <h3 class="text-sm font-bold text-white">Tài khoản Google</h3>
-                <p class="text-[11px] text-gray-400 leading-relaxed">Đăng nhập chỉ để lưu danh sách yêu thích cá nhân.</p>
+                <p class="text-[11px] text-gray-400 leading-relaxed">Đăng nhập để lưu danh sách yêu thích cá nhân.</p>
             </div>
 
             <div id="loggedOutView" class="space-y-2.5 pt-1">
@@ -346,10 +374,20 @@
         let currentCategory = 'all';
         let displayedCount = 8;
         const loadStepCount = 4;
+        let isDatabaseLoaded = false;
+        let isSkeletonActive = true;
 
         let cloudFavorites = [];
         let cloudCustomGradients = [];
         let cloudUploadedImages = [];
+        let countdownTimer = null;
+
+        const sampleWallpapers = [
+            { id: 'sample_1', category: 'Gradient', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80', timestamp: Date.now() - 1000 },
+            { id: 'sample_2', category: 'Ảnh chụp', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80', timestamp: Date.now() - 2000 },
+            { id: 'sample_3', category: 'Gradient', url: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80', timestamp: Date.now() - 3000 },
+            { id: 'sample_4', category: 'Ảnh chụp', url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80', timestamp: Date.now() - 4000 }
+        ];
 
         async function initFirebase() {
             try {
@@ -357,7 +395,6 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // Lắng nghe toàn bộ ảnh đám mây công khai (Collection Firestore chuẩn)
                 setupPublicCloudListener();
 
                 onAuthStateChanged(auth, (user) => {
@@ -374,7 +411,11 @@
                         refreshCurrentView();
                     }
                 });
-            } catch (e) {}
+            } catch (e) {
+                isDatabaseLoaded = true;
+                cloudUploadedImages = sampleWallpapers;
+                updateWallpapersList();
+            }
         }
 
         function setupPublicCloudListener() {
@@ -385,12 +426,21 @@
                 snapshot.forEach((docSnap) => {
                     images.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                // Sắp xếp mới nhất lên đầu
-                images.sort((a, b) => b.timestamp - a.timestamp);
-                cloudUploadedImages = images;
+                
+                isDatabaseLoaded = true;
+                if (images.length === 0) {
+                    cloudUploadedImages = [...sampleWallpapers];
+                } else {
+                    images.sort((a, b) => b.timestamp - a.timestamp);
+                    cloudUploadedImages = images;
+                }
                 updateWallpapersList();
                 if (currentTab === 'uploader') renderUploadedImages();
-            }, (err) => {});
+            }, (err) => {
+                isDatabaseLoaded = true;
+                cloudUploadedImages = sampleWallpapers;
+                updateWallpapersList();
+            });
         }
 
         function setupPrivateCloudListeners() {
@@ -511,15 +561,23 @@
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
             
+            cloudUploadedImages = sampleWallpapers;
+            updateWallpapersList();
+
             initFirebase();
 
             setTimeout(() => {
                 if(splashScreen) {
                     splashScreen.style.opacity = '0';
                     body.classList.remove('overflow-hidden');
-                    setTimeout(() => { splashScreen.style.display = 'none'; }, 700);
+                    setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
                 }
-            }, 900);
+            }, 600);
+
+            setTimeout(() => {
+                isSkeletonActive = false;
+                renderWallpapers(currentCategory);
+            }, 3000);
 
             renderWallpapers(currentCategory);
             initGradientStudio();
@@ -546,7 +604,6 @@
             const uploaderBtn = document.getElementById('navUploaderBtn');
             const catNav = document.getElementById('categoryNav');
             const searchBarContainer = document.getElementById('searchBarContainer');
-            const storageNotice = document.getElementById('storageNotice');
             const wallpaperGridContainer = document.getElementById('wallpaperGridContainer');
             const gradientStudioContainer = document.getElementById('gradientStudioContainer');
             const cloudUploaderContainer = document.getElementById('cloudUploaderContainer');
@@ -560,7 +617,6 @@
                 exploreBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
                 catNav.style.display = 'flex';
                 searchBarContainer.style.display = 'block';
-                storageNotice.classList.remove('hidden');
                 wallpaperGridContainer.style.display = 'block';
                 gradientStudioContainer.classList.add('hidden');
                 cloudUploaderContainer.classList.add('hidden');
@@ -570,7 +626,6 @@
                 favBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
                 catNav.style.display = 'none';
                 searchBarContainer.style.display = 'none';
-                storageNotice.classList.add('hidden');
                 wallpaperGridContainer.style.display = 'block';
                 gradientStudioContainer.classList.add('hidden');
                 cloudUploaderContainer.classList.add('hidden');
@@ -579,7 +634,6 @@
                 uploaderBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
                 catNav.style.display = 'none';
                 searchBarContainer.style.display = 'none';
-                storageNotice.classList.add('hidden');
                 wallpaperGridContainer.style.display = 'none';
                 gradientStudioContainer.classList.add('hidden');
                 cloudUploaderContainer.classList.remove('hidden');
@@ -588,15 +642,12 @@
                 studioBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
                 catNav.style.display = 'none';
                 searchBarContainer.style.display = 'none';
-                storageNotice.classList.add('hidden');
                 wallpaperGridContainer.style.display = 'none';
                 gradientStudioContainer.classList.remove('hidden');
                 cloudUploaderContainer.classList.add('hidden');
                 renderSavedGradients();
             }
         }
-
-        window.dismissStorageNotice = function() { document.getElementById('storageNotice').classList.add('hidden'); }
 
         window.searchCloudLibrary = function() {
             const query = document.getElementById('searchInput').value.trim();
@@ -618,11 +669,22 @@
             const grid = document.getElementById('wallpaperGrid');
             const paginationContainer = document.getElementById('paginationContainer');
             if(!grid) return;
+            
+            if (isSkeletonActive) {
+                grid.innerHTML = `
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
+                `;
+                return;
+            }
+
             grid.innerHTML = '';
             
             let filtered = wallpapers;
-            if (category === 'gradient') {
-                filtered = wallpapers.filter(w => w.category === 'Gradient');
+            if (category !== 'all') {
+                filtered = wallpapers.filter(w => w.category === category);
             }
 
             const paginatedList = filtered.slice(0, displayedCount);
@@ -643,11 +705,11 @@
             paginatedList.forEach(w => {
                 const isFav = cloudFavorites.some(f => f.id === w.id);
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm animate-fade-in';
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm animate-fade-in';
                 card.onclick = () => openModalById(w.id);
                 card.innerHTML = `
-                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10 z-10">
+                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 relative z-10">
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10 z-20 shadow">
                         <i class="${isFav ? 'fa-solid text-white' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
                     </button>
                 `;
@@ -667,17 +729,17 @@
             grid.innerHTML = '';
 
             if (cloudFavorites.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-regular fa-heart text-2xl text-gray-700 block"></i><span>Chưa có hình nền yêu thích nào.<br>(Cần đăng nhập Google để lưu yêu thích)</span></div>`;
+                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-regular fa-heart text-2xl text-gray-700 block"></i><span>Chưa có hình nền yêu thích nào.<br>Hãy bấm vào biểu tượng trái tim trên ảnh để lưu.</span></div>`;
                 return;
             }
 
             cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
                 card.onclick = () => openModalById(w.id);
                 card.innerHTML = `
-                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10 z-10">
+                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 relative z-10">
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10 z-20 shadow">
                         <i class="fa-solid text-white fa-heart text-[11px]"></i>
                     </button>
                 `;
@@ -686,12 +748,7 @@
         }
 
         window.toggleFavorite = function(id) {
-            if (!userId) {
-                showMessage("Vui lòng đăng nhập Google để lưu danh sách yêu thích cá nhân!");
-                openAuthModal();
-                return;
-            }
-            const wallpaper = wallpapers.find(w => w.id === id) || cloudCustomGradients.find(w => w.id === id);
+            const wallpaper = wallpapers.find(w => w.id === id);
             if (!wallpaper) return;
 
             let updatedFavs = [...cloudFavorites];
@@ -720,7 +777,7 @@
         }
 
         window.openModalById = function(id) {
-            let wallpaper = wallpapers.find(w => w.id === id) || cloudCustomGradients.find(w => w.id === id);
+            let wallpaper = wallpapers.find(w => w.id === id);
             if (wallpaper) openModal(wallpaper);
         }
 
@@ -731,15 +788,50 @@
             updateModalFavState();
 
             const deleteBtn = document.getElementById('modalDeleteBtn');
-            deleteBtn.classList.remove('hidden');
-            deleteBtn.classList.add('flex');
+            if(deleteBtn) deleteBtn.style.display = 'flex';
 
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
         window.closeModal = function() { document.getElementById('detailModal').classList.add('hidden'); }
 
-        window.triggerDownloadDirect = async function() {
+        window.deleteCurrentDatabaseImage = async function() {
+            if(!currentSelectedWallpaper) return;
+            if(confirm("Bạn có chắc chắn muốn xóa ảnh này khỏi Cơ Sở Dữ Liệu Đám Mây?")) {
+                await removeImageFromFirestoreCloud(currentSelectedWallpaper.id);
+                closeModal();
+                showMessage("Đã xóa ảnh khỏi đám mây chung.");
+            }
+        }
+
+        window.startDownloadWith5sCountdown = function() {
+            if (!currentSelectedWallpaper) return;
+            const countdownModal = document.getElementById('countdownModal');
+            const countdownNumber = document.getElementById('countdownNumber');
+            countdownModal.classList.remove('hidden');
+
+            let timeLeft = 3;
+            countdownNumber.innerText = timeLeft;
+
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                countdownNumber.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownModal.classList.add('hidden');
+                    executeActualDownload();
+                }
+            }, 1000);
+        }
+
+        window.cancelCountdown = function() {
+            if (countdownTimer) clearInterval(countdownTimer);
+            document.getElementById('countdownModal').classList.add('hidden');
+        }
+
+        async function executeActualDownload() {
             if (!currentSelectedWallpaper) return;
             try {
                 const response = await fetch(currentSelectedWallpaper.url);
@@ -752,7 +844,7 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
-                showMessage("Đã tải ảnh gốc thành công!");
+                showMessage("Tải ảnh thành công sau 5 giây chờ!");
             } catch (e) {
                 const link = document.createElement('a');
                 link.href = currentSelectedWallpaper.url;
@@ -761,7 +853,7 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                showMessage("Đã mở và tải ảnh thành công!");
+                showMessage("Đã mở ảnh trong tab mới để lưu!");
             }
         }
 
@@ -797,20 +889,20 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.90);
 
                     const newImage = {
                         id: 'db_' + Date.now(),
-                        category: 'Database',
+                        category: 'Ảnh chụp',
                         url: compressedDataUrl,
                         date: new Date().toLocaleDateString('vi-VN'),
                         timestamp: Date.now()
                     };
 
                     addImageToFirestoreCloud(newImage);
-                    renderUploadedImages();
-                    showMessage("Tải ảnh lên Đám Mây Chung thành công! Đã lưu vĩnh viễn.");
+                    showMessage("Tải ảnh lên Đám Mây Chung thành công!");
                     event.target.value = '';
+                    switchMainTab('explore', document.getElementById('navExploreBtn'));
                 };
                 img.src = e.target.result;
             };
@@ -819,44 +911,28 @@
 
         function renderUploadedImages() {
             const grid = document.getElementById('uploadedImagesGrid');
-            const badge = document.getElementById('cloudStorageCountBadge');
-            if (!grid) return;
-
-            badge.innerText = `${cloudUploadedImages.length} ảnh`;
+            const countBadge = document.getElementById('cloudStorageCountBadge');
+            if(!grid) return;
             grid.innerHTML = '';
+            if(countBadge) countBadge.innerText = cloudUploadedImages.length + ' ảnh';
 
-            if (cloudUploadedImages.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-500 text-xs">Chưa có ảnh nào trong Đám Mây Chung. Hãy chọn ảnh phía trên để tải lên!</div>`;
+            if(cloudUploadedImages.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-gray-500 text-xs">Chưa có ảnh nào trên đám mây.</div>`;
                 return;
             }
 
-            cloudUploadedImages.forEach(item => {
+            cloudUploadedImages.forEach(img => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm border border-white/5';
-                card.onclick = () => openModalById(item.id);
+                card.className = 'relative group rounded-2xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow';
+                card.onclick = () => openModalById(img.id);
                 card.innerHTML = `
-                    <img src="${item.url}" alt="Database Image" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-transparent p-3 flex justify-between items-end">
-                        <span class="text-[9px] font-semibold text-white/80">${item.date || ''}</span>
-                        <button onclick="event.stopPropagation(); deleteUploadedImage('${item.id}')" class="w-7 h-7 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition">
-                            <i class="fa-solid fa-trash-can text-[10px]"></i>
-                        </button>
-                    </div>
+                    <img src="${img.url}" class="w-full h-full object-cover relative z-10">
+                    <button onclick="event.stopPropagation(); removeImageFromFirestoreCloud('${img.id}')" class="absolute top-2 right-2 w-7 h-7 bg-red-500/80 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs transition z-20">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
                 `;
                 grid.appendChild(card);
             });
-        }
-
-        window.deleteUploadedImage = function(id) {
-            removeImageFromFirestoreCloud(id);
-            renderUploadedImages();
-            closeModal();
-            showMessage("Đã xóa ảnh khỏi Đám Mây Chung.");
-        }
-
-        window.deleteCurrentDatabaseImage = function() {
-            if (!currentSelectedWallpaper) return;
-            deleteUploadedImage(currentSelectedWallpaper.id);
         }
 
         function initGradientStudio() {
@@ -914,7 +990,7 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 1080, 1920);
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
             const newItem = {
                 id: 'grad_' + Date.now(),
                 category: 'Gradient',
@@ -924,81 +1000,13 @@
             };
 
             addImageToFirestoreCloud(newItem);
-            showMessage("Đã đẩy Gradient lên Đám Mây Chung thành công!");
-        }
-
-        window.downloadCustomGradient = async function() {
-            const c1 = document.getElementById('gradColor1').value;
-            const c2 = document.getElementById('gradColor2').value;
-            const t = document.getElementById('gradType').value;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 1080;
-            canvas.height = 1920;
-            const ctx = canvas.getContext('2d');
-
-            let gradient;
-            if (t === 'circle') {
-                gradient = ctx.createRadialGradient(540, 960, 100, 540, 960, 1000);
-            } else if (t === 'to right') {
-                gradient = ctx.createLinearGradient(0, 0, 1080, 0);
-            } else if (t === 'to bottom') {
-                gradient = ctx.createLinearGradient(0, 0, 0, 1920);
-            } else {
-                gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
-            }
-
-            gradient.addColorStop(0, c1);
-            gradient.addColorStop(1, c2);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 1080, 1920);
-
-            canvas.toBlob((blob) => {
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.download = `wallzy-gradient-${Date.now()}.jpg`;
-                link.href = blobUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-                showMessage("Đã tải ảnh Gradient về máy!");
-            }, 'image/jpeg', 0.9);
-        }
-
-        function renderSavedGradients() {
-            const grid = document.getElementById('savedGradientGrid');
-            const countBadge = document.getElementById('savedGradientCount');
-            if (!grid) return;
-
-            countBadge.innerText = cloudCustomGradients.length;
-            grid.innerHTML = '';
-
-            if (cloudCustomGradients.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-10 text-gray-500 text-xs">Chưa có gradient cá nhân nào.</div>`;
-                return;
-            }
-
-            cloudCustomGradients.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#16161a] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm border border-white/5';
-                card.onclick = () => openModalById(item.id);
-                card.innerHTML = `
-                    <img src="${item.url}" alt="Gradient" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                    <button onclick="event.stopPropagation(); deleteCloudGradient('${item.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 flex items-center justify-center transition border border-white/10 z-10">
-                        <i class="fa-solid fa-trash-can text-[11px]"></i>
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        window.deleteCloudGradient = function(id) {
-            cloudCustomGradients = cloudCustomGradients.filter(item => item.id !== id);
+            cloudCustomGradients.unshift(newItem);
             saveCloudGradients(cloudCustomGradients);
-            renderSavedGradients();
-            showMessage("Đã xóa gradient.");
+            
+            showMessage("Đã đẩy Gradient lên Đám Mây Chung!");
+            switchMainTab('explore', document.getElementById('navExploreBtn'));
         }
+
     </script>
 </body>
 </html>
