@@ -51,7 +51,7 @@
             </div>
         </div>
         <h1 class="text-sm font-semibold tracking-widest text-white/90 uppercase">Wallzy Studio</h1>
-        <p class="text-[11px] text-gray-500 mt-1">Đang đồng bộ Database chung từ mây...</p>
+        <p class="text-[11px] text-gray-500 mt-1">Đang kết nối Database chung...</p>
     </div>
 
     <header class="sticky top-0 z-40 bg-[#0b0b0e]/80 backdrop-blur-xl border-b border-white/5 px-4 py-3.5 flex justify-between items-center">
@@ -63,7 +63,6 @@
         </div>
         
         <div class="flex items-center space-x-2">
-            <!-- Khu vực Đăng nhập Google thực tế -->
             <div id="authContainer" class="flex items-center space-x-2">
                 <button onclick="handleGoogleLogin()" class="bg-[#16161a] hover:bg-[#222228] text-gray-200 text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 flex items-center space-x-2 shadow-sm transition cursor-pointer">
                     <i class="fa-brands fa-google text-red-400"></i>
@@ -102,7 +101,7 @@
                 <button onclick="filterCategory('scenery')" id="cat-scenery" class="category-btn bg-[#16161a] hover:bg-[#222228] text-gray-300 text-xs font-semibold px-4 py-2 rounded-xl border border-white/10 transition cursor-pointer whitespace-nowrap">Phong cảnh</button>
             </div>
 
-            <!-- Khung đánh giá cộng đồng -->
+            <!-- Đánh giá cộng đồng -->
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-3 shadow-xl">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
@@ -133,7 +132,7 @@
                 </div>
             </div>
 
-            <!-- Lưới hình nền chuẩn 100% từ Database -->
+            <!-- Lưới hình nền -->
             <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
 
@@ -141,7 +140,7 @@
         <section id="favoritesTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Bộ sưu tập yêu thích</h2>
-                <p class="text-xs text-gray-400">Các hình nền bạn đã thả tim trên tài khoản.</p>
+                <p class="text-xs text-gray-400">Các hình nền bạn đã thả tim.</p>
             </div>
             <div id="favoritesGrid" class="grid grid-cols-2 gap-3.5"></div>
         </section>
@@ -194,7 +193,7 @@
         <section id="adminTab" class="space-y-4 hidden">
             <div class="space-y-1">
                 <h2 class="text-sm font-bold text-white tracking-wide">Đăng Ảnh Lên Database Chung</h2>
-                <p class="text-xs text-gray-400">Tải ảnh từ thiết bị để lưu thẳng vào Database công khai cho tất cả mọi người cùng thấy.</p>
+                <p class="text-xs text-gray-400">Tải ảnh từ thiết bị để lưu thẳng vào Database công khai.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 rounded-2xl p-4 space-y-4 shadow-xl relative">
@@ -241,7 +240,6 @@
         </button>
     </nav>
 
-    <!-- Modal chi tiết ảnh -->
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
         <div class="flex justify-between items-center relative z-10">
             <button onclick="closeModal()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
@@ -299,29 +297,37 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, setDoc, doc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, setDoc, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-app';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallzy-shared-db-app-v2';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "mock", authDomain: "mock", projectId: "mock" };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
 
         let app, db, auth;
         let currentUser = null;
-        let databaseWallpapers = [];
-        let favorites = [];
-        let reviews = [];
+        
+        // Đã loại bỏ hoàn toàn các ảnh mẫu bên ngoài (sample wallpapers)
+        let databaseWallpapers = JSON.parse(localStorage.getItem('wallzy_cache_wallpapers') || '[]');
+        let favorites = JSON.parse(localStorage.getItem('wallzy_cache_favorites') || '[]');
+        let reviews = JSON.parse(localStorage.getItem('wallzy_cache_reviews') || '[]');
         let currentCategory = 'all';
         let searchQuery = '';
         let currentSelectedWallpaper = null;
         let currentRating = 5;
         let countdownTimer = null;
-        let isSkeletonActive = true;
 
-        function initFirebase() {
+        async function initFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
@@ -331,7 +337,7 @@
                 setupCloudListeners();
                 setupReviewsListener();
             } catch (e) {
-                databaseWallpapers = [];
+                console.warn("Lỗi kết nối Firebase, chuyển sang chế độ Local Cache.", e);
                 updateWallpapersList();
                 renderReviews();
             }
@@ -371,7 +377,7 @@
             const userAvatar = document.getElementById('userAvatar');
             const userNameDisplay = document.getElementById('userNameDisplay');
 
-            if (user) {
+            if (user && !user.isAnonymous) {
                 if (authContainer) authContainer.style.display = 'none';
                 if (userProfileBadge) {
                     userProfileBadge.style.display = 'flex';
@@ -394,13 +400,13 @@
                         loadedImages.push({ id: docSnap.id, ...docSnap.data() });
                     });
                     databaseWallpapers = loadedImages;
+                    localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
                     updateWallpapersList();
                 }, (error) => {
-                    databaseWallpapers = [];
+                    console.error("Lỗi đồng bộ Firestore:", error);
                     updateWallpapersList();
                 });
             } catch (e) {
-                databaseWallpapers = [];
                 updateWallpapersList();
             }
         }
@@ -410,10 +416,14 @@
             try {
                 const q = collection(db, 'artifacts', appId, 'public', 'data', 'shared_reviews');
                 onSnapshot(q, (snapshot) => {
-                    reviews = [];
+                    const loadedReviews = [];
                     snapshot.forEach((docSnap) => {
-                        reviews.push({ id: docSnap.id, ...docSnap.data() });
+                        loadedReviews.push({ id: docSnap.id, ...docSnap.data() });
                     });
+                    if (loadedReviews.length > 0) {
+                        reviews = loadedReviews;
+                        localStorage.setItem('wallzy_cache_reviews', JSON.stringify(reviews));
+                    }
                     renderReviews();
                 }, (error) => {
                     renderReviews();
@@ -442,7 +452,7 @@
                 showMessage("Vui lòng nhập nội dung đánh giá của bạn.");
                 return;
             }
-            const authorName = (currentUser && currentUser.displayName) ? currentUser.displayName : 'Khách Wallzy';
+            const authorName = (currentUser && currentUser.displayName && !currentUser.isAnonymous) ? currentUser.displayName : 'Khách Wallzy';
             const newRev = {
                 userName: authorName,
                 rating: currentRating,
@@ -454,18 +464,14 @@
                 if (db) {
                     const revId = 'rev-' + Date.now();
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_reviews', revId), newRev);
-                } else {
-                    reviews.unshift(newRev);
-                    renderReviews();
                 }
-                document.getElementById('reviewComment').value = '';
-                showMessage("Đã gửi đánh giá lên Database chung!");
-            } catch (e) {
-                reviews.unshift(newRev);
-                renderReviews();
-                document.getElementById('reviewComment').value = '';
-                showMessage("Đã gửi đánh giá thành công!");
-            }
+            } catch (e) {}
+
+            reviews.unshift(newRev);
+            localStorage.setItem('wallzy_cache_reviews', JSON.stringify(reviews));
+            renderReviews();
+            document.getElementById('reviewComment').value = '';
+            showMessage("Đã gửi đánh giá lên Database chung!");
         }
 
         function renderReviews() {
@@ -530,18 +536,6 @@
             const grid = document.getElementById('wallpaperGrid');
             if (!grid) return;
 
-            if (isSkeletonActive) {
-                grid.innerHTML = Array(4).fill(0).map(() => `
-                    <div class="w-full aspect-[9/16] rounded-2xl skeleton-shimmer border border-white/5"></div>
-                `).join('');
-                
-                setTimeout(() => {
-                    isSkeletonActive = false;
-                    updateWallpapersList();
-                }, 800);
-                return;
-            }
-
             let list = [...databaseWallpapers];
             if (currentCategory !== 'all') {
                 list = list.filter(w => w.category === currentCategory);
@@ -564,7 +558,7 @@
 
             grid.innerHTML = list.map(w => `
                 <div onclick="openModalById('${w.id}')" class="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#16161a] border border-white/10 cursor-pointer shadow-lg transition-all duration-300 hover:scale-[1.02]">
-                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/600x1067/16161a/ffffff?text=Wallzy+Studio'">
+                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                         <span class="text-[10px] uppercase font-bold tracking-widest text-white/90">${w.category || 'Database'}</span>
                     </div>
@@ -680,6 +674,7 @@
                 favorites.push(currentSelectedWallpaper);
                 showMessage("Đã thêm vào danh sách yêu thích!");
             }
+            localStorage.setItem('wallzy_cache_favorites', JSON.stringify(favorites));
             updateModalFavState();
             updateFavoritesGrid();
         }
@@ -689,7 +684,7 @@
             const icon = document.getElementById('modalFavIcon');
             const isFav = favorites.some(f => f.id === currentSelectedWallpaper.id);
             if (isFav) {
-                icon.className = "fa-solid fa-heart text-red-500 text-white";
+                icon.className = "fa-solid fa-heart text-red-500";
             } else {
                 icon.className = "fa-regular fa-heart text-white";
             }
@@ -736,11 +731,14 @@
                 if (db) {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', uniqueId), newWallpaper);
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Lỗi ghi Gradient:", e);
+            }
 
             if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
                 databaseWallpapers.unshift(newWallpaper);
             }
+            localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
             updateWallpapersList();
             showMessage("Đã đẩy Gradient lên Database chung thành công!");
             switchTab('explore');
@@ -779,11 +777,14 @@
                     if (db) {
                         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', uniqueId), newWallpaper);
                     }
-                } catch (err) {}
+                } catch (err) {
+                    console.error("Lỗi ghi ảnh lên Database:", err);
+                }
 
                 if (!databaseWallpapers.some(w => w.id === newWallpaper.id)) {
                     databaseWallpapers.unshift(newWallpaper);
                 }
+                localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
                 updateWallpapersList();
 
                 if (uploadOverlay) uploadOverlay.classList.add('hidden');
@@ -808,16 +809,15 @@
                 if (db) {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shared_wallpapers', currentSelectedWallpaper.id));
                 }
-                databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
-                updateWallpapersList();
-                closeModal();
-                showMessage("Đã xóa hình nền thành công!");
             } catch (e) {
-                databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
-                updateWallpapersList();
-                closeModal();
-                showMessage("Đã xóa hình nền thành công!");
+                console.error("Lỗi xóa ảnh:", e);
             }
+
+            databaseWallpapers = databaseWallpapers.filter(w => w.id !== currentSelectedWallpaper.id);
+            localStorage.setItem('wallzy_cache_wallpapers', JSON.stringify(databaseWallpapers));
+            updateWallpapersList();
+            closeModal();
+            showMessage("Đã xóa hình nền thành công!");
         }
 
         function showMessage(text) {
@@ -834,9 +834,7 @@
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
             
-            databaseWallpapers = [];
             updateWallpapersList();
-
             initFirebase();
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -844,7 +842,7 @@
             if (imgParam) {
                 setTimeout(() => {
                     openModalById(imgParam);
-                }, 1000);
+                }, 800);
             }
 
             setTimeout(() => {
@@ -853,7 +851,7 @@
                     body.classList.remove('overflow-hidden');
                     setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
                 }
-            }, 800);
+            }, 600);
         });
     </script>
 </body>
