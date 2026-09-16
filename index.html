@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wallzy Wallpaper Studio - PWA & Studio Edition</title>
     
-    <!-- PWA Manifest & Meta Tags -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Wallzy%20Wallpaper%20Studio%22%2C%22short_name%22%3A%22Wallzy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2308080a%22%2C%22theme_color%22%3A%22%2308080a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Butf%2C%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22120%22%20fill%3D%22%2308080a%22%2F%3E%3Cpath%20d%3D%22M256%20120l110%20272H146z%22%20fill%3D%22%23ffffff%22%2F%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
     <meta name="theme-color" content="#08080a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,17 +19,11 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                     colors: {
                         minimal: {
-                            bg: '#fbfbfd',
-                            card: '#ffffff',
-                            darkBg: '#08080a',
-                            darkCard: '#121216',
-                            borderLight: 'rgba(0, 0, 0, 0.06)',
-                            borderDark: 'rgba(255, 255, 255, 0.08)'
+                            bg: '#fbfbfd', card: '#ffffff', darkBg: '#08080a', darkCard: '#121216',
+                            borderLight: 'rgba(0, 0, 0, 0.06)', borderDark: 'rgba(255, 255, 255, 0.08)'
                         }
                     }
                 }
@@ -38,21 +31,10 @@
         }
     </script>
     <style>
-        ::-webkit-scrollbar {
-            width: 3px;
-            height: 3px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(150, 150, 150, 0.2);
-            border-radius: 3px;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        ::-webkit-scrollbar { width: 3px; height: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 3px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
@@ -60,7 +42,6 @@
 
     <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[90vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#08080a] transition-colors duration-500">
 
-        <!-- MÀN HÌNH CHÀO TỐI GIẢN (SPLASH SCREEN) -->
         <div id="splashScreen" class="absolute inset-0 bg-[#08080a] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
             <div class="w-16 h-16 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl mb-4">
                 <i class="fa-solid fa-feather text-xl"></i>
@@ -75,7 +56,6 @@
             </div>
             
             <div class="flex items-center space-x-2">
-                <!-- PWA Install Button Header -->
                 <button id="pwaInstallBtn" onclick="promptInstallPWA()" class="w-9 h-9 rounded-full bg-white text-gray-900 flex items-center justify-center shadow-md transition hover:scale-105 cursor-pointer" title="Thêm ra màn hình chính">
                     <i class="fa-solid fa-arrow-down text-xs"></i>
                 </button>
@@ -95,7 +75,7 @@
         <div id="searchBarContainer" class="px-5 pb-2 flex-shrink-0">
             <div class="relative flex items-center">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs"></i>
-                <input type="text" id="searchInput" placeholder="Tìm kiếm kho ảnh miễn phí (VD: cyberpunk, ocean, cat...)" class="w-full bg-[#16161a] border border-white/5 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-white focus:outline-none transition shadow-inner">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm kho ảnh miễn phí (VD: cyberpunk, ocean...)" class="w-full bg-[#16161a] border border-white/5 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-white focus:outline-none transition shadow-inner">
                 <button onclick="searchFreeLibrary()" class="absolute right-2.5 w-7 h-7 rounded-xl bg-white text-gray-900 flex items-center justify-center text-[10px] transition cursor-pointer shadow">
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
@@ -105,7 +85,6 @@
                 <button onclick="quickSearchTag('aesthetic')" class="px-2.5 py-1 bg-[#16161a] hover:bg-[#222228] text-gray-400 rounded-lg text-[10px] whitespace-nowrap transition cursor-pointer">#aesthetic</button>
                 <button onclick="quickSearchTag('space')" class="px-2.5 py-1 bg-[#16161a] hover:bg-[#222228] text-gray-400 rounded-lg text-[10px] whitespace-nowrap transition cursor-pointer">#space</button>
                 <button onclick="quickSearchTag('architecture')" class="px-2.5 py-1 bg-[#16161a] hover:bg-[#222228] text-gray-400 rounded-lg text-[10px] whitespace-nowrap transition cursor-pointer">#architecture</button>
-                <button onclick="quickSearchTag('car')" class="px-2.5 py-1 bg-[#16161a] hover:bg-[#222228] text-gray-400 rounded-lg text-[10px] whitespace-nowrap transition cursor-pointer">#car</button>
             </div>
         </div>
 
@@ -115,12 +94,9 @@
                 <button onclick="dismissStorageNotice()" class="font-semibold text-white ml-2">Ẩn</button>
             </div>
 
-            <!-- KHU VỰC HIỂN THỊ HÌNH NỀN CHÍNH -->
+            <!-- WALLPAPER GRID -->
             <div id="wallpaperGridContainer">
-                <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
-                    <!-- Nội dung được render qua JS -->
-                </div>
-
+                <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5"></div>
                 <div id="paginationContainer" class="py-6 text-center">
                     <button id="loadMoreBtn" onclick="loadMoreWallpapers()" class="w-full py-3 bg-[#16161a] hover:bg-[#222228] text-gray-200 rounded-2xl text-xs font-semibold transition cursor-pointer">
                         Khám phá thêm (<span id="remainingCount">0</span>)
@@ -128,7 +104,7 @@
                 </div>
             </div>
 
-            <!-- KHU VỰC PHA MÀU RIÊNG (GRADIENT STUDIO) -->
+            <!-- GRADIENT STUDIO -->
             <div id="gradientStudioContainer" class="hidden space-y-4">
                 <div class="bg-[#121216] border border-white/10 p-4 rounded-3xl space-y-4 shadow-xl">
                     <div class="flex items-center justify-between">
@@ -136,12 +112,10 @@
                         <span class="text-[10px] text-gray-400">Pha màu sắc nét</span>
                     </div>
 
-                    <!-- Khu vực preview màu -->
                     <div id="gradientPreviewBox" class="w-full h-44 rounded-2xl shadow-inner border border-white/10 flex items-center justify-center relative overflow-hidden transition-all duration-300">
                         <div class="absolute bottom-3 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold text-white border border-white/10" id="gradientTextInfo">Linear 45°</div>
                     </div>
 
-                    <!-- Bảng điều khiển màu -->
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-[#08080a] p-3 rounded-2xl border border-white/5 flex items-center justify-between">
                             <span class="text-[11px] text-gray-400 font-medium">Màu 1</span>
@@ -153,7 +127,6 @@
                         </div>
                     </div>
 
-                    <!-- Hướng gradient -->
                     <div class="space-y-1.5">
                         <label class="text-[10px] text-gray-400 font-medium">Kiểu chuyển màu</label>
                         <select id="gradType" class="w-full bg-[#08080a] border border-white/5 rounded-2xl p-3 text-xs text-white focus:outline-none transition">
@@ -174,12 +147,9 @@
                     </div>
                 </div>
 
-                <!-- Danh sách đã lưu -->
                 <div class="space-y-2 pt-2">
                     <h4 class="text-xs font-bold text-white px-1">Kho hình nền tự pha (<span id="savedGradientCount">0</span>)</h4>
-                    <div id="savedGradientGrid" class="grid grid-cols-2 gap-3.5">
-                        <!-- Render các gradient đã lưu qua JS -->
-                    </div>
+                    <div id="savedGradientGrid" class="grid grid-cols-2 gap-3.5"></div>
                 </div>
             </div>
         </main>
@@ -203,13 +173,8 @@
 
     </div>
 
-    <!-- MÀN HÌNH CHẶN & BẮT BUỘC THÊM RA MÀN HÌNH CHÍNH (PWA GATEWAY) -->
-    <div id="pwaGatewayModal" class="fixed inset-0 bg-[#08080a] z-[2000] flex flex-col items-center justify-between p-6 text-center animate-fade-in">
-        <div class="w-full flex justify-end">
-            <button onclick="bypassPwaCheckForDemo()" class="text-[10px] text-gray-500 hover:text-white transition cursor-pointer px-3 py-1 bg-[#16161a] rounded-full border border-white/5">
-                Bỏ qua (Demo) &rarr;
-            </button>
-        </div>
+    <div id="pwaGatewayModal" class="fixed inset-0 bg-[#08080a] z-[2000] flex flex-col items-center justify-between p-6 text-center animate-fade-in hidden">
+        <div class="w-full flex justify-end"></div>
 
         <div class="my-auto space-y-6 max-w-xs w-full">
             <div class="w-20 h-20 rounded-3xl bg-white text-gray-900 flex items-center justify-center shadow-2xl mx-auto">
@@ -217,35 +182,31 @@
             </div>
             <div class="space-y-2">
                 <h2 class="text-base font-bold text-white tracking-tight">Cài đặt Wallzy Studio</h2>
-                <p class="text-xs text-gray-400 leading-relaxed">Để sử dụng trọn vẹn kho hình nền chất lượng cao và công cụ pha màu độc quyền, vui lòng thêm ứng dụng ra Màn hình chính.</p>
+                <p class="text-xs text-gray-400 leading-relaxed">Để tiếp tục sử dụng ứng dụng và kho hình nền, vui lòng thêm ứng dụng ra Màn hình chính.</p>
             </div>
 
             <div class="bg-[#121216] border border-white/10 p-4 rounded-3xl text-left text-[11px] text-gray-300 space-y-3 shadow-xl">
                 <div class="flex items-start space-x-2.5">
                     <i class="fa-brands fa-apple text-base mt-0.5 text-white"></i>
-                    <div><b>iOS (Safari):</b> Bấm nút Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket mx-0.5"></i> trên thanh công cụ & chọn <b>"Thêm vào Màn hình chính"</b>.</div>
+                    <div><b>iOS (Safari):</b> Bấm nút Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket mx-0.5"></i> rồi chọn <b>"Thêm vào Màn hình chính"</b>.</div>
                 </div>
                 <div class="flex items-start space-x-2.5">
                     <i class="fa-brands fa-android text-base mt-0.5 text-white"></i>
-                    <div><b>Android (Chrome):</b> Bấm menu <i class="fa-solid fa-ellipsis-vertical mx-0.5"></i> góc trên & chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào màn hình chính"</b>.</div>
+                    <div><b>Android (Chrome):</b> Bấm menu <i class="fa-solid fa-ellipsis-vertical mx-0.5"></i> rồi chọn <b>"Thêm vào màn hình chính"</b>.</div>
                 </div>
             </div>
 
             <div class="space-y-2">
                 <button onclick="promptInstallPWAFromGateway()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3.5 rounded-2xl shadow-lg transition text-xs cursor-pointer flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-arrow-down text-xs"></i>
-                    <span>Thêm ngay ra màn hình chính</span>
-                </button>
-                <button onclick="checkPwaInstalledStatus()" class="w-full bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl transition text-xs cursor-pointer border border-white/10">
-                    <i class="fa-solid fa-rotate-right mr-1.5"></i> Tôi đã thêm, Vào ứng dụng
+                    <span>Thêm ra màn hình chính</span>
                 </button>
             </div>
         </div>
 
-        <div class="text-[10px] text-gray-600">Wallzy PWA Studio Edition &bull; v2.0</div>
+        <div class="text-[10px] text-gray-600">Wallzy PWA Studio Edition</div>
     </div>
 
-    <!-- MODAL XEM CHI TIẾT -->
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
         <div class="flex justify-between items-center relative z-10">
             <button onclick="closeModal()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
@@ -271,11 +232,10 @@
         
         <div class="relative z-10 flex flex-col space-y-3 p-5 w-full max-w-sm mx-auto">
             <div class="flex space-x-1.5 overflow-x-auto scrollbar-none py-1 justify-center bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10">
-                <button onclick="applyImageFilter('none')" class="px-3 py-1 rounded-xl bg-white/20 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer hover:bg-white/40">Gốc</button>
-                <button onclick="applyImageFilter('grayscale(100%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer hover:bg-white/40">Đen Trắng</button>
-                <button onclick="applyImageFilter('sepia(80%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer hover:bg-white/40">Cổ Điển</button>
-                <button onclick="applyImageFilter('contrast(130%) saturate(120%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer hover:bg-white/40">Rực rỡ</button>
-                <button onclick="applyImageFilter('blur(2px) brightness(90%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer hover:bg-white/40">Mờ nhẹ</button>
+                <button onclick="applyImageFilter('none')" class="px-3 py-1 rounded-xl bg-white/25 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer">Gốc</button>
+                <button onclick="applyImageFilter('grayscale(100%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer">Đen Trắng</button>
+                <button onclick="applyImageFilter('sepia(80%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer">Cổ Điển</button>
+                <button onclick="applyImageFilter('contrast(130%) saturate(120%)')" class="px-3 py-1 rounded-xl bg-white/10 text-white text-[10px] font-semibold whitespace-nowrap cursor-pointer">Rực rỡ</button>
             </div>
 
             <button onclick="openLiveMockupModal()" class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-semibold py-3 rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer border border-white/20">
@@ -289,7 +249,6 @@
         </div>
     </div>
 
-    <!-- MODAL HƯỚNG DẪN CÀI ĐẶT PWA -->
     <div id="pwaModal" class="fixed inset-0 bg-black/80 backdrop-blur-xl z-[1180] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
         <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <div class="w-12 h-12 bg-white text-gray-900 rounded-2xl flex items-center justify-center mx-auto text-base">
@@ -297,11 +256,11 @@
             </div>
             <div>
                 <h3 class="text-sm font-bold text-white">Thêm ra Màn hình chính</h3>
-                <p class="text-[11px] text-gray-400 mt-1.5 leading-relaxed">Trải nghiệm ứng dụng như một App độc lập toàn màn hình bằng cách thêm vào thiết bị:</p>
+                <p class="text-[11px] text-gray-400 mt-1.5 leading-relaxed">Trải nghiệm ứng dụng toàn màn hình bằng cách thêm vào thiết bị:</p>
             </div>
             <div class="bg-[#08080a] p-3 rounded-2xl text-left text-[11px] text-gray-300 space-y-2 border border-white/5">
-                <div class="flex items-center space-x-2"><i class="fa-brands fa-apple text-sm"></i><span><b>iOS (Safari):</b> Bấm nút Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket"></i> rồi chọn <b>"Thêm vào Màn hình chính"</b>.</span></div>
-                <div class="flex items-center space-x-2"><i class="fa-brands fa-android text-sm"></i><span><b>Android (Chrome):</b> Bấm menu <i class="fa-solid fa-ellipsis-vertical"></i> rồi chọn <b>"Cài đặt ứng dụng"</b> hoặc <b>"Thêm vào màn hình chính"</b>.</span></div>
+                <div class="flex items-center space-x-2"><i class="fa-brands fa-apple text-sm"></i><span><b>iOS:</b> Bấm Chia sẻ <i class="fa-solid fa-arrow-up-from-bracket"></i> chọn <b>"Thêm vào Màn hình chính"</b>.</span></div>
+                <div class="flex items-center space-x-2"><i class="fa-brands fa-android text-sm"></i><span><b>Android:</b> Bấm menu <i class="fa-solid fa-ellipsis-vertical"></i> chọn <b>"Thêm vào màn hình chính"</b>.</span></div>
             </div>
             <button onclick="closePwaModal()" class="w-full bg-white text-gray-900 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer">
                 Đã hiểu
@@ -322,7 +281,7 @@
             </div>
         </div>
 
-        <div id="iphoneFrame" class="relative w-[260px] h-[520px] bg-black rounded-[40px] border-[8px] border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col items-center justify-between p-4 cursor-pointer select-none">
+        <div class="relative w-[260px] h-[520px] bg-black rounded-[40px] border-[8px] border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col items-center justify-between p-4 cursor-pointer select-none">
             <img id="mockupImg" src="" alt="Mockup BG" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700">
             <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40 pointer-events-none"></div>
 
@@ -331,10 +290,9 @@
                 <div class="w-2 h-2 rounded-full bg-[#1c1c1e]"></div>
             </div>
 
-            <!-- LOCKSCREEN -->
             <div id="mockupLockContent" class="relative z-10 w-full flex flex-col items-center justify-between h-full py-2">
                 <div class="text-center text-white mt-4 w-full">
-                    <div class="text-[50px] font-light tracking-tight leading-none drop-shadow-md font-sans" id="mockupTime">09:41</div>
+                    <div class="text-[50px] font-light tracking-tight leading-none drop-shadow-md" id="mockupTime">09:41</div>
                     <div class="text-xs font-normal drop-shadow text-white/80 mt-1" id="mockupDate">Thứ Tư, 16 Tháng 9</div>
                 </div>
                 <div class="w-full flex flex-col items-center space-y-2 mb-2">
@@ -349,7 +307,6 @@
                 </div>
             </div>
 
-            <!-- HOMESCREEN -->
             <div id="mockupHomeContent" class="relative z-10 w-full h-full flex flex-col justify-between py-4 hidden">
                 <div class="grid grid-cols-4 gap-3 px-1 mt-6">
                     <div class="flex flex-col items-center space-y-1"><div class="w-11 h-11 bg-blue-500/80 backdrop-blur-md rounded-2xl shadow flex items-center justify-center text-white"><i class="fa-solid fa-message text-xs"></i></div><span class="text-[9px] text-white font-medium">Tin nhắn</span></div>
@@ -380,11 +337,11 @@
                 <i class="fa-solid fa-bolt-lightning"></i>
             </div>
             <div>
-                <h3 class="text-sm font-bold text-white">Chuẩn bị chất lượng gốc</h3>
-                <p class="text-[11px] text-gray-400 mt-1">Vui lòng chờ <span id="countdown" class="text-white font-bold">5</span> giây...</p>
+                <h3 class="text-sm font-bold text-white">Đang tải chất lượng gốc</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Vui lòng chờ <span id="countdown" class="text-white font-bold">3</span> giây...</p>
             </div>
             <div class="w-full bg-white/10 h-1 rounded-full overflow-hidden">
-                <div id="adProgress" class="bg-white h-full w-full transition-all duration-1000"></div>
+                <div id="adProgress" class="bg-white h-full w-full"></div>
             </div>
         </div>
     </div>
@@ -393,7 +350,7 @@
         <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full space-y-4 shadow-2xl">
             <div class="text-center space-y-1">
                 <h3 class="text-sm font-bold text-white">Chọn độ phân giải</h3>
-                <p class="text-[10px] text-gray-400">Đã mở khóa toàn bộ chất lượng dọc</p>
+                <p class="text-[10px] text-gray-400">Đã mở khóa chất lượng cao nhất</p>
             </div>
 
             <div class="space-y-2 pt-1">
@@ -434,7 +391,7 @@
                 <i class="fa-solid fa-check"></i>
             </div>
             <div>
-                <h3 class="text-sm font-bold text-white">Đã tải xuống thành công</h3>
+                <h3 class="text-sm font-bold text-white">Tải xuống thành công</h3>
                 <p id="successDetailText" class="text-[11px] text-gray-400 mt-1">Hình nền đã được lưu về thiết bị.</p>
             </div>
             <button onclick="closeSuccessModal()" class="w-full bg-[#08080a] hover:bg-[#1c1c1e] text-white font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer">
@@ -470,7 +427,6 @@
         let activeImageFilter = 'none';
         let deferredPrompt = null;
 
-        // Đăng ký Service Worker cho PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
@@ -479,16 +435,11 @@
                         e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
                     });
                     self.addEventListener('fetch', (e) => {
-                        e.respondWith(
-                            caches.match(e.request).then((response) => response || fetch(e.request))
-                        );
+                        e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request)));
                     });
                 `;
                 const blob = new Blob([swCode], { type: 'text/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl)
-                    .then(() => console.log('ServiceWorker registered successfully'))
-                    .catch((err) => console.log('ServiceWorker registration failed: ', err));
+                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
             });
         }
 
@@ -497,16 +448,16 @@
             deferredPrompt = e;
         });
 
-        // Kiểm tra xem ứng dụng đã chạy ở chế độ standalone (PWA) hoặc đã lưu trạng thái bỏ qua chưa
+        // Tự động kiểm tra: nếu chưa cài đặt PWA (standalone) và chưa lưu trạng thái xác nhận thì bật thông báo, nếu đã thêm rồi thì tự động ẩn ngay
         function checkPwaInstalledStatus() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            const bypassed = localStorage.getItem('wallzy_pwa_bypassed') === 'true';
-
             const gatewayModal = document.getElementById('pwaGatewayModal');
-            if (isStandalone || bypassed) {
-                if (gatewayModal) gatewayModal.style.display = 'none';
+            const hasInstalledLocally = localStorage.getItem('wallzy_pwa_installed') === 'true';
+
+            if (isStandalone || hasInstalledLocally) {
+                if (gatewayModal) gatewayModal.classList.add('hidden');
             } else {
-                if (gatewayModal) gatewayModal.style.display = 'flex';
+                if (gatewayModal) gatewayModal.classList.remove('hidden');
             }
         }
 
@@ -515,7 +466,7 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('wallzy_pwa_bypassed', 'true');
+                        localStorage.setItem('wallzy_pwa_installed', 'true');
                         checkPwaInstalledStatus();
                     }
                     deferredPrompt = null;
@@ -530,24 +481,20 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('wallzy_pwa_bypassed', 'true');
+                        localStorage.setItem('wallzy_pwa_installed', 'true');
                         checkPwaInstalledStatus();
                     }
                     deferredPrompt = null;
                 });
             } else {
-                // Nếu trình duyệt không hỗ trợ prompt trực tiếp, mở modal hướng dẫn chi tiết
                 document.getElementById('pwaModal').classList.remove('hidden');
             }
         }
 
-        function bypassPwaCheckForDemo() {
-            localStorage.setItem('wallzy_pwa_bypassed', 'true');
-            checkPwaInstalledStatus();
-        }
-
         function closePwaModal() {
             document.getElementById('pwaModal').classList.add('hidden');
+            localStorage.setItem('wallzy_pwa_installed', 'true');
+            checkPwaInstalledStatus();
         }
 
         function getFavorites() {
@@ -594,9 +541,7 @@
             const searchInputEl = document.getElementById('searchInput');
             if(searchInputEl) {
                 searchInputEl.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        searchFreeLibrary();
-                    }
+                    if (e.key === 'Enter') searchFreeLibrary();
                 });
             }
         });
@@ -690,23 +635,17 @@
 
         function searchFreeLibrary() {
             const query = document.getElementById('searchInput').value.trim();
-            if(!query) {
-                renderWallpapers(currentCategory);
-                return;
-            }
+            if(!query) { renderWallpapers(currentCategory); return; }
             
             const sampleUrls = [
                 `https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1080&h=1920&fit=crop&q=80`,
                 `https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1080&h=1920&fit=crop&q=80`,
                 `https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1080&h=1920&fit=crop&q=80`,
-                `https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&h=1920&fit=crop&q=80`,
-                `https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1920&fit=crop&q=80`,
-                `https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&h=1920&fit=crop&q=80`
+                `https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&h=1920&fit=crop&q=80`
             ];
 
             const grid = document.getElementById('wallpaperGrid');
-            const paginationContainer = document.getElementById('paginationContainer');
-            paginationContainer.style.display = 'none';
+            document.getElementById('paginationContainer').style.display = 'none';
             grid.innerHTML = '';
 
             const favs = getFavorites();
@@ -719,9 +658,6 @@
                     <button onclick="event.stopPropagation(); toggleFavorite(${wallpaperItem.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
                         <i class="${favs.some(f => f.id === wallpaperItem.id) ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
                     </button>
-                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-3.5 pointer-events-none">
-                        <span class="text-[9px] font-semibold text-white/90 uppercase tracking-widest bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">${query}</span>
-                    </div>
                 `;
                 grid.appendChild(card);
             });
@@ -735,16 +671,13 @@
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = 'cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer';
             });
-            if (btnElement) {
-                btnElement.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer';
-            }
+            if (btnElement) btnElement.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer';
             renderWallpapers(cat);
         }
 
         function renderWallpapers(category = 'all') {
             const grid = document.getElementById('wallpaperGrid');
             const paginationContainer = document.getElementById('paginationContainer');
-            const remainingCountSpan = document.getElementById('remainingCount');
             if(!grid) return;
             grid.innerHTML = '';
             
@@ -754,7 +687,7 @@
             const remaining = filtered.length - displayedCount;
             if (remaining > 0) {
                 paginationContainer.style.display = 'block';
-                remainingCountSpan.innerText = remaining;
+                document.getElementById('remainingCount').innerText = remaining;
             } else {
                 paginationContainer.style.display = 'none';
             }
@@ -766,7 +699,6 @@
             }
 
             const favs = getFavorites();
-
             paginatedList.forEach(w => {
                 const isFav = favs.some(f => f.id === w.id);
                 const card = document.createElement('div');
@@ -776,9 +708,6 @@
                     <button onclick="event.stopPropagation(); toggleFavorite(${w.id})" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10">
                         <i class="${isFav ? 'fa-solid text-red-500' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
                     </button>
-                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-3.5 pointer-events-none">
-                        <span class="text-[9px] font-semibold text-white/90 uppercase tracking-widest bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">${w.category}</span>
-                    </div>
                 `;
                 grid.appendChild(card);
             });
@@ -791,17 +720,13 @@
 
         function renderFavorites() {
             const grid = document.getElementById('wallpaperGrid');
-            const paginationContainer = document.getElementById('paginationContainer');
+            document.getElementById('paginationContainer').style.display = 'none';
             if(!grid) return;
-            paginationContainer.style.display = 'none';
             grid.innerHTML = '';
             const favs = getFavorites();
 
             if (favs.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2">
-                    <i class="fa-regular fa-heart text-2xl text-gray-700 block"></i>
-                    <span>Chưa có hình nền yêu thích nào.</span>
-                </div>`;
+                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-regular fa-heart text-2xl text-gray-700 block"></i><span>Chưa có hình nền yêu thích nào.</span></div>`;
                 return;
             }
 
@@ -819,20 +744,17 @@
         }
 
         function toggleFavorite(id) {
-            const wallpaper = wallpapers.find(w => w.id === id);
+            const wallpaper = wallpapers.find(w => w.id === id) || getCustomGradients().find(w => w.id === id);
             if (!wallpaper) return;
 
             let favs = getFavorites();
             const index = favs.findIndex(f => f.id === id);
-
             if (index > -1) favs.splice(index, 1);
             else favs.push(wallpaper);
 
             saveFavorites(favs);
-
             if (currentTab === 'explore') renderWallpapers(currentCategory);
             else if (currentTab === 'favorites') renderFavorites();
-
             if (currentSelectedWallpaper && currentSelectedWallpaper.id === id) updateModalFavState();
         }
 
@@ -849,13 +771,13 @@
         }
 
         function openModalById(id) {
-            const wallpaper = wallpapers.find(w => w.id === id);
+            let wallpaper = wallpapers.find(w => w.id === id) || getCustomGradients().find(w => w.id === id);
             if (wallpaper) openModal(wallpaper);
         }
 
         function openModal(wallpaper) {
             currentSelectedWallpaper = wallpaper;
-            document.getElementById('modalCategory').innerText = wallpaper.category;
+            document.getElementById('modalCategory').innerText = wallpaper.category || 'Gradient';
             const imgEl = document.getElementById('detailImg');
             imgEl.src = wallpaper.url;
             applyImageFilter('none');
@@ -863,9 +785,7 @@
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        function closeModal() {
-            document.getElementById('detailModal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
 
         function applyImageFilter(filterStyle) {
             activeImageFilter = filterStyle;
@@ -881,9 +801,7 @@
             document.getElementById('liveMockupModal').classList.remove('hidden');
         }
 
-        function closeLiveMockupModal() {
-            document.getElementById('liveMockupModal').classList.add('hidden');
-        }
+        function closeLiveMockupModal() { document.getElementById('liveMockupModal').classList.add('hidden'); }
 
         function switchMockupMode(mode) {
             const lockContent = document.getElementById('mockupLockContent');
@@ -908,16 +826,13 @@
         }
 
         function toggleFullScreenFromModal() {
-            const fullscreenModal = document.getElementById('fullscreenModal');
             const fsImg = document.getElementById('fullscreenImg');
             fsImg.src = currentSelectedWallpaper.url;
             fsImg.style.filter = activeImageFilter;
-            fullscreenModal.classList.remove('hidden');
+            document.getElementById('fullscreenModal').classList.remove('hidden');
         }
 
-        function closeFullScreen() {
-            document.getElementById('fullscreenModal').classList.add('hidden');
-        }
+        function closeFullScreen() { document.getElementById('fullscreenModal').classList.add('hidden'); }
 
         function triggerDownloadWithAd() {
             closeModal();
@@ -925,9 +840,8 @@
             const countdownEl = document.getElementById('countdown');
             adModal.classList.remove('hidden');
 
-            let timeLeft = 5;
+            let timeLeft = 3;
             countdownEl.innerText = timeLeft;
-
             let timer = setInterval(() => {
                 timeLeft--;
                 countdownEl.innerText = timeLeft;
@@ -939,10 +853,9 @@
             }, 1000);
         }
 
-        function closeQualityModal() {
-            document.getElementById('qualityModal').classList.add('hidden');
-        }
+        function closeQualityModal() { document.getElementById('qualityModal').classList.add('hidden'); }
 
+        // --- BLOB PURE DOWNLOAD HANDLER ---
         async function executeDownload(quality) {
             closeQualityModal();
             if (!currentSelectedWallpaper) return;
@@ -951,26 +864,18 @@
             let resolutionTag = '1080P HD';
 
             if (downloadUrl.includes('unsplash.com')) {
-                if (quality === 'hd') {
-                    downloadUrl = downloadUrl.replace(/w=\d+/, 'w=1080').replace(/h=\d+/, 'h=1920').replace(/q=\d+/, 'q=85');
-                    resolutionTag = '1080P HD';
-                } else if (quality === '2k') {
-                    downloadUrl = downloadUrl.replace(/w=\d+/, 'w=1440').replace(/h=\d+/, 'h=2560').replace(/q=\d+/, 'q=95');
-                    resolutionTag = '2K QHD';
-                } else if (quality === '4k') {
-                    downloadUrl = downloadUrl.replace(/w=\d+/, 'w=2160').replace(/h=\d+/, 'w=3840').replace(/q=\d+/, 'q=100');
-                    resolutionTag = '4K Ultra HD';
-                }
+                if (quality === 'hd') { downloadUrl = downloadUrl.replace(/w=\d+/, 'w=1080').replace(/h=\d+/, 'h=1920'); resolutionTag = '1080P HD'; }
+                else if (quality === '2k') { downloadUrl = downloadUrl.replace(/w=\d+/, 'w=1440').replace(/h=\d+/, 'h=2560'); resolutionTag = '2K QHD'; }
+                else if (quality === '4k') { downloadUrl = downloadUrl.replace(/w=\d+/, 'w=2160').replace(/h=\d+/, 'h=3840'); resolutionTag = '4K Ultra HD'; }
             }
 
             try {
                 const response = await fetch(downloadUrl, { mode: 'cors' });
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
-                
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = `wallzy-minimal-${quality}-${currentSelectedWallpaper.id}.jpg`;
+                link.download = `wallzy-minimal-${quality}-${Date.now()}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -982,21 +887,19 @@
                 const link = document.createElement('a');
                 link.href = downloadUrl;
                 link.target = '_blank';
-                link.download = `wallzy-minimal-${quality}-${currentSelectedWallpaper.id}.jpg`;
+                link.download = `wallzy-minimal-${quality}-${Date.now()}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
-                document.getElementById('successDetailText').innerText = `Đã mở hình nền ${resolutionTag} ở tab mới.`;
+                document.getElementById('successDetailText').innerText = `Đã mở hình nền ${resolutionTag}.`;
                 document.getElementById('successModal').classList.remove('hidden');
             }
         }
 
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.add('hidden');
-        }
+        function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); }
 
-        // --- GRADIENT STUDIO LOGIC ---
+        // --- GRADIENT STUDIO ---
         function initGradientStudio() {
             const color1Input = document.getElementById('gradColor1');
             const color2Input = document.getElementById('gradColor2');
@@ -1027,7 +930,7 @@
         function generateGradientCanvas() {
             const c1 = document.getElementById('gradColor1').value;
             const c2 = document.getElementById('gradColor2').value;
-            const type = document.getElementById('gradType'].value;
+            const type = document.getElementById('gradType').value;
 
             const canvas = document.createElement('canvas');
             canvas.width = 1080;
@@ -1040,12 +943,12 @@
                 gradient.addColorStop(1, c2);
                 ctx.fillStyle = gradient;
             } else {
-                let x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+                let x1 = 0, y1 = 0;
                 if (type === 'to right') { x1 = 1080; y1 = 0; }
                 else if (type === 'to bottom') { x1 = 0; y1 = 1920; }
                 else if (type === 'to bottom right') { x1 = 1080; y1 = 1920; }
 
-                const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+                const gradient = ctx.createLinearGradient(0, 0, x1, y1);
                 gradient.addColorStop(0, c1);
                 gradient.addColorStop(1, c2);
                 ctx.fillStyle = gradient;
@@ -1080,6 +983,7 @@
 
             const newGrad = {
                 id: Date.now(),
+                category: 'gradient',
                 c1: c1,
                 c2: c2,
                 type: type,
