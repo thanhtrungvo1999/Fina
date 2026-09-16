@@ -490,17 +490,8 @@
                 showMessage("Đăng nhập Google thành công!");
                 setupCloudListeners();
             } catch (e) {
-                // Fallback simulation if popup restricted
-                currentUser = {
-                    uid: userId || crypto.randomUUID(),
-                    displayName: "Wallzy Member",
-                    email: "member@wallzystudio.app",
-                    photoURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop"
-                };
-                updateAuthUIState(currentUser);
-                closeAuthModal();
-                showMessage("Đã đồng bộ tài khoản thành công!");
-                setupCloudListeners();
+                console.error("Google Auth Error:", e);
+                showMessage("Đăng nhập Google thất bại. Vui lòng kiểm tra lại cấu hình Authorized domains trên Firebase.");
             }
         }
 
