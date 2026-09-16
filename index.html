@@ -17,11 +17,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         window.firebaseAppModules = {
-            initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+            initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged,
             signInAnonymously, signInWithCustomToken, getFirestore, doc, getDoc, setDoc, collection
         };
     </script>
@@ -452,7 +452,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-cache-v5';
+                    const CACHE_NAME = 'wallzy-cache-v7';
                     self.addEventListener('install', (e) => {
                         self.skipWaiting();
                         e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
@@ -594,19 +594,26 @@
                 return;
             }
             try {
-                const { GoogleAuthProvider, signInWithPopup } = window.firebaseAppModules;
+                const { GoogleAuthProvider, signInWithPopup, signInWithRedirect } = window.firebaseAppModules;
                 const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-                closeAuthModal();
-                showMessage("Đăng nhập tài khoản Google thành công!");
+                
+                // Ưu tiên dùng popup trước vì ổn định nhất trên môi trường xem trước iframe
+                try {
+                    await signInWithPopup(auth, provider);
+                    closeAuthModal();
+                    showMessage("Đăng nhập tài khoản Google thành công!");
+                } catch (popupErr) {
+                    console.log("Popup fallback to redirect:", popupErr);
+                    await signInWithRedirect(auth, provider);
+                }
             } catch (error) {
                 console.error("Google login error details:", error);
-                if (error.code === 'auth/popup-blocked') {
-                    showMessage("Trình duyệt đã chặn cửa sổ pop-up. Vui lòng cho phép pop-up cho trang web này.");
-                } else if (error.code === 'auth/unauthorized-domain') {
-                    showMessage("Lỗi: Tên miền này chưa được cấu hình trong Firebase Console (Authorized Domains).");
+                if (error.code === 'auth/operation-not-allowed') {
+                    showMessage("Lỗi: Tính năng đăng nhập Google chưa được kích hoạt trong Firebase Console.");
+                } else if (error.code === 'auth/popup-blocked') {
+                    showMessage("Trình duyệt đã chặn cửa sổ Popup. Vui lòng cho phép popup hoặc thử lại.");
                 } else {
-                    showMessage("Lỗi đăng nhập: " + (error.message || "Vui lòng thử lại."));
+                    showMessage("Không thể đăng nhập Google: " + (error.message || "Vui lòng kiểm tra lại cấu hình."));
                 }
             }
         }
