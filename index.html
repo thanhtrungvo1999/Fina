@@ -215,16 +215,13 @@
     <!-- Detail Modal -->
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
         <div class="flex justify-between items-center relative z-10">
-            <button onclick="closeModal()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Quay lại">
-                <i class="fa-solid fa-arrow-left text-white text-sm"></i>
+            <button onclick="closeModal()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg">
+                <i class="fa-solid fa-xmark text-white"></i>
             </button>
             <div class="text-center">
                 <span class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10" id="modalCategory">Database</span>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="shareNativeCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Chia sẻ ảnh">
-                    <i class="fa-solid fa-share-nodes text-white"></i>
-                </button>
                 <button onclick="copyShareLinkCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Sao chép link riêng">
                     <i class="fa-solid fa-link text-white"></i>
                 </button>
@@ -240,16 +237,10 @@
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-5 w-full max-w-sm mx-auto">
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="shareNativeCurrent()" class="w-full bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/10">
-                    <i class="fa-solid fa-share-nodes text-xs text-white"></i>
-                    <span class="text-[11px] uppercase tracking-wider font-semibold">Chia sẻ</span>
-                </button>
-                <button onclick="copyShareLinkCurrent()" class="w-full bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/10">
-                    <i class="fa-solid fa-link text-xs text-white"></i>
-                    <span class="text-[11px] uppercase tracking-wider font-semibold">Sao chép link</span>
-                </button>
-            </div>
+            <button onclick="copyShareLinkCurrent()" class="w-full bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/10">
+                <i class="fa-solid fa-link text-xs text-white"></i>
+                <span class="text-[11px] uppercase tracking-wider font-semibold">Sao chép link riêng cho ảnh</span>
+            </button>
             <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
                 <i class="fa-solid fa-download text-xs text-gray-900"></i>
                 <span class="text-[11px] uppercase tracking-wider font-semibold">Tải về chuẩn 4K Ultra HD (Đợi 5s)</span>
@@ -859,22 +850,6 @@
                 const newUrl = window.location.pathname;
                 window.history.pushState({path: newUrl}, '', newUrl);
             } catch (e) {}
-        }
-
-        window.shareNativeCurrent = function() {
-            if (!currentSelectedWallpaper) return;
-            const shareUrl = `${window.location.origin}${window.location.pathname}?img=${currentSelectedWallpaper.id}`;
-            const shareData = {
-                title: 'Wallzy 4K Wallpaper',
-                text: 'Khám phá hình nền 4K Ultra HD cực đẹp trên Wallzy Studio!',
-                url: shareUrl
-            };
-
-            if (navigator.share) {
-                navigator.share(shareData).catch(() => {});
-            } else {
-                copyShareLinkCurrent();
-            }
         }
 
         window.copyShareLinkCurrent = function() {
