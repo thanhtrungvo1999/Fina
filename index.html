@@ -30,6 +30,21 @@
         ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 3px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+        /* Hiệu ứng Skeleton lướt sóng (Wave Shimmer Effect) */
+        @keyframes waveShimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        .skeleton-wave {
+            background: linear-gradient(90deg, #16161a 25%, #25252d 37%, #16161a 63%);
+            background-size: 400% 100%;
+            animation: waveShimmer 1.6s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
@@ -300,6 +315,7 @@
         const loadStepCount = 4;
         let cloudFavorites = [];
         let cloudUploadedImages = [];
+        let isLoadingData = true;
 
         async function initFirebase() {
             try {
@@ -325,6 +341,7 @@
                 });
             } catch (e) {
                 cloudUploadedImages = getLocalImages();
+                isLoadingData = false;
                 updateWallpapersList();
             }
         }
@@ -344,10 +361,12 @@
                     images.sort((a, b) => b.timestamp - a.timestamp);
                     cloudUploadedImages = images;
                 }
+                isLoadingData = false;
                 updateWallpapersList();
                 if (currentTab === 'uploader') renderUploadedImages();
             }, (err) => {
                 cloudUploadedImages = getLocalImages();
+                isLoadingData = false;
                 updateWallpapersList();
             });
         }
@@ -446,14 +465,12 @@
                     return;
                 } catch (e) {}
             }
-            // Fallback to local storage if Firestore write fails
             cloudUploadedImages.unshift(imageObj);
             saveLocalImages(cloudUploadedImages);
             updateWallpapersList();
             if (currentTab === 'uploader') renderUploadedImages();
         }
 
-        // Globalized function to fix ReferenceError
         window.removeImageFromFirestoreCloud = async function(id) {
             if (db) {
                 try {
@@ -479,7 +496,7 @@
             const body = document.getElementById('bodyElement');
             
             cloudUploadedImages = getLocalImages();
-            updateWallpapersList();
+            setTimeout(() => { isLoadingData = false; updateWallpapersList(); }, 800);
 
             initFirebase();
 
@@ -489,7 +506,7 @@
                     body.classList.remove('overflow-hidden');
                     setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
                 }
-            }, 500);
+            }, 600);
 
             renderWallpapers(currentCategory);
         });
@@ -579,6 +596,22 @@
             
             grid.innerHTML = '';
             
+            // Hiển thị hiệu ứng Skeleton lướt sóng khi đang tải dữ liệu
+            if (isLoadingData) {
+                paginationContainer.style.display = 'none';
+                for (let i = 0; i < 4; i++) {
+                    const skeletonCard = document.createElement('div');
+                    skeletonCard.className = 'rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] relative border border-white/5 shadow-inner';
+                    skeletonCard.innerHTML = `
+                        <div class="absolute inset-0 skeleton-wave"></div>
+                        <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/20 skeleton-wave"></div>
+                        <div class="absolute bottom-4 left-4 right-4 h-3 rounded-full skeleton-wave opacity-60"></div>
+                    `;
+                    grid.appendChild(skeletonCard);
+                }
+                return;
+            }
+
             let filtered = wallpapers;
             if (category !== 'all') {
                 filtered = wallpapers.filter(w => w.category === category);
@@ -632,7 +665,7 @@
 
             cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm animate-fade-in';
                 card.onclick = () => openModalById(w.id);
                 card.innerHTML = `
                     <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 relative z-10">
@@ -797,7 +830,7 @@
 
             cloudUploadedImages.forEach(img => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-2xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow';
+                card.className = 'relative group rounded-2xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow animate-fade-in';
                 card.onclick = () => openModalById(img.id);
                 card.innerHTML = `
                     <img src="${img.url}" class="w-full h-full object-cover relative z-10">
