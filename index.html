@@ -91,8 +91,6 @@
         <!-- Category Nav -->
         <nav id="categoryNav" class="px-5 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 bg-transparent">
             <button onclick="filterCategory('all', this)" class="cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm">Tất cả ảnh</button>
-            <button onclick="filterCategory('Gradient', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Gradient</button>
-            <button onclick="filterCategory('Ảnh chụp', this)" class="cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Ảnh chụp</button>
         </nav>
 
         <!-- Search Bar -->
@@ -582,8 +580,35 @@
             }
         }
 
+        function renderCategoryNav() {
+            const categoryNav = document.getElementById('categoryNav');
+            if (!categoryNav) return;
+
+            // Tìm tất cả các danh mục độc nhất từ danh sách wallpapers
+            const categoriesSet = new Set();
+            wallpapers.forEach(w => {
+                if (w.category && typeof w.category === 'string' && w.category.trim() !== '') {
+                    categoriesSet.add(w.category.trim());
+                }
+            });
+
+            const categories = Array.from(categoriesSet);
+
+            let html = `<button onclick="filterCategory('all', this)" class="cat-btn ${currentCategory === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'bg-[#16161a] text-gray-400 hover:text-white'} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">Tất cả ảnh</button>`;
+
+            categories.forEach(cat => {
+                const isActive = currentCategory.toLowerCase() === cat.toLowerCase();
+                const activeClass = isActive ? 'bg-white text-gray-900 shadow-sm' : 'bg-[#16161a] text-gray-400 hover:text-white';
+                const escapedCat = cat.replace(/'/g, "\\'");
+                html += `<button onclick="filterCategory('${escapedCat}', this)" class="cat-btn ${activeClass} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">${cat}</button>`;
+            });
+
+            categoryNav.innerHTML = html;
+        }
+
         function updateWallpapersList() {
             wallpapers = [...cloudUploadedImages];
+            renderCategoryNav();
             refreshCurrentView();
         }
 
