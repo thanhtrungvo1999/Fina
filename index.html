@@ -157,7 +157,7 @@
 
                     <div class="flex space-x-2 pt-1">
                         <button onclick="saveCustomGradient()" class="flex-1 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-2xl text-xs transition cursor-pointer shadow">
-                            <i class="fa-solid fa-cloud-arrow-up mr-1 text-gray-900"></i> Lưu vào DB chung
+                            <i class="fa-solid fa-bookmark mr-1 text-gray-900"></i> Lưu Gradient
                         </button>
                         <button onclick="downloadCustomGradient()" class="flex-1 bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl text-xs transition cursor-pointer border border-white/10">
                             <i class="fa-solid fa-download mr-1 text-white"></i> Tải ảnh về
@@ -359,6 +359,25 @@
         let cloudUploadedImages = [];
         let countdownTimer = null;
 
+        function loadLocalGradients() {
+            try {
+                const stored = localStorage.getItem('wallzy_local_gradients');
+                if (stored) {
+                    cloudCustomGradients = JSON.parse(stored);
+                } else {
+                    cloudCustomGradients = [];
+                }
+            } catch (e) {
+                cloudCustomGradients = [];
+            }
+        }
+
+        function saveLocalGradients() {
+            try {
+                localStorage.setItem('wallzy_local_gradients', JSON.stringify(cloudCustomGradients));
+            } catch (e) {}
+        }
+
         async function initFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -378,6 +397,7 @@
                         userId = null;
                         updateAuthUIState(null);
                         cloudFavorites = [];
+                        loadLocalGradients();
                         refreshCurrentView();
                     }
                 });
@@ -423,100 +443,16 @@
 
             const gradRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'gradients');
             onSnapshot(gradRef, (docSnap) => {
-                cloudCustomGradients = docSnap.exists() ? (docSnap.data().items || []) : [];
-                if (currentTab === 'studio') renderSavedGradients();
-            }, (err) => {});
-        }
-
-        window.loginWithGoogleReal = async function() {
-            try {
-                const provider = new GoogleAuthProvider();
-                provider.setCustomParameters({ prompt: 'select_account' });
-                const result = await signInWithPopup(auth, provider);
-                if (result && result.user) {
-                    currentUser = result.user;
-                    userId = result.user.uid;
-                    updateAuthUIState(currentUser);
-                    setupPrivateCloudListeners();
-                    closeAuthModal();
-                    showMessage("Đăng nhập Google thành công!");
+                if (docSnap.exists() && docSnap.data().items) {
+                    cloudCustomGradients = docSnap.data().items;
+                } else {
+                    loadLocalGradients();
                 }
-            } catch (e) {
-                showMessage("Lỗi đăng nhập: " + e.message);
-            }
+                if (currentTab === 'studio') renderSavedGradients();
+            }, (err) => {
+                loadLocalGradients();
+            });
         }
-
-        window.logoutUser = async function() {
-            try {
-                await signOut(auth);
-                currentUser = null;
-                userId = null;
-                updateAuthUIState(null);
-                closeAuthModal();
-                cloudFavorites = [];
-                refreshCurrentView();
-                showMessage("Đã đăng xuất thành công.");
-            } catch (e) {}
-        }
-
-        function updateAuthUIState(user) {
-            const authButtonText = document.getElementById('authButtonText');
-            const loggedOutView = document.getElementById('loggedOutView');
-            const loggedInView = document.getElementById('loggedInView');
-            const userIdDisplay = document.getElementById('userIdDisplay');
-            
-            if (user) {
-                authButtonText.innerText = (user.displayName || 'Tài khoản').split(' ')[0];
-                loggedOutView.classList.add('hidden');
-                loggedInView.classList.remove('hidden');
-                document.getElementById('userName').innerText = user.displayName || 'Wallzy User';
-                document.getElementById('userEmail').innerText = user.email || 'database@wallzystudio.app';
-                document.getElementById('userAvatar').src = user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
-                if(userIdDisplay) userIdDisplay.innerText = `UID: ${user.uid}`;
-            } else {
-                authButtonText.innerText = 'Tài khoản';
-                loggedOutView.classList.remove('hidden');
-                loggedInView.classList.add('hidden');
-            }
-        }
-
-        function updateWallpapersList() {
-            wallpapers = [...cloudUploadedImages];
-            refreshCurrentView();
-        }
-
-        async function saveCloudFavorites(favs) {
-            if (!db || !userId) return;
-            try {
-                const favRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'favorites');
-                await setDoc(favRef, { items: favs });
-            } catch (e) {}
-        }
-
-        async function saveCloudGradients(grads) {
-            if (!db || !userId) return;
-            try {
-                const gradRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'gradients');
-                await setDoc(gradRef, { items: grads });
-            } catch (e) {}
-        }
-
-        async function addImageToFirestorePublicCloud(imageObj) {
-            if (!db) return;
-            try {
-                const docRef = doc(db, 'artifacts', 'public', 'uploaded_images_v3', imageObj.id);
-                await setDoc(docRef, imageObj);
-            } catch (e) {
-                showMessage("Lỗi khi lưu lên đám mây chung: " + e.message);
-            }
-        }
-
-        function refreshCurrentView() {
-            if (currentTab === 'explore') renderWallpapers(currentCategory);
-            else if (currentTab === 'favorites') renderFavorites();
-            else if (currentTab === 'studio') renderSavedGradients();
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
@@ -528,6 +464,7 @@
             });
             
             cloudUploadedImages = [];
+            loadLocalGradients();
             updateWallpapersList();
 
             initFirebase();
@@ -549,161 +486,276 @@
             initGradientStudio();
         });
 
-        function checkUrlParamForImage() {
-            const params = new URLSearchParams(window.location.search);
-            const imgId = params.get('img');
-            if (imgId) {
-                setTimeout(() => {
-                    openModalById(imgId);
-                }, 800);
+        window.showMessage = function(msg) {
+            const modal = document.getElementById('msgModal');
+            const txt = document.getElementById('msgText');
+            if (txt) txt.innerText = msg;
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeMsgModal = function() {
+            const modal = document.getElementById('msgModal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.openInstallModal = function() {
+            document.getElementById('installModal')?.classList.remove('hidden');
+        };
+
+        window.closeInstallModal = function() {
+            document.getElementById('installModal')?.classList.add('hidden');
+        };
+
+        window.openAuthModal = function() {
+            document.getElementById('authModal')?.classList.remove('hidden');
+        };
+
+        window.closeAuthModal = function() {
+            document.getElementById('authModal')?.classList.add('hidden');
+        };
+
+        window.loginWithGoogleReal = async function() {
+            if (!auth) return;
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                closeAuthModal();
+                showMessage("Đăng nhập thành công!");
+            } catch (error) {
+                console.error("Auth error:", error);
+                showMessage("Đăng nhập thất bại: " + error.message);
+            }
+        };
+
+        window.logoutUser = async function() {
+            if (!auth) return;
+            try {
+                await signOut(auth);
+                closeAuthModal();
+                showMessage("Đã đăng xuất tài khoản.");
+            } catch (error) {
+                showMessage("Lỗi đăng xuất.");
+            }
+        };
+
+        function updateAuthUIState(user) {
+            const btnText = document.getElementById('authButtonText');
+            const loggedOutView = document.getElementById('loggedOutView');
+            const loggedInView = document.getElementById('loggedInView');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userIdDisplay = document.getElementById('userIdDisplay');
+
+            if (user) {
+                if (btnText) btnText.innerText = user.displayName ? user.displayName.split(' ')[0] : 'Tài khoản';
+                if (loggedOutView) loggedOutView.classList.add('hidden');
+                if (loggedInView) loggedInView.classList.remove('hidden');
+                if (userAvatar) userAvatar.src = user.photoURL || 'https://placehold.co/100x100/121216/ffffff?text=User';
+                if (userName) userName.innerText = user.displayName || 'Người dùng Google';
+                if (userEmail) userEmail.innerText = user.email || '';
+                if (userIdDisplay) userIdDisplay.innerText = `UID: ${user.uid}`;
+            } else {
+                if (btnText) btnText.innerText = 'Tài khoản';
+                if (loggedOutView) loggedOutView.classList.remove('hidden');
+                if (loggedInView) loggedInView.classList.add('hidden');
             }
         }
 
-        window.openAuthModal = function() { document.getElementById('authModal').classList.remove('hidden'); }
-        window.closeAuthModal = function() { document.getElementById('authModal').classList.add('hidden'); }
-
-        window.openInstallModal = function() { document.getElementById('installModal').classList.remove('hidden'); }
-        window.closeInstallModal = function() { document.getElementById('installModal').classList.add('hidden'); }
-
-        window.showMessage = function(text) {
-            document.getElementById('msgText').innerText = text;
-            document.getElementById('msgModal').classList.remove('hidden');
+        async function saveCloudFavorites(favs) {
+            if (!db || !userId) return;
+            try {
+                const favRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'favorites');
+                await setDoc(favRef, { items: favs }, { merge: true });
+            } catch (e) {
+                console.error("Error saving favorites:", e);
+            }
         }
 
-        window.closeMsgModal = function() { document.getElementById('msgModal').classList.add('hidden'); }
+        async function saveCloudGradients(grads) {
+            if (!db || !userId) return;
+            try {
+                const gradRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'gradients');
+                await setDoc(gradRef, { items: grads }, { merge: true });
+            } catch (e) {
+                console.error("Error saving gradients:", e);
+            }
+        }
 
-        window.switchMainTab = function(tab, btnElement) {
-            currentTab = tab;
-            const exploreBtn = document.getElementById('navExploreBtn');
-            const favBtn = document.getElementById('navFavBtn');
-            const studioBtn = document.getElementById('navStudioBtn');
-            const catNav = document.getElementById('categoryNav');
-            const searchBarContainer = document.getElementById('searchBarContainer');
-            const wallpaperGridContainer = document.getElementById('wallpaperGridContainer');
-            const gradientStudioContainer = document.getElementById('gradientStudioContainer');
+        function updateWallpapersList() {
+            wallpapers = [...cloudUploadedImages];
+            refreshCurrentView();
+        }
 
-            exploreBtn.className = "flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white cursor-pointer transition";
-            favBtn.className = "flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white cursor-pointer transition";
-            studioBtn.className = "flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white cursor-pointer transition";
-
-            if (tab === 'explore') {
-                exploreBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
-                catNav.style.display = 'flex';
-                searchBarContainer.style.display = 'block';
-                wallpaperGridContainer.style.display = 'block';
-                gradientStudioContainer.classList.add('hidden');
-                displayedCount = 8;
+        function refreshCurrentView() {
+            if (currentTab === 'explore') {
                 renderWallpapers(currentCategory);
-            } else if (tab === 'favorites') {
-                favBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
-                catNav.style.display = 'none';
-                searchBarContainer.style.display = 'none';
-                wallpaperGridContainer.style.display = 'block';
-                gradientStudioContainer.classList.add('hidden');
-                renderFavorites();
-            } else if (tab === 'studio') {
-                studioBtn.className = "flex flex-col items-center space-y-0.5 text-white cursor-pointer transition";
-                catNav.style.display = 'none';
-                searchBarContainer.style.display = 'none';
-                wallpaperGridContainer.style.display = 'none';
-                gradientStudioContainer.classList.remove('hidden');
+            } else if (currentTab === 'favorites') {
+                renderFavoritesView();
+            } else if (currentTab === 'studio') {
                 renderSavedGradients();
             }
         }
 
-        window.searchCloudLibrary = function() {
-            const query = document.getElementById('searchInput').value.trim();
-            if(!query) { renderWallpapers(currentCategory); return; }
-            showMessage(`Đã tìm kiếm: "${query}"`);
+        function checkUrlParamForImage() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const imgId = urlParams.get('img');
+                if (imgId) {
+                    const found = wallpapers.find(w => w.id === imgId);
+                    if (found) openModal(found);
+                }
+            } catch (e) {}
         }
 
-        window.filterCategory = function(cat, btnElement) {
+        window.filterCategory = function(cat, element) {
             currentCategory = cat;
             displayedCount = 8;
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = 'cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer';
             });
-            if (btnElement) btnElement.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm';
-            renderWallpapers(cat);
-        }
-
-        function renderWallpapers(category = 'all') {
-            const grid = document.getElementById('wallpaperGrid');
-            const paginationContainer = document.getElementById('paginationContainer');
-            if(!grid) return;
-            
-            if (isSkeletonActive) {
-                grid.innerHTML = `
-                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
-                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
-                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
-                    <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
-                `;
-                return;
+            if (element) {
+                element.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm';
             }
+            renderWallpapers(currentCategory);
+        };
 
-            grid.innerHTML = '';
-            
-            let filtered = wallpapers;
-            if (category !== 'all') {
-                filtered = wallpapers.filter(w => w.category === category);
-            }
-
-            const paginatedList = filtered.slice(0, displayedCount);
-            const remaining = filtered.length - displayedCount;
-
-            if (remaining > 0) {
-                paginationContainer.style.display = 'block';
-                document.getElementById('remainingCount').innerText = remaining;
-            } else {
-                paginationContainer.style.display = 'none';
-            }
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-solid fa-cloud text-2xl text-gray-700 block"></i><span>Kho ảnh đám mây công cộng đang trống.<br>Hãy tạo Gradient mới ở mục Pha màu để lưu lên DB!</span></div>`;
-                return;
-            }
-
-            paginatedList.forEach(w => {
-                const isFav = cloudFavorites.some(f => f.id === w.id);
-                const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm animate-fade-in';
-                card.onclick = () => openModalById(w.id);
-                card.innerHTML = `
-                    <div class="skeleton-wave-loader absolute inset-0 skeleton-wave z-0"></div>
-                    <img src="${w.url}" alt="Wallpaper" onload="this.previousElementSibling?.remove()" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 relative z-10">
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10 z-20 shadow">
-                        <i class="${isFav ? 'fa-solid text-white' : 'fa-regular text-white'} fa-heart text-[11px]"></i>
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-        }
+        window.searchCloudLibrary = function() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            renderWallpapers(currentCategory, query);
+        };
 
         window.loadMoreWallpapers = function() {
             displayedCount += loadStepCount;
             renderWallpapers(currentCategory);
-        }
+        };
 
-        function renderFavorites() {
+        window.switchMainTab = function(tab, el) {
+            currentTab = tab;
+            const gridContainer = document.getElementById('wallpaperGridContainer');
+            const studioContainer = document.getElementById('gradientStudioContainer');
+            const categoryNav = document.getElementById('categoryNav');
+            const searchBarContainer = document.getElementById('searchBarContainer');
+
+            ['navExploreBtn', 'navFavBtn', 'navStudioBtn'].forEach(id => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.className = 'flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white cursor-pointer transition';
+                    const icon = button.querySelector('i');
+                    if (icon) icon.className = icon.className.replace('text-white', 'text-gray-400');
+                }
+            });
+
+            if (el) {
+                el.className = 'flex flex-col items-center space-y-0.5 text-white cursor-pointer transition';
+                const icon = el.querySelector('i');
+                if (icon) icon.className = icon.className.replace('text-gray-400', 'text-white');
+            }
+
+            if (tab === 'studio') {
+                if (gridContainer) gridContainer.classList.add('hidden');
+                if (studioContainer) studioContainer.classList.remove('hidden');
+                if (categoryNav) categoryNav.classList.add('hidden');
+                if (searchBarContainer) searchBarContainer.classList.add('hidden');
+                renderSavedGradients();
+            } else {
+                if (gridContainer) gridContainer.classList.remove('hidden');
+                if (studioContainer) studioContainer.classList.add('hidden');
+                if (categoryNav) categoryNav.classList.remove('hidden');
+                if (searchBarContainer) searchBarContainer.classList.remove('hidden');
+
+                if (tab === 'explore') {
+                    renderWallpapers(currentCategory);
+                } else if (tab === 'favorites') {
+                    renderFavoritesView();
+                }
+            }
+        };
+
+        function renderWallpapers(category = 'all', searchQuery = '') {
             const grid = document.getElementById('wallpaperGrid');
-            document.getElementById('paginationContainer').style.display = 'none';
-            if(!grid) return;
+            const paginationContainer = document.getElementById('paginationContainer');
+            const remainingCountSpan = document.getElementById('remainingCount');
+            if (!grid) return;
+
             grid.innerHTML = '';
 
+            if (isSkeletonActive) {
+                for (let i = 0; i < 4; i++) {
+                    const skel = document.createElement('div');
+                    skel.className = 'relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave';
+                    grid.appendChild(skel);
+                }
+                if (paginationContainer) paginationContainer.classList.add('hidden');
+                return;
+            }
+
+            let filtered = wallpapers;
+            if (category !== 'all') {
+                filtered = filtered.filter(w => (w.category || '').toLowerCase() === category.toLowerCase());
+            }
+
+            if (searchQuery) {
+                filtered = filtered.filter(w => 
+                    (w.category || '').toLowerCase().includes(searchQuery) ||
+                    (w.id || '').toLowerCase().includes(searchQuery)
+                );
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-500 text-xs">Chưa có ảnh nào trong mục này.</div>`;
+                if (paginationContainer) paginationContainer.classList.add('hidden');
+                return;
+            }
+
+            const visibleItems = filtered.slice(0, displayedCount);
+            visibleItems.forEach(w => {
+                const card = document.createElement('div');
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow border border-white/5';
+                
+                const isFav = cloudFavorites.some(f => f.id === w.id);
+                const heartClass = isFav ? "fa-solid text-red-500 fa-heart" : "fa-regular text-white fa-heart";
+
+                card.innerHTML = `
+                    <div class="absolute inset-0 skeleton-wave z-0" id="skel_${w.id}"></div>
+                    <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-300 opacity-0" onload="this.classList.remove('opacity-0'); document.getElementById('skel_${w.id}')?.remove();" onclick="openModalById('${w.id}')">
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
+                        <i class="${heartClass}"></i>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (filtered.length > displayedCount) {
+                if (paginationContainer) paginationContainer.classList.remove('hidden');
+                if (remainingCountSpan) remainingCountSpan.innerText = filtered.length - displayedCount;
+            } else {
+                if (paginationContainer) paginationContainer.classList.add('hidden');
+            }
+        }
+
+        function renderFavoritesView() {
+            const grid = document.getElementById('wallpaperGrid');
+            const paginationContainer = document.getElementById('paginationContainer');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            if (paginationContainer) paginationContainer.classList.add('hidden');
+
             if (cloudFavorites.length === 0) {
-                grid.innerHTML = `<div class="col-span-2 text-center py-20 text-gray-400 text-xs font-medium space-y-2"><i class="fa-regular fa-heart text-2xl text-gray-700 block"></i><span>Chưa có hình nền yêu thích nào.<br>Hãy bấm vào biểu tượng trái tim trên ảnh để lưu.</span></div>`;
+                grid.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-500 text-xs">Chưa có ảnh yêu thích nào.</div>`;
                 return;
             }
 
             cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer transition-all duration-300 shadow-sm';
-                card.onclick = () => openModalById(w.id);
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow border border-white/5';
+                
                 card.innerHTML = `
-                    <img src="${w.url}" alt="Wallpaper" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 relative z-10">
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md flex items-center justify-center text-white transition border border-white/10 z-20 shadow">
-                        <i class="fa-solid text-white fa-heart text-[11px]"></i>
+                    <img src="${w.url}" class="w-full h-full object-cover relative z-10" onclick="openModalById('${w.id}')">
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
+                        <i class="fa-solid text-red-500 fa-heart"></i>
                     </button>
                 `;
                 grid.appendChild(card);
@@ -906,7 +958,7 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 1080, 1920);
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
             const newItem = {
                 id: 'grad_' + Date.now(),
                 category: 'Gradient',
@@ -915,12 +967,21 @@
                 timestamp: Date.now()
             };
 
-            addImageToFirestorePublicCloud(newItem);
+            // Không đẩy lên Public Cloud DB
             cloudCustomGradients.unshift(newItem);
-            saveCloudGradients(cloudCustomGradients);
             
-            showMessage("Đã đẩy Gradient lên Đám Mây Chung (artifacts/public/...)!");
-            switchMainTab('explore', document.getElementById('navExploreBtn'));
+            if (userId) {
+                saveCloudGradients(cloudCustomGradients);
+            }
+            saveLocalGradients();
+
+            renderSavedGradients();
+            
+            if (userId) {
+                showMessage("Đã lưu Gradient vào tài khoản cá nhân của bạn!");
+            } else {
+                showMessage("Đã lưu Gradient vào trình duyệt (Thiết bị này)!");
+            }
         }
 
         window.downloadCustomGradient = function() {
