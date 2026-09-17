@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallzy Wallpaper Studio - Cloud Database</title>
+    <title>Wallzy Wallpaper Studio - 3s Skeleton Wave</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -31,7 +31,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 
-        /* Hiệu ứng Skeleton lướt sóng (Wave Shimmer Effect) - Thời gian 3 giây */
+        /* Hiệu ứng Skeleton lướt sóng đúng chuẩn 3 giây */
         @keyframes waveShimmer {
             0% {
                 background-position: -200% 0;
@@ -41,7 +41,7 @@
             }
         }
         .skeleton-wave {
-            background: linear-gradient(90deg, #16161a 25%, #25252d 37%, #16161a 63%);
+            background: linear-gradient(90deg, #16161a 25%, #2a2a35 37%, #16161a 63%);
             background-size: 400% 100%;
             animation: waveShimmer 3.0s ease-in-out infinite;
         }
@@ -341,8 +341,10 @@
                 });
             } catch (e) {
                 cloudUploadedImages = getLocalImages();
-                isLoadingData = false;
-                updateWallpapersList();
+                setTimeout(() => {
+                    isLoadingData = false;
+                    updateWallpapersList();
+                }, 3000); // 3 giây skeleton wave
             }
         }
 
@@ -361,13 +363,18 @@
                     images.sort((a, b) => b.timestamp - a.timestamp);
                     cloudUploadedImages = images;
                 }
-                isLoadingData = false;
-                updateWallpapersList();
-                if (currentTab === 'uploader') renderUploadedImages();
+                
+                setTimeout(() => {
+                    isLoadingData = false;
+                    updateWallpapersList();
+                    if (currentTab === 'uploader') renderUploadedImages();
+                }, 3000); // Đảm bảo hiệu ứng skeleton wave chạy chuẩn 3 giây
             }, (err) => {
                 cloudUploadedImages = getLocalImages();
-                isLoadingData = false;
-                updateWallpapersList();
+                setTimeout(() => {
+                    isLoadingData = false;
+                    updateWallpapersList();
+                }, 3000);
             });
         }
 
@@ -496,7 +503,12 @@
             const body = document.getElementById('bodyElement');
             
             cloudUploadedImages = getLocalImages();
-            setTimeout(() => { isLoadingData = false; updateWallpapersList(); }, 800);
+            
+            // Khởi tạo chạy skeleton wave trong đúng 3 giây
+            setTimeout(() => { 
+                isLoadingData = false; 
+                updateWallpapersList(); 
+            }, 3000);
 
             initFirebase();
 
@@ -506,7 +518,7 @@
                     body.classList.remove('overflow-hidden');
                     setTimeout(() => { splashScreen.style.display = 'none'; }, 500);
                 }
-            }, 600);
+            }, 800);
 
             renderWallpapers(currentCategory);
         });
@@ -596,7 +608,7 @@
             
             grid.innerHTML = '';
             
-            // Hiển thị hiệu ứng Skeleton lướt sóng khi đang tải dữ liệu
+            // Hiển thị hiệu ứng Skeleton lướt sóng chạy trong 3 giây
             if (isLoadingData) {
                 paginationContainer.style.display = 'none';
                 for (let i = 0; i < 4; i++) {
