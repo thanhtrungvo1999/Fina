@@ -2,7 +2,7 @@
 <html lang="vi" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Wallzy Wallpaper Studio - Cloud Database</title>
     
     <link rel="manifest" href="manifest.json">
@@ -29,6 +29,26 @@
                 }
             }
         }
+
+        // Chặn hoàn toàn thao tác phóng to / thu nhỏ trang web trên di động (Pinch-to-zoom prevention)
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function(e) {
+            e.preventDefault();
+        });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
     </script>
     <style>
         ::-webkit-scrollbar { width: 3px; height: 3px; }
@@ -724,13 +744,10 @@
                     <div class="absolute inset-0 skeleton-wave z-0"></div>
                     <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onclick="openModalById('${w.id}')">
                     
-                    <!-- Integrated Category & Quality Pill Badge (Matching Screenshot) -->
-                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[82%]">
-                        <span class="text-[10px] font-bold text-white truncate max-w-[65px]">${catText}</span>
-                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K Cloud</span>
-                        <button onclick="event.stopPropagation(); startDownloadUrlWith5sCountdown('${w.url}', '${w.id}')" class="w-6 h-6 rounded-full bg-white text-gray-900 flex items-center justify-center text-[10px] hover:bg-gray-200 transition flex-shrink-0 cursor-pointer shadow" title="Tải xuống">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
+                    <!-- Integrated Category & Quality Pill Badge (Bỏ nút tải xuống ở ngoài trang chính) -->
+                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[90%]">
+                        <span class="text-[10px] font-bold text-white truncate max-w-[80px]">${catText}</span>
+                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
                     </div>
 
                     <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
@@ -770,13 +787,10 @@
                     <div class="absolute inset-0 skeleton-wave z-0"></div>
                     <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onclick="openModalById('${w.id}')">
                     
-                    <!-- Integrated Category & Quality Pill Badge (Matching Screenshot) -->
-                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[82%]">
-                        <span class="text-[10px] font-bold text-white truncate max-w-[65px]">${catText}</span>
-                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K Cloud</span>
-                        <button onclick="event.stopPropagation(); startDownloadUrlWith5sCountdown('${w.url}', '${w.id}')" class="w-6 h-6 rounded-full bg-white text-gray-900 flex items-center justify-center text-[10px] hover:bg-gray-200 transition flex-shrink-0 cursor-pointer shadow" title="Tải xuống">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
+                    <!-- Integrated Category & Quality Pill Badge (Bỏ nút tải xuống ở ngoài trang chính) -->
+                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[90%]">
+                        <span class="text-[10px] font-bold text-white truncate max-w-[80px]">${catText}</span>
+                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
                     </div>
 
                     <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
