@@ -222,6 +222,9 @@
                 <span class="text-[10px] font-semibold uppercase tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10" id="modalCategory">Database</span>
             </div>
             <div class="flex items-center space-x-2">
+                <button onclick="shareWallpaperCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Chia sẻ ngay">
+                    <i class="fa-solid fa-share-nodes text-white"></i>
+                </button>
                 <button onclick="copyShareLinkCurrent()" class="text-white text-xs bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/10 shadow-lg" title="Sao chép link riêng">
                     <i class="fa-solid fa-link text-white"></i>
                 </button>
@@ -237,10 +240,16 @@
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-5 w-full max-w-sm mx-auto">
-            <button onclick="copyShareLinkCurrent()" class="w-full bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/10">
-                <i class="fa-solid fa-link text-xs text-white"></i>
-                <span class="text-[11px] uppercase tracking-wider font-semibold">Sao chép link riêng cho ảnh</span>
-            </button>
+            <div class="flex space-x-2">
+                <button onclick="shareWallpaperCurrent()" class="flex-1 bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/10">
+                    <i class="fa-solid fa-share-nodes text-xs text-white"></i>
+                    <span class="text-[11px] uppercase tracking-wider font-semibold">Chia sẻ</span>
+                </button>
+                <button onclick="copyShareLinkCurrent()" class="flex-1 bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/10">
+                    <i class="fa-solid fa-link text-xs text-white"></i>
+                    <span class="text-[11px] uppercase tracking-wider font-semibold">Sao chép Link</span>
+                </button>
+            </div>
             <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
                 <i class="fa-solid fa-download text-xs text-gray-900"></i>
                 <span class="text-[11px] uppercase tracking-wider font-semibold">Tải về chuẩn 4K Ultra HD (Đợi 5s)</span>
@@ -850,6 +859,26 @@
                 const newUrl = window.location.pathname;
                 window.history.pushState({path: newUrl}, '', newUrl);
             } catch (e) {}
+        }
+
+        window.shareWallpaperCurrent = async function() {
+            if (!currentSelectedWallpaper) return;
+            const shareUrl = `${window.location.origin}${window.location.pathname}?img=${currentSelectedWallpaper.id}`;
+            const shareData = {
+                title: 'Wallzy Wallpaper 4K',
+                text: 'Tải ngay hình nền 4K Ultra HD cực đẹp từ Wallzy Wallpaper Studio!',
+                url: shareUrl
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (e) {
+                    // User canceled share
+                }
+            } else {
+                copyShareLinkCurrent();
+            }
         }
 
         window.copyShareLinkCurrent = function() {
