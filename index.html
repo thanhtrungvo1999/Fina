@@ -93,17 +93,6 @@
             <button onclick="filterCategory('all', this)" class="cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm">Tất cả ảnh</button>
         </nav>
 
-        <!-- Search Bar -->
-        <div id="searchBarContainer" class="px-5 pb-2 flex-shrink-0">
-            <div class="relative flex items-center">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs"></i>
-                <input type="text" id="searchInput" placeholder="Tìm kiếm kho ảnh đám mây chung..." class="w-full bg-[#16161a] border border-white/5 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-white focus:outline-none transition shadow-inner">
-                <button onclick="searchCloudLibrary()" class="absolute right-2.5 w-7 h-7 rounded-xl bg-white text-gray-900 flex items-center justify-center text-[10px] transition cursor-pointer shadow">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
             <!-- Wallpaper Grid Container -->
             <div id="wallpaperGridContainer">
@@ -645,12 +634,6 @@
             renderWallpapers(currentCategory);
         };
 
-        window.searchCloudLibrary = function() {
-            const searchInput = document.getElementById('searchInput');
-            const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-            renderWallpapers(currentCategory, query);
-        };
-
         window.loadMoreWallpapers = function() {
             displayedCount += loadStepCount;
             renderWallpapers(currentCategory);
@@ -661,7 +644,6 @@
             const gridContainer = document.getElementById('wallpaperGridContainer');
             const studioContainer = document.getElementById('gradientStudioContainer');
             const categoryNav = document.getElementById('categoryNav');
-            const searchBarContainer = document.getElementById('searchBarContainer');
 
             ['navExploreBtn', 'navFavBtn', 'navStudioBtn'].forEach(id => {
                 const button = document.getElementById(id);
@@ -682,13 +664,11 @@
                 if (gridContainer) gridContainer.classList.add('hidden');
                 if (studioContainer) studioContainer.classList.remove('hidden');
                 if (categoryNav) categoryNav.classList.add('hidden');
-                if (searchBarContainer) searchBarContainer.classList.add('hidden');
                 renderSavedGradients();
             } else {
                 if (gridContainer) gridContainer.classList.remove('hidden');
                 if (studioContainer) studioContainer.classList.add('hidden');
                 if (categoryNav) categoryNav.classList.remove('hidden');
-                if (searchBarContainer) searchBarContainer.classList.remove('hidden');
 
                 if (tab === 'explore') {
                     renderWallpapers(currentCategory);
@@ -698,7 +678,7 @@
             }
         };
 
-        function renderWallpapers(category = 'all', searchQuery = '') {
+        function renderWallpapers(category = 'all') {
             const grid = document.getElementById('wallpaperGrid');
             const paginationContainer = document.getElementById('paginationContainer');
             const remainingCountSpan = document.getElementById('remainingCount');
@@ -721,13 +701,6 @@
                 filtered = filtered.filter(w => (w.category || '').toLowerCase() === category.toLowerCase());
             }
 
-            if (searchQuery) {
-                filtered = filtered.filter(w => 
-                    (w.category || '').toLowerCase().includes(searchQuery) ||
-                    (w.id || '').toLowerCase().includes(searchQuery)
-                );
-            }
-
             if (filtered.length === 0) {
                 grid.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-500 text-xs">Chưa có ảnh nào trong mục này.</div>`;
                 if (paginationContainer) paginationContainer.classList.add('hidden');
@@ -741,10 +714,15 @@
                 
                 const isFav = cloudFavorites.some(f => f.id === w.id);
                 const heartClass = isFav ? "fa-solid text-red-500 fa-heart" : "fa-regular text-white fa-heart";
+                const qualityText = w.quality || '4K';
 
                 card.innerHTML = `
                     <div class="absolute inset-0 skeleton-wave z-0" id="skel_${w.id}"></div>
                     <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-300 opacity-0" onload="this.classList.remove('opacity-0'); document.getElementById('skel_${w.id}')?.remove();" onclick="openModalById('${w.id}')">
+                    <div class="absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest border border-white/15 uppercase flex items-center space-x-1 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>${qualityText}</span>
+                    </div>
                     <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
                         <i class="${heartClass}"></i>
                     </button>
@@ -776,9 +754,14 @@
             cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow border border-white/5';
+                const qualityText = w.quality || '4K';
                 
                 card.innerHTML = `
                     <img src="${w.url}" class="w-full h-full object-cover relative z-10" onclick="openModalById('${w.id}')">
+                    <div class="absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest border border-white/15 uppercase flex items-center space-x-1 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>${qualityText}</span>
+                    </div>
                     <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
                         <i class="fa-solid text-red-500 fa-heart"></i>
                     </button>
@@ -823,7 +806,9 @@
 
         function openModal(wallpaper) {
             currentSelectedWallpaper = wallpaper;
-            document.getElementById('modalCategory').innerText = wallpaper.category || 'Database';
+            const qualityText = wallpaper.quality || '4K';
+            const catText = wallpaper.category || 'Database';
+            document.getElementById('modalCategory').innerText = `${catText} • ${qualityText}`;
             document.getElementById('detailImg').src = wallpaper.url;
             updateModalFavState();
 
@@ -1061,8 +1046,12 @@
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-2xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow';
                 card.onclick = () => openModal(g);
+                const qualityText = g.quality || '4K UHD';
                 card.innerHTML = `
                     <img src="${g.url}" class="w-full h-full object-cover relative z-10">
+                    <div class="absolute top-2.5 left-2.5 z-20 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest border border-white/15 uppercase">
+                        ${qualityText}
+                    </div>
                 `;
                 grid.appendChild(card);
             });
