@@ -232,7 +232,8 @@
         </div>
 
         <div class="absolute inset-0 flex items-center justify-center p-4">
-            <img id="detailImg" src="" alt="Detail" class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-all duration-300">
+            <div id="modalImgSkel" class="w-full h-full max-h-[80vh] rounded-2xl skeleton-wave"></div>
+            <img id="detailImg" src="" alt="Detail" class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10" onload="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');" onerror="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');">
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-5 w-full max-w-sm mx-auto">
@@ -242,7 +243,7 @@
             </button>
             <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer">
                 <i class="fa-solid fa-download text-xs text-gray-900"></i>
-                <span class="text-[11px] uppercase tracking-wider font-semibold">Tải về chuẩn gốc (Đợi 5s)</span>
+                <span class="text-[11px] uppercase tracking-wider font-semibold">Tải về chuẩn 4K Ultra HD (Đợi 5s)</span>
             </button>
         </div>
     </div>
@@ -254,8 +255,8 @@
                 5
             </div>
             <div class="space-y-1">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Đang chuẩn bị ảnh gốc</h3>
-                <p class="text-[11px] text-gray-400">Vui lòng đợi 5 giây để hệ thống tối ưu liên kết tải xuống...</p>
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Đang chuẩn bị file 4K Ultra HD</h3>
+                <p class="text-[11px] text-gray-400">Vui lòng đợi 5 giây để hệ thống xuất liên kết tải ảnh 4K gốc...</p>
             </div>
             <button onclick="cancelCountdown()" class="w-full bg-[#16161a] hover:bg-[#222228] text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/10">
                 Hủy bỏ
@@ -714,16 +715,22 @@
                 
                 const isFav = cloudFavorites.some(f => f.id === w.id);
                 const heartClass = isFav ? "fa-solid text-red-500 fa-heart" : "fa-regular text-white fa-heart";
-                const qualityText = w.quality || '4K';
+                const catText = w.category || 'Tất cả';
 
                 card.innerHTML = `
-                    <div class="absolute inset-0 skeleton-wave z-0" id="skel_${w.id}"></div>
-                    <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-300 opacity-0" onload="this.classList.remove('opacity-0'); document.getElementById('skel_${w.id}')?.remove();" onclick="openModalById('${w.id}')">
-                    <div class="absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest border border-white/15 uppercase flex items-center space-x-1 shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>${qualityText}</span>
+                    <div class="absolute inset-0 skeleton-wave z-0"></div>
+                    <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onclick="openModalById('${w.id}')">
+                    
+                    <!-- Integrated Category & Quality Pill Badge -->
+                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[82%]">
+                        <span class="text-[10px] font-bold text-white truncate max-w-[65px]">${catText}</span>
+                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
+                        <button onclick="event.stopPropagation(); startDownloadUrlWith5sCountdown('${w.url}', '${w.id}')" class="w-6 h-6 rounded-full bg-white text-gray-900 flex items-center justify-center text-[10px] hover:bg-gray-200 transition flex-shrink-0 cursor-pointer shadow" title="Tải xuống">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
                     </div>
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
+
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
                         <i class="${heartClass}"></i>
                     </button>
                 `;
@@ -754,15 +761,22 @@
             cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
                 card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow border border-white/5';
-                const qualityText = w.quality || '4K';
+                const catText = w.category || 'Yêu thích';
                 
                 card.innerHTML = `
-                    <img src="${w.url}" class="w-full h-full object-cover relative z-10" onclick="openModalById('${w.id}')">
-                    <div class="absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest border border-white/15 uppercase flex items-center space-x-1 shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>${qualityText}</span>
+                    <div class="absolute inset-0 skeleton-wave z-0"></div>
+                    <img src="${w.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onclick="openModalById('${w.id}')">
+                    
+                    <!-- Integrated Category & Quality Pill Badge -->
+                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[82%]">
+                        <span class="text-[10px] font-bold text-white truncate max-w-[65px]">${catText}</span>
+                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
+                        <button onclick="event.stopPropagation(); startDownloadUrlWith5sCountdown('${w.url}', '${w.id}')" class="w-6 h-6 rounded-full bg-white text-gray-900 flex items-center justify-center text-[10px] hover:bg-gray-200 transition flex-shrink-0 cursor-pointer shadow" title="Tải xuống">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
                     </div>
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
+
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
                         <i class="fa-solid text-red-500 fa-heart"></i>
                     </button>
                 `;
@@ -809,7 +823,16 @@
             const qualityText = wallpaper.quality || '4K';
             const catText = wallpaper.category || 'Database';
             document.getElementById('modalCategory').innerText = `${catText} • ${qualityText}`;
-            document.getElementById('detailImg').src = wallpaper.url;
+
+            const detailImg = document.getElementById('detailImg');
+            const modalImgSkel = document.getElementById('modalImgSkel');
+            
+            if (modalImgSkel) modalImgSkel.classList.remove('hidden');
+            if (detailImg) {
+                detailImg.classList.add('opacity-0');
+                detailImg.src = wallpaper.url;
+            }
+
             updateModalFavState();
 
             // Update browser URL query without reloading page
@@ -882,6 +905,11 @@
             }, 1000);
         }
 
+        window.startDownloadUrlWith5sCountdown = function(url, id) {
+            currentSelectedWallpaper = { url: url, id: id };
+            startDownloadWith5sCountdown();
+        };
+
         window.cancelCountdown = function() {
             if (countdownTimer) clearInterval(countdownTimer);
             document.getElementById('countdownModal').classList.add('hidden');
@@ -890,26 +918,26 @@
         async function executeActualDownload() {
             if (!currentSelectedWallpaper) return;
             try {
-                const response = await fetch(currentSelectedWallpaper.url);
+                const response = await fetch(currentSelectedWallpaper.url, { mode: 'cors' });
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = `wallzy-${currentSelectedWallpaper.id}.jpg`;
+                link.download = `wallzy-4k-ultrahd-${currentSelectedWallpaper.id || Date.now()}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
-                showMessage("Tải ảnh thành công sau 5 giây chờ!");
+                showMessage("Đã tải thành công ảnh 4K Ultra HD nguyên bản về máy!");
             } catch (e) {
                 const link = document.createElement('a');
                 link.href = currentSelectedWallpaper.url;
                 link.target = '_blank';
-                link.download = `wallzy-${currentSelectedWallpaper.id}.jpg`;
+                link.download = `wallzy-4k-ultrahd-${currentSelectedWallpaper.id || Date.now()}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                showMessage("Đã mở ảnh trong tab mới để lưu!");
+                showMessage("Đã mở liên kết ảnh 4K Ultra HD gốc để bạn lưu về máy!");
             }
         }
 
@@ -928,10 +956,10 @@
                 let cssVal = '';
                 if(t === 'circle') {
                     cssVal = `radial-gradient(circle, ${val1}, ${val2})`;
-                    info.innerText = 'Radial Circle';
+                    info.innerText = 'Radial Circle 4K';
                 } else {
                     cssVal = `linear-gradient(${t}, ${val1}, ${val2})`;
-                    info.innerText = `Linear ${t}`;
+                    info.innerText = `Linear ${t} 4K`;
                 }
                 box.style.background = cssVal;
             }
@@ -947,37 +975,38 @@
             const c2 = document.getElementById('gradColor2').value;
             const t = document.getElementById('gradType').value;
 
+            // Render true 4K resolution canvas (2160 x 3840)
             const canvas = document.createElement('canvas');
-            canvas.width = 1080;
-            canvas.height = 1920;
+            canvas.width = 2160;
+            canvas.height = 3840;
             const ctx = canvas.getContext('2d');
 
             let gradient;
             if (t === 'circle') {
-                gradient = ctx.createRadialGradient(540, 960, 100, 540, 960, 1000);
+                gradient = ctx.createRadialGradient(1080, 1920, 200, 1080, 1920, 2000);
             } else if (t === 'to right') {
-                gradient = ctx.createLinearGradient(0, 0, 1080, 0);
+                gradient = ctx.createLinearGradient(0, 0, 2160, 0);
             } else if (t === 'to bottom') {
-                gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+                gradient = ctx.createLinearGradient(0, 0, 0, 3840);
             } else {
-                gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
+                gradient = ctx.createLinearGradient(0, 0, 2160, 3840);
             }
 
             gradient.addColorStop(0, c1);
             gradient.addColorStop(1, c2);
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 1080, 1920);
+            ctx.fillRect(0, 0, 2160, 3840);
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
             const newItem = {
                 id: 'grad_' + Date.now(),
                 category: 'Gradient',
+                quality: '4K Ultra HD',
                 url: dataUrl,
                 date: new Date().toLocaleDateString('vi-VN'),
                 timestamp: Date.now()
             };
 
-            // Không đẩy lên Public Cloud DB
             cloudCustomGradients.unshift(newItem);
             
             if (userId) {
@@ -988,9 +1017,9 @@
             renderSavedGradients();
             
             if (userId) {
-                showMessage("Đã lưu Gradient vào tài khoản cá nhân của bạn!");
+                showMessage("Đã lưu Gradient 4K vào tài khoản cá nhân!");
             } else {
-                showMessage("Đã lưu Gradient vào trình duyệt (Thiết bị này)!");
+                showMessage("Đã lưu Gradient 4K vào bộ nhớ thiết bị!");
             }
         }
 
@@ -999,35 +1028,36 @@
             const c2 = document.getElementById('gradColor2').value;
             const t = document.getElementById('gradType').value;
 
+            // Export true 4K resolution (2160 x 3840 px)
             const canvas = document.createElement('canvas');
-            canvas.width = 1080;
-            canvas.height = 1920;
+            canvas.width = 2160;
+            canvas.height = 3840;
             const ctx = canvas.getContext('2d');
 
             let gradient;
             if (t === 'circle') {
-                gradient = ctx.createRadialGradient(540, 960, 100, 540, 960, 1000);
+                gradient = ctx.createRadialGradient(1080, 1920, 200, 1080, 1920, 2000);
             } else if (t === 'to right') {
-                gradient = ctx.createLinearGradient(0, 0, 1080, 0);
+                gradient = ctx.createLinearGradient(0, 0, 2160, 0);
             } else if (t === 'to bottom') {
-                gradient = ctx.createLinearGradient(0, 0, 0, 1920);
+                gradient = ctx.createLinearGradient(0, 0, 0, 3840);
             } else {
-                gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
+                gradient = ctx.createLinearGradient(0, 0, 2160, 3840);
             }
 
             gradient.addColorStop(0, c1);
             gradient.addColorStop(1, c2);
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 1080, 1920);
+            ctx.fillRect(0, 0, 2160, 3840);
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.98);
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = `wallzy-gradient-${Date.now()}.jpg`;
+            link.download = `wallzy-gradient-4k-${Date.now()}.jpg`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showMessage("Đã tải ảnh gradient về máy!");
+            showMessage("Đã tải ảnh Gradient 4K Ultra HD (2160x3840) về máy!");
         }
 
         function renderSavedGradients() {
@@ -1048,7 +1078,8 @@
                 card.onclick = () => openModal(g);
                 const qualityText = g.quality || '4K UHD';
                 card.innerHTML = `
-                    <img src="${g.url}" class="w-full h-full object-cover relative z-10">
+                    <div class="absolute inset-0 skeleton-wave z-0"></div>
+                    <img src="${g.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();">
                     <div class="absolute top-2.5 left-2.5 z-20 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest border border-white/15 uppercase">
                         ${qualityText}
                     </div>
