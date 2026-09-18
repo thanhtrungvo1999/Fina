@@ -226,15 +226,6 @@
                 <span class="text-[10px] font-semibold uppercase tracking-widest text-white/90 bg-[#16161a]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-lg" id="modalCategory">Database</span>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="toggleFullscreen()" class="text-white text-xs bg-[#16161a] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Fullscreen">
-                    <i id="fullscreenIcon" class="fa-solid fa-expand text-white"></i>
-                </button>
-                <button onclick="shareCurrentWallpaper()" class="text-white text-xs bg-[#16161a] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Share">
-                    <i class="fa-solid fa-share-nodes text-white"></i>
-                </button>
-                <button onclick="copyShareLinkCurrent()" class="text-white text-xs bg-[#16161a] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Copy Link">
-                    <i class="fa-solid fa-link text-white"></i>
-                </button>
                 <button onclick="toggleFavoriteCurrent()" class="text-white text-xs bg-[#16161a] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Favorite">
                     <i id="modalFavIcon" class="fa-regular fa-heart text-white"></i>
                 </button>
@@ -243,7 +234,7 @@
 
         <div class="flex-1 flex items-center justify-center p-2 relative my-2 overflow-hidden" id="imageWrapperContainer">
             <div id="modalImgSkel" class="absolute inset-4 rounded-2xl skeleton-wave"></div>
-            <img id="detailImg" src="" alt="Detail" class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10" onload="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');" onerror="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');">
+            <img id="detailImg" src="" alt="Detail" class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10 pointer-events-none select-none" onload="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');" onerror="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');">
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-1 w-full max-w-sm mx-auto flex-shrink-0">
@@ -332,7 +323,7 @@
         let app, db, auth, userId = null;
         let wallpapers = [], cloudFavorites = [], cloudCustomGradients = [], cloudUploadedImages = [];
         let currentSelectedWallpaper = null, currentTab = 'explore', currentCategory = 'all';
-        let displayedCount = 8, loadStepCount = 4, isSkeletonActive = true, countdownTimer = null;
+        let displayedCount = 10, loadStepCount = 10, isSkeletonActive = true, countdownTimer = null;
 
         const loadLocalGradients = () => {
             try { cloudCustomGradients = JSON.parse(localStorage.getItem('wallzy_local_gradients')) || []; }
@@ -492,7 +483,7 @@
 
         window.filterCategory = (cat, el) => {
             currentCategory = cat;
-            displayedCount = 8;
+            displayedCount = 10;
             document.querySelectorAll('.cat-btn').forEach(btn => btn.className = 'cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer');
             if (el) el.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm';
             renderWallpapers(currentCategory);
@@ -665,23 +656,8 @@
 
         window.closeModal = () => {
             document.getElementById('detailModal').classList.add('hidden');
-            document.getElementById('detailImg').className = "max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10";
-            document.getElementById('fullscreenIcon').className = "fa-solid fa-expand text-white";
+            document.getElementById('detailImg').className = "max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10 pointer-events-none select-none";
             try { window.history.pushState({ path: window.location.pathname }, '', window.location.pathname); } catch (e) {}
-        };
-
-        window.toggleFullscreen = () => {
-            const img = document.getElementById('detailImg');
-            const icon = document.getElementById('fullscreenIcon');
-            if (img.classList.contains('object-contain')) {
-                img.classList.replace('object-contain', 'object-cover');
-                icon.className = "fa-solid fa-compress text-white";
-                showMessage("Switched to Fullscreen Cover");
-            } else {
-                img.classList.replace('object-cover', 'object-contain');
-                icon.className = "fa-solid fa-expand text-white";
-                showMessage("Switched to Fit screen");
-            }
         };
 
         window.shareCurrentWallpaper = async () => {
@@ -689,13 +665,9 @@
             const shareUrl = `${window.location.origin}${window.location.pathname}?img=${currentSelectedWallpaper.id}`;
             if (navigator.share) {
                 try { await navigator.share({ title: 'Wallzy Wallpaper', url: shareUrl }); } catch (e) {}
-            } else { copyShareLinkCurrent(); }
-        };
-
-        window.copyShareLinkCurrent = () => {
-            if (!currentSelectedWallpaper) return;
-            const shareUrl = `${window.location.origin}${window.location.pathname}?img=${currentSelectedWallpaper.id}`;
-            navigator.clipboard?.writeText(shareUrl).then(() => showMessage("Link copied successfully!")).catch(() => showMessage("Share link: " + shareUrl));
+            } else {
+                navigator.clipboard?.writeText(shareUrl).then(() => showMessage("Link copied successfully!")).catch(() => showMessage("Share link: " + shareUrl));
+            }
         };
 
         window.startDownloadWith5sCountdown = () => {
