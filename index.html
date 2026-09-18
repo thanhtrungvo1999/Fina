@@ -563,7 +563,7 @@
             const imgId = new URLSearchParams(window.location.search).get('img');
             if (imgId) {
                 const found = wallpapers.find(w => w.id === imgId);
-                if (found) openModal(found, false);
+                if (found) openModal(found, false); // Cờ false: Tải từ link trực tiếp, không tạo history mới
             }
         }
 
@@ -681,7 +681,8 @@
             if (found) openModal(found, true);
         };
 
-        function openModal(wallpaper, isUserInteraction = false) {
+        // Nhận thêm cờ isUserInteraction để biết người dùng chủ động bấm hay do web tự tải link
+        function openModal(wallpaper, isUserInteraction = true) {
             currentSelectedWallpaper = wallpaper;
             document.getElementById('modalCategory').innerText = `${wallpaper.category || 'Database'} • ${wallpaper.quality || '4K'}`;
             const detailImg = document.getElementById('detailImg');
@@ -690,10 +691,10 @@
             detailImg.src = wallpaper.url;
             updateModalFavState();
             
-            // Chỉ thêm vào lịch sử duyệt web khi người dùng chủ động bấm vào ảnh
+            // Chỉ thêm lịch sử duyệt web nếu người dùng chủ động bấm vào ảnh
             if (isUserInteraction) {
                 try { 
-                    window.history.pushState({ modal: true }, '', `?img=${wallpaper.id}`); 
+                    window.history.pushState({ modalOpen: true }, '', `?img=${wallpaper.id}`); 
                     isModalHistoryPushed = true;
                 } catch (e) {}
             }
@@ -701,28 +702,28 @@
             document.getElementById('detailModal').classList.remove('hidden');
         }
 
-        window.closeModal = () => {
+        function hideModalUI() {
             document.getElementById('detailModal').classList.add('hidden');
             document.getElementById('detailImg').className = "max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10 pointer-events-none select-none";
-            
-            // Xử lý nút back UI trên giao diện đồng bộ với history
-            try { 
-                if (isModalHistoryPushed) {
-                    window.history.back();
-                    isModalHistoryPushed = false;
-                } else {
-                    window.history.replaceState(null, '', window.location.pathname);
-                }
-            } catch (e) {}
+        }
+
+        window.closeModal = () => {
+            if (isModalHistoryPushed) {
+                // Kích hoạt phím back của trình duyệt, sẽ tự động gọi event popstate bên dưới
+                window.history.back(); 
+            } else {
+                // Nếu vào thẳng từ URL chia sẻ, chỉ cần ẩn UI và xóa parameter trên URL
+                hideModalUI();
+                try { window.history.replaceState(null, '', window.location.pathname); } catch (e) {}
+            }
         };
 
-        // BẮT SỰ KIỆN: Lắng nghe thao tác bấm nút "Back" trên điện thoại
+        // Lắng nghe sự kiện Back của trình duyệt / Nút back điện thoại
         window.addEventListener('popstate', (e) => {
             const urlParams = new URLSearchParams(window.location.search);
+            // Khi URL bị lùi về trạng thái không còn parameter 'img', tự động đóng modal
             if (!urlParams.get('img')) {
-                // Nếu URL không còn chứa ?img (nghĩa là đã back ra ngoài gallery), ẩn modal
-                document.getElementById('detailModal').classList.add('hidden');
-                document.getElementById('detailImg').className = "max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10 pointer-events-none select-none";
+                hideModalUI();
                 isModalHistoryPushed = false;
             }
         });
@@ -861,12 +862,11 @@
                 card.onclick = () => openModal(g, true);
                 card.innerHTML = `
                     <div class="absolute inset-0 skeleton-wave z-0"></div>
-                    <img src="${g.url}" loading="lazy" decoding="async" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();">
+                    <img src="${g.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();">
                     <div class="absolute top-2.5 left-2.5 z-20 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest uppercase">4K UHD</div>
                 `;
-                fragment.appendChild(card);
+                grid.appendChild(card);
             });
-            grid.appendChild(fragment);
         }
     </script>
 </body>
