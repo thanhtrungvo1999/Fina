@@ -214,7 +214,7 @@
             </div>
         </main>
 
-        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#0a0a0c]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
+        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#0a0a0c]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-all duration-300 ease-in-out rounded-full shadow-2xl">
             <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex flex-col items-center space-y-0.5 text-white cursor-pointer transition">
                 <i class="fa-regular fa-compass text-xs text-white"></i>
                 <span class="text-[9px] font-semibold">Explore</span>
@@ -425,10 +425,11 @@
             updateWallpapersList();
         }
 
-        // Ẩn/hiện Search Bar + Category Nav khi cuộn trong khu vực nội dung chính
+        // Ẩn/hiện Search Bar + Category Nav + Footer menu khi cuộn trong khu vực nội dung chính
         function initTopControlsHideOnScroll() {
             const scrollArea = document.getElementById('mainScrollArea');
             const wrapper = document.getElementById('topControlsWrapper');
+            const footer = document.getElementById('footerEl');
             if (!scrollArea || !wrapper) return;
 
             let lastScrollTop = 0;
@@ -454,6 +455,11 @@
                 wrapper.style.maxHeight = naturalHeight() + 'px';
                 wrapper.style.opacity = '1';
                 wrapper.style.pointerEvents = '';
+                if (footer) {
+                    footer.style.transform = 'translateY(0)';
+                    footer.style.opacity = '1';
+                    footer.style.pointerEvents = '';
+                }
             }
 
             function hide() {
@@ -462,6 +468,11 @@
                 wrapper.style.maxHeight = '0px';
                 wrapper.style.opacity = '0';
                 wrapper.style.pointerEvents = 'none';
+                if (footer) {
+                    footer.style.transform = 'translateY(150%)';
+                    footer.style.opacity = '0';
+                    footer.style.pointerEvents = 'none';
+                }
             }
 
             // Thiết lập chiều cao ban đầu để transition hoạt động đúng
