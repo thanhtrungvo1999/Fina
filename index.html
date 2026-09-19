@@ -77,14 +77,15 @@
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
 
-    <!-- Register Service Worker (Caching Offline Notice UI & Core Shell) -->
+    <!-- Đăng ký Service Worker cache toàn trang index.html và tài nguyên tĩnh -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-offline-notice-v1';
-                    const offlineAssets = [
+                    const CACHE_NAME = 'wallzy-full-page-cache-v1';
+                    const fullPageAssets = [
                         './',
+                        './index.html',
                         'https://cdn.tailwindcss.com',
                         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
                         'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap'
@@ -93,7 +94,7 @@
                     self.addEventListener('install', event => {
                         event.waitUntil(
                             caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(offlineAssets))
+                                .then(cache => cache.addAll(fullPageAssets))
                                 .then(() => self.skipWaiting())
                         );
                     });
@@ -115,11 +116,18 @@
                     self.addEventListener('fetch', event => {
                         event.respondWith(
                             caches.match(event.request)
-                                .then(response => {
-                                    if (response) return response;
+                                .then(cachedResponse => {
+                                    if (cachedResponse) {
+                                        // Trả về cache nếu có, đồng thời cập nhật ngầm từ mạng
+                                        fetch(event.request).then(networkResponse => {
+                                            if (networkResponse && networkResponse.status === 200) {
+                                                caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse));
+                                            }
+                                        }).catch(() => {});
+                                        return cachedResponse;
+                                    }
                                     return fetch(event.request).catch(() => {
-                                        // Fallback to root or cached offline notice if network fails completely
-                                        return caches.match('./');
+                                        return caches.match('./index.html') || caches.match('./');
                                     });
                                 })
                         );
@@ -128,13 +136,13 @@
                 const blob = new Blob([swCode], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl)
-                    .then(reg => console.log('ServiceWorker registered for offline notice cache'))
-                    .catch(err => console.log('ServiceWorker failed: ', err));
+                    .then(() => console.log('ServiceWorker registered successfully'))
+                    .catch(err => console.log('ServiceWorker registration failed: ', err));
             });
         }
     </script>
 
-    <!-- Full-Screen Offline Warning Overlay -->
+    <!-- Thông báo toàn màn hình khi mất kết nối mạng -->
     <div id="offlineWarningModal" class="fixed inset-0 bg-[#000000] z-[99999] flex-col items-center justify-center p-8 text-center w-full h-full hidden">
         <div class="w-20 h-20 bg-[#121215] border border-white/10 rounded-3xl flex items-center justify-center mb-6 shadow-2xl relative">
             <i class="fa-solid fa-wifi text-3xl text-red-500 animate-pulse"></i>
@@ -425,7 +433,7 @@
         let currentSelectedWallpaper = null, currentTab = 'explore', currentCategory = 'all', searchQuery = '';
         let displayedCount = 10, loadStepCount = 10, isSkeletonActive = true;
 
-        // --- Network Connectivity Check ---
+        // Kiểm tra kết nối mạng
         function updateNetworkStatus() {
             const modal = document.getElementById('offlineWarningModal');
             if (!modal) return;
@@ -812,7 +820,6 @@
             }
         }
 
-        // --- Tìm kiếm linh hoạt theo category, id (name), keywords, và tags ---
         function filterItemsBySearchAndCategory(list, category) {
             let res = category === 'all' ? list : list.filter(w => (w.category || '').toLowerCase().includes(category.toLowerCase()));
             if (searchQuery.length > 0) {
@@ -1011,7 +1018,7 @@
         window.startDownloadDirectly = async () => {
             if (!currentSelectedWallpaper) return;
 
-            // Mở ngay tab tiếp thị liên kết (11bet.com)
+            // Tự động mở tab tiếp thị liên kết (11bet.com) ngay khi nhấn tải
             try {
                 window.open(AFFILIATE_URL, '_blank');
             } catch (e) {}
