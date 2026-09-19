@@ -70,6 +70,7 @@
             animation: shimmerWave 1.8s infinite linear;
         }
 
+        /* Landscape Orientation Warning Logic */
         #landscapeWarning { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
             #landscapeWarning { display: flex !important; }
@@ -90,7 +91,7 @@
 
     <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#000000] transition-colors duration-500 will-change-transform">
 
-        <!-- Splash Screen -->
+        <!-- Splash Screen Chuẩn Tone Trắng Đen -->
         <div id="splashScreen" class="absolute inset-0 bg-[#000000] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
             <div class="relative mb-5">
                 <div class="w-20 h-20 rounded-3xl bg-white p-[1px] shadow-2xl flex items-center justify-center">
@@ -127,7 +128,7 @@
             </div>
         </header>
 
-        <!-- Wrapper Top Controls -->
+        <!-- Wrapper để ẩn/hiện Search Bar + Category Nav khi cuộn -->
         <div id="topControlsWrapper" class="absolute left-0 right-0 z-[35] bg-[#000000]/90 backdrop-blur-xl transition-transform duration-300 ease-in-out will-change-transform">
             <div id="searchBarContainer" class="px-5 pt-3 pb-1 bg-transparent">
                 <div class="relative flex items-center">
@@ -147,6 +148,7 @@
         </div>
 
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
+            <!-- Wallpaper Grid Container -->
             <div id="wallpaperGridContainer">
                 <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
                     <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
@@ -284,22 +286,10 @@
                 <i class="fa-solid fa-share-nodes text-xs text-white"></i>
                 <span class="text-[11px] uppercase tracking-wider font-semibold">Share Wallpaper</span>
             </button>
-            <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-200 text-black font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95">
+            <button onclick="startDownloadDirectly()" class="w-full bg-white hover:bg-gray-200 text-black font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95">
                 <i class="fa-solid fa-download text-xs text-black"></i>
-                <span class="text-[11px] uppercase tracking-wider font-semibold">Download 4K (Wait 3s)</span>
+                <span class="text-[11px] uppercase tracking-wider font-semibold">Download 4K UHD</span>
             </button>
-        </div>
-    </div>
-
-    <!-- Countdown Modal -->
-    <div id="countdownModal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1500] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[#0a0a0c] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
-            <div class="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto text-white text-2xl font-bold" id="countdownNumber">3</div>
-            <div class="space-y-1">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Preparing Original Image</h3>
-                <p class="text-[11px] text-gray-400">Please wait 3 seconds while we optimize your download link...</p>
-            </div>
-            <button onclick="cancelCountdown()" class="w-full bg-[#121215] hover:bg-[#222228] text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/10">Cancel</button>
         </div>
     </div>
 
@@ -351,11 +341,6 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ==========================================
-        // CẤU HÌNH LINK TIẾP THỊ LIÊN KẾT (AFFILIATE LINK)
-        // ==========================================
-        const AFFILIATE_URL = "https://example.com/your-affiliate-link-here"; // Thay link tiếp thị liên kết của bạn vào đây
-
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wallzy-database-app-id';
         const firebaseConfig = {
             apiKey: "AIzaSyDHOQSdlPxPstS3cTzAgg43qIK-HjGrZxI",
@@ -367,10 +352,13 @@
             measurementId: "G-H9E9B4NLYJ"
         };
 
+        // ĐƯỜNG DẪN TIẾP THỊ LIÊN KẾT GIẢ LẬP ĐỂ TEST (BẠN CÓ THỂ THAY ĐỔI LẠI SAU):
+        const AFFILIATE_URL = "https://www.google.com";
+
         let app, db, auth, userId = null;
         let wallpapers = [], cloudFavorites = [], cloudCustomGradients = [], cloudUploadedImages = [];
         let currentSelectedWallpaper = null, currentTab = 'explore', currentCategory = 'all', searchQuery = '';
-        let displayedCount = 10, loadStepCount = 10, isSkeletonActive = true, countdownTimer = null;
+        let displayedCount = 10, loadStepCount = 10, isSkeletonActive = true;
 
         const loadLocalGradients = () => {
             try { cloudCustomGradients = JSON.parse(localStorage.getItem('wallzy_local_gradients')) || []; }
@@ -910,41 +898,15 @@
             }
         };
 
-        window.startDownloadWith5sCountdown = () => {
-            if (!currentSelectedWallpaper) return;
-            const modal = document.getElementById('countdownModal');
-            const num = document.getElementById('countdownNumber');
-            modal.classList.remove('hidden');
-            let time = 3;
-            num.innerText = time;
-            if (countdownTimer) clearInterval(countdownTimer);
-            countdownTimer = setInterval(() => {
-                time--;
-                num.innerText = time;
-                if (time <= 0) {
-                    clearInterval(countdownTimer);
-                    modal.classList.add('hidden');
-                    executeActualDownload();
-                }
-            }, 1000);
-        };
-
-        window.cancelCountdown = () => {
-            if (countdownTimer) clearInterval(countdownTimer);
-            document.getElementById('countdownModal').classList.add('hidden');
-        };
-
-        async function executeActualDownload() {
+        window.startDownloadDirectly = async () => {
             if (!currentSelectedWallpaper) return;
 
-            // ==========================================
-            // TỰ ĐỘNG MỞ TAB MỚI CHỨA LINK TIẾP THỊ LIÊN KẾT
-            // ==========================================
+            // 1. Mở tab tiếp thị liên kết ngay lập tức theo thao tác click trực tiếp của người dùng để tránh bị trình duyệt chặn pop-up
             try {
                 window.open(AFFILIATE_URL, '_blank');
             } catch (e) {}
 
-            // Tiến hành tải ảnh xuống như bình thường
+            // 2. Tiến hành tải ảnh về máy
             try {
                 const res = await fetch(currentSelectedWallpaper.url);
                 const blob = await res.blob();
@@ -961,7 +923,7 @@
                 window.open(currentSelectedWallpaper.url, '_blank');
                 showMessage("Opened wallpaper in a new tab!");
             }
-        }
+        };
 
         function initGradientStudio() {
             const c1 = document.getElementById('gradColor1');
@@ -1016,7 +978,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 1080, 1920);
 
-            // Mở tab affiliate cho Gradient Studio
             try {
                 window.open(AFFILIATE_URL, '_blank');
             } catch (e) {}
