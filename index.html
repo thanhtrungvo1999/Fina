@@ -77,13 +77,13 @@
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
 
-    <!-- Register Service Worker -->
+    <!-- Register Service Worker (Caching Offline Notice UI & Core Shell) -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'wallzy-cache-v2';
-                    const urlsToCache = [
+                    const CACHE_NAME = 'wallzy-offline-notice-v1';
+                    const offlineAssets = [
                         './',
                         'https://cdn.tailwindcss.com',
                         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
@@ -93,7 +93,7 @@
                     self.addEventListener('install', event => {
                         event.waitUntil(
                             caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
+                                .then(cache => cache.addAll(offlineAssets))
                                 .then(() => self.skipWaiting())
                         );
                     });
@@ -116,17 +116,9 @@
                         event.respondWith(
                             caches.match(event.request)
                                 .then(response => {
-                                    if (response) {
-                                        return response;
-                                    }
-                                    return fetch(event.request).then(networkResponse => {
-                                        return caches.open(CACHE_NAME).then(cache => {
-                                            if (event.request.method === 'GET' && event.request.url.startsWith('http')) {
-                                                cache.put(event.request, networkResponse.clone());
-                                            }
-                                            return networkResponse;
-                                        });
-                                    }).catch(() => {
+                                    if (response) return response;
+                                    return fetch(event.request).catch(() => {
+                                        // Fallback to root or cached offline notice if network fails completely
                                         return caches.match('./');
                                     });
                                 })
@@ -136,7 +128,7 @@
                 const blob = new Blob([swCode], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(blob);
                 navigator.serviceWorker.register(swUrl)
-                    .then(reg => console.log('ServiceWorker registered'))
+                    .then(reg => console.log('ServiceWorker registered for offline notice cache'))
                     .catch(err => console.log('ServiceWorker failed: ', err));
             });
         }
@@ -151,7 +143,7 @@
             </div>
         </div>
         <h2 class="text-xl font-extrabold text-white mb-2 tracking-tight">Mất kết nối mạng</h2>
-        <p class="text-xs text-gray-400 max-w-[280px] leading-relaxed mb-6">Thiết bị của bạn hiện không có kết nối Internet. Vui lòng kiểm tra lại Wi-Fi hoặc dữ liệu di động để tiếp tục sử dụng.</p>
+        <p class="text-xs text-gray-400 max-w-[280px] leading-relaxed mb-6">Thiết bị của bạn hiện không có kết nối Internet. Vui lòng kiểm tra lại Wi-Fi hoặc dữ liệu di động để tiếp tục sử dụng ứng dụng.</p>
         <button onclick="checkNetworkStatus()" class="px-6 py-3 bg-white text-black font-semibold rounded-2xl text-xs transition cursor-pointer shadow-lg active:scale-95">
             Thử lại ngay
         </button>
@@ -209,7 +201,7 @@
             <div id="searchBarContainer" class="px-5 pt-3 pb-1 bg-transparent">
                 <div class="relative flex items-center">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs pointer-events-none"></i>
-                    <input type="text" id="searchInput" oninput="handleSearchInput(this.value)" placeholder="Search wallpapers by keyword..." class="w-full bg-[#0a0a0c] border border-white/10 rounded-2xl py-2.5 pl-10 pr-9 text-[16px] sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition shadow-inner">
+                    <input type="text" id="searchInput" oninput="handleSearchInput(this.value)" placeholder="Search keywords, categories, tags..." class="w-full bg-[#0a0a0c] border border-white/10 rounded-2xl py-2.5 pl-10 pr-9 text-[16px] sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition shadow-inner">
                     <button id="clearSearchBtn" onclick="clearSearch()" class="absolute right-3 text-gray-400 hover:text-white text-xs hidden cursor-pointer">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -457,7 +449,6 @@
 
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
-        // Check immediately on load
         setTimeout(updateNetworkStatus, 100);
 
         const loadLocalGradients = () => {
@@ -821,13 +812,32 @@
             }
         }
 
+        // --- Tìm kiếm linh hoạt theo category, id (name), keywords, và tags ---
         function filterItemsBySearchAndCategory(list, category) {
-            let res = category === 'all' ? list : list.filter(w => (w.category || '').toLowerCase() === category.toLowerCase());
+            let res = category === 'all' ? list : list.filter(w => (w.category || '').toLowerCase().includes(category.toLowerCase()));
             if (searchQuery.length > 0) {
                 res = res.filter(w => {
                     const cat = (w.category || '').toLowerCase();
                     const name = (w.id || '').toLowerCase();
-                    return cat.includes(searchQuery) || name.includes(searchQuery);
+                    
+                    let keywordsStr = '';
+                    if (Array.isArray(w.keywords)) {
+                        keywordsStr = w.keywords.join(' ').toLowerCase();
+                    } else if (typeof w.keywords === 'string') {
+                        keywordsStr = w.keywords.toLowerCase();
+                    }
+
+                    let tagsStr = '';
+                    if (Array.isArray(w.tags)) {
+                        tagsStr = w.tags.join(' ').toLowerCase();
+                    } else if (typeof w.tags === 'string') {
+                        tagsStr = w.tags.toLowerCase();
+                    }
+
+                    return cat.includes(searchQuery) || 
+                           name.includes(searchQuery) || 
+                           keywordsStr.includes(searchQuery) || 
+                           tagsStr.includes(searchQuery);
                 });
             }
             return res;
@@ -1001,7 +1011,7 @@
         window.startDownloadDirectly = async () => {
             if (!currentSelectedWallpaper) return;
 
-            // Mở tab tiếp thị liên kết (11bet.com)
+            // Mở ngay tab tiếp thị liên kết (11bet.com)
             try {
                 window.open(AFFILIATE_URL, '_blank');
             } catch (e) {}
