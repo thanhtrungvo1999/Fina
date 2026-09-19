@@ -440,15 +440,17 @@
             let isHidden = false;
             let ticking = false;
             const threshold = 6; // Ngưỡng (px) để tránh rung lắc nhạy quá mức
+            let headerH = header.offsetHeight;
+            let wrapperH = wrapper.offsetHeight;
 
             // Đặt vị trí wrapper ngay dưới header, và chừa khoảng trống (padding-top) tương ứng
-            // trong main để nội dung không bị che lúc wrapper đang hiện. Việc này chỉ tính 1 lần
-            // (và khi resize/xoay màn hình) chứ không chạy trong lúc cuộn, nên không gây giật.
-            function layoutTopControls() {
-                const headerH = header.offsetHeight;
-                const wrapperH = wrapper.offsetHeight;
+            // trong main để nội dung không bị che lúc wrapper đang hiện, đồng thời giữ đúng vị trí
+            // ẩn/hiện hiện tại theo số đo mới nhất (tránh hở khi header đổi chiều cao do font tải
+            // xong muộn, thanh địa chỉ Android co giãn, xoay màn hình...).
+            function applyLayout() {
                 wrapper.style.top = headerH + 'px';
                 scrollArea.style.paddingTop = (wrapperH + 8) + 'px';
+                wrapper.style.transform = isHidden ? `translateY(-${headerH + wrapperH}px)` : 'translateY(0)';
             }
 
             function show() {
@@ -467,7 +469,9 @@
             function hide() {
                 if (isHidden) return;
                 isHidden = true;
-                wrapper.style.transform = 'translateY(-100%)';
+                // Đẩy lên đủ cả chiều cao header + wrapper để nó khuất hẳn phía trên (bị appContainer
+                // che), không chỉ lùi đúng chiều cao của chính nó -> tránh đè/hở với header.
+                wrapper.style.transform = `translateY(-${headerH + wrapperH}px)`;
                 wrapper.style.opacity = '0';
                 wrapper.style.pointerEvents = 'none';
                 if (footer) {
@@ -477,9 +481,24 @@
                 }
             }
 
-            layoutTopControls();
-            wrapper.style.transform = 'translateY(0)';
+            applyLayout();
             wrapper.style.opacity = '1';
+
+            // Theo dõi khi header/wrapper đổi kích thước THẬT (font web load xong, xoay máy, thanh
+            // địa chỉ trình duyệt Android co giãn...) để luôn tính lại đúng vị trí ngay lập tức,
+            // thay vì chỉ đo 1 lần lúc tải trang (nguyên nhân gây hở trên một số máy Android).
+            const remeasure = () => {
+                headerH = header.offsetHeight;
+                wrapperH = wrapper.offsetHeight;
+                applyLayout();
+            };
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(remeasure);
+                ro.observe(header);
+                ro.observe(wrapper);
+            } else {
+                window.addEventListener('resize', remeasure);
+            }
 
             scrollArea.addEventListener('scroll', () => {
                 if (ticking) return;
@@ -508,11 +527,8 @@
                 });
             }, { passive: true });
 
-            // Tính lại vị trí/khoảng trống khi nội dung (danh mục) thay đổi hoặc xoay màn hình
-            window.addEventListener('resize', layoutTopControls);
-
             // Cho phép các hàm khác (vd: sau khi load category thật, đổi tab) gọi lại để cập nhật
-            window.refreshTopControlsHeight = layoutTopControls;
+            window.refreshTopControlsHeight = remeasure;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
