@@ -82,18 +82,33 @@
             pointer-events: none;
         }
 
-        /* Auto-hide search + category while scrolling down */
+        /* Auto-hide search + category: collapse their space too */
         #searchBarContainer,
         #categoryNav {
-            transform: translateY(0);
+            max-height: 80px;
             opacity: 1;
-            transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.2s ease;
-            will-change: transform, opacity;
+            overflow: hidden;
+            transform: translateY(0);
+            transition:
+                max-height 0.28s cubic-bezier(.4,0,.2,1),
+                opacity 0.18s ease,
+                transform 0.28s cubic-bezier(.4,0,.2,1),
+                padding 0.28s cubic-bezier(.4,0,.2,1);
+            will-change: max-height, opacity, transform;
         }
+
         #searchBarContainer.toolbar-top-hidden,
         #categoryNav.toolbar-top-hidden {
-            transform: translateY(-110%);
+            max-height: 0 !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            border-width: 0 !important;
             opacity: 0;
+            transform: translateY(-8px);
             pointer-events: none;
         }
 
