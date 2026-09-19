@@ -502,11 +502,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
-            
-            loadLocalGradients();
-            updateWallpapersList();
-            initGradientStudio();
-            initTopControlsHideOnScroll();
+
+            try { loadLocalGradients(); } catch (e) { console.error('loadLocalGradients loi:', e); }
+            try { updateWallpapersList(); } catch (e) { console.error('updateWallpapersList loi:', e); }
+            try { initGradientStudio(); } catch (e) { console.error('initGradientStudio loi:', e); }
+            try { initTopControlsHideOnScroll(); } catch (e) { console.error('initTopControlsHideOnScroll loi:', e); }
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
