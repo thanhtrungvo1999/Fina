@@ -70,7 +70,6 @@
             animation: shimmerWave 1.8s infinite linear;
         }
 
-        /* Landscape Orientation Warning Logic */
         #landscapeWarning { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
             #landscapeWarning { display: flex !important; }
@@ -91,7 +90,7 @@
 
     <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#000000] transition-colors duration-500 will-change-transform">
 
-        <!-- Splash Screen Chuẩn Tone Trắng Đen -->
+        <!-- Splash Screen -->
         <div id="splashScreen" class="absolute inset-0 bg-[#000000] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
             <div class="relative mb-5">
                 <div class="w-20 h-20 rounded-3xl bg-white p-[1px] shadow-2xl flex items-center justify-center">
@@ -128,9 +127,8 @@
             </div>
         </header>
 
-        <!-- Wrapper để ẩn/hiện Search Bar + Category Nav khi cuộn (overlay + transform, không gây giật khi cuộn) -->
+        <!-- Wrapper Top Controls -->
         <div id="topControlsWrapper" class="absolute left-0 right-0 z-[35] bg-[#000000]/90 backdrop-blur-xl transition-transform duration-300 ease-in-out will-change-transform">
-            <!-- Search Bar Tích Hợp Mới (Đặt font-size 16px trên mobile để tránh tự động zoom) -->
             <div id="searchBarContainer" class="px-5 pt-3 pb-1 bg-transparent">
                 <div class="relative flex items-center">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs pointer-events-none"></i>
@@ -149,7 +147,6 @@
         </div>
 
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
-            <!-- Wallpaper Grid Container -->
             <div id="wallpaperGridContainer">
                 <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
                     <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
@@ -354,6 +351,11 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ==========================================
+        // CẤU HÌNH LINK TIẾP THỊ LIÊN KẾT (AFFILIATE LINK)
+        // ==========================================
+        const AFFILIATE_URL = "https://example.com/your-affiliate-link-here"; // Thay link tiếp thị liên kết của bạn vào đây
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wallzy-database-app-id';
         const firebaseConfig = {
             apiKey: "AIzaSyDHOQSdlPxPstS3cTzAgg43qIK-HjGrZxI",
@@ -425,10 +427,6 @@
             updateWallpapersList();
         }
 
-        // Ẩn/hiện Search Bar + Category Nav + Footer menu khi cuộn trong khu vực nội dung chính.
-        // Dùng transform/opacity (overlay đè lên main) thay vì đổi chiều cao (max-height), vì
-        // transform/opacity chỉ chạy trên GPU (compositor), không bắt trình duyệt tính lại layout
-        // mỗi khung hình -> tránh giật khi đang cuộn, kể cả lúc chạm đáy trang.
         function initTopControlsHideOnScroll() {
             const scrollArea = document.getElementById('mainScrollArea');
             const wrapper = document.getElementById('topControlsWrapper');
@@ -439,14 +437,10 @@
             let lastScrollTop = 0;
             let isHidden = false;
             let ticking = false;
-            const threshold = 6; // Ngưỡng (px) để tránh rung lắc nhạy quá mức
+            const threshold = 6;
             let headerH = header.offsetHeight;
             let wrapperH = wrapper.offsetHeight;
 
-            // Đặt vị trí wrapper ngay dưới header, và chừa khoảng trống (padding-top) tương ứng
-            // trong main để nội dung không bị che lúc wrapper đang hiện, đồng thời giữ đúng vị trí
-            // ẩn/hiện hiện tại theo số đo mới nhất (tránh hở khi header đổi chiều cao do font tải
-            // xong muộn, thanh địa chỉ Android co giãn, xoay màn hình...).
             function applyLayout() {
                 wrapper.style.top = headerH + 'px';
                 scrollArea.style.paddingTop = (wrapperH + 8) + 'px';
@@ -469,8 +463,6 @@
             function hide() {
                 if (isHidden) return;
                 isHidden = true;
-                // Đẩy lên đủ cả chiều cao header + wrapper để nó khuất hẳn phía trên (bị appContainer
-                // che), không chỉ lùi đúng chiều cao của chính nó -> tránh đè/hở với header.
                 wrapper.style.transform = `translateY(-${headerH + wrapperH}px)`;
                 wrapper.style.opacity = '0';
                 wrapper.style.pointerEvents = 'none';
@@ -484,9 +476,6 @@
             applyLayout();
             wrapper.style.opacity = '1';
 
-            // Theo dõi khi header/wrapper đổi kích thước THẬT (font web load xong, xoay máy, thanh
-            // địa chỉ trình duyệt Android co giãn...) để luôn tính lại đúng vị trí ngay lập tức,
-            // thay vì chỉ đo 1 lần lúc tải trang (nguyên nhân gây hở trên một số máy Android).
             const remeasure = () => {
                 headerH = header.offsetHeight;
                 wrapperH = wrapper.offsetHeight;
@@ -504,8 +493,6 @@
                 if (ticking) return;
                 ticking = true;
                 requestAnimationFrame(() => {
-                    // Chặn giá trị scrollTop khi bị hiệu ứng đàn hồi (bounce) ở đầu/cuối trang trên iOS,
-                    // tránh scrollTop âm hoặc vượt quá max làm delta tính sai gây giật liên tục.
                     const maxScroll = Math.max(0, scrollArea.scrollHeight - scrollArea.clientHeight);
                     const st = Math.min(Math.max(0, scrollArea.scrollTop), maxScroll);
                     const delta = st - lastScrollTop;
@@ -514,7 +501,6 @@
                         show();
                         lastScrollTop = st;
                     } else if (st >= maxScroll - threshold) {
-                        // Đang ở vùng đáy trang (kể cả khi đang bounce) -> giữ nguyên trạng thái, không toggle
                         lastScrollTop = st;
                     } else if (delta > threshold) {
                         hide();
@@ -527,7 +513,6 @@
                 });
             }, { passive: true });
 
-            // Cho phép các hàm khác (vd: sau khi load category thật, đổi tab) gọi lại để cập nhật
             window.refreshTopControlsHeight = remeasure;
         }
 
@@ -535,10 +520,10 @@
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
 
-            try { loadLocalGradients(); } catch (e) { console.error('loadLocalGradients loi:', e); }
-            try { updateWallpapersList(); } catch (e) { console.error('updateWallpapersList loi:', e); }
-            try { initGradientStudio(); } catch (e) { console.error('initGradientStudio loi:', e); }
-            try { initTopControlsHideOnScroll(); } catch (e) { console.error('initTopControlsHideOnScroll loi:', e); }
+            try { loadLocalGradients(); } catch (e) {}
+            try { updateWallpapersList(); } catch (e) {}
+            try { initGradientStudio(); } catch (e) {}
+            try { initTopControlsHideOnScroll(); } catch (e) {}
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
@@ -669,7 +654,6 @@
             let categories = Array.from(new Set(wallpapers.map(w => w.category?.trim()).filter(Boolean)));
             categories.sort((a, b) => a.localeCompare(b));
 
-            // Đẩy danh mục "Other" xuống cuối cùng theo yêu cầu trước đó
             const otherIndex = categories.findIndex(c => c.toLowerCase() === 'other');
             if (otherIndex > -1) {
                 const otherCategory = categories.splice(otherIndex, 1)[0];
@@ -952,6 +936,15 @@
 
         async function executeActualDownload() {
             if (!currentSelectedWallpaper) return;
+
+            // ==========================================
+            // TỰ ĐỘNG MỞ TAB MỚI CHỨA LINK TIẾP THỊ LIÊN KẾT
+            // ==========================================
+            try {
+                window.open(AFFILIATE_URL, '_blank');
+            } catch (e) {}
+
+            // Tiến hành tải ảnh xuống như bình thường
             try {
                 const res = await fetch(currentSelectedWallpaper.url);
                 const blob = await res.blob();
@@ -1017,11 +1010,16 @@
             canvas.width = 1080; canvas.height = 1920;
             const ctx = canvas.getContext('2d');
             const t = document.getElementById('gradType').value;
-            let grad = t === 'circle' ? ctx.createRadialGradient(540, 960, 100, 540, 960, 1000) : ctx.createLinearGrid ? ctx.createLinearGradient(0, 0, 1080, 1920) : ctx.createLinearGradient(0, 0, 1080, 1920);
+            let grad = t === 'circle' ? ctx.createRadialGradient(540, 960, 100, 540, 960, 1000) : ctx.createLinearGradient(0, 0, 1080, 1920);
             grad.addColorStop(0, document.getElementById('gradColor1').value);
             grad.addColorStop(1, document.getElementById('gradColor2').value);
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 1080, 1920);
+
+            // Mở tab affiliate cho Gradient Studio
+            try {
+                window.open(AFFILIATE_URL, '_blank');
+            } catch (e) {}
 
             const link = document.createElement('a');
             link.href = canvas.toDataURL('image/jpeg', 0.95);
