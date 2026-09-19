@@ -352,8 +352,8 @@
             measurementId: "G-H9E9B4NLYJ"
         };
 
-        // ĐƯỜNG DẪN TIẾP THỊ LIÊN KẾT GIẢ LẬP ĐỂ TEST (BẠN CÓ THỂ THAY ĐỔI LẠI SAU):
-        const AFFILIATE_URL = "https://www.google.com";
+        // ĐƯỜNG DẪN TIẾP THỊ LIÊN KẾT 11BET.COM
+        const AFFILIATE_URL = "https://11bet.com";
 
         let app, db, auth, userId = null;
         let wallpapers = [], cloudFavorites = [], cloudCustomGradients = [], cloudUploadedImages = [];
@@ -901,12 +901,12 @@
         window.startDownloadDirectly = async () => {
             if (!currentSelectedWallpaper) return;
 
-            // 1. Mở tab tiếp thị liên kết ngay lập tức theo thao tác click trực tiếp của người dùng để tránh bị trình duyệt chặn pop-up
+            // 1. Mở ngay lập tức tab tiếp thị liên kết (11bet.com) ngay khi người dùng click
             try {
                 window.open(AFFILIATE_URL, '_blank');
             } catch (e) {}
 
-            // 2. Tiến hành tải ảnh về máy
+            // 2. Tiến hành tải ảnh về thiết bị
             try {
                 const res = await fetch(currentSelectedWallpaper.url);
                 const blob = await res.blob();
