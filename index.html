@@ -128,8 +128,8 @@
             </div>
         </header>
 
-        <!-- Wrapper để ẩn/hiện Search Bar + Category Nav khi cuộn -->
-        <div id="topControlsWrapper" class="flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out">
+        <!-- Wrapper để ẩn/hiện Search Bar + Category Nav khi cuộn (overlay + transform, không gây giật khi cuộn) -->
+        <div id="topControlsWrapper" class="absolute left-0 right-0 z-20 bg-[#000000]/90 backdrop-blur-xl transition-transform duration-300 ease-in-out will-change-transform">
             <!-- Search Bar Tích Hợp Mới (Đặt font-size 16px trên mobile để tránh tự động zoom) -->
             <div id="searchBarContainer" class="px-5 pt-3 pb-1 bg-transparent">
                 <div class="relative flex items-center">
@@ -425,34 +425,36 @@
             updateWallpapersList();
         }
 
-        // Ẩn/hiện Search Bar + Category Nav + Footer menu khi cuộn trong khu vực nội dung chính
+        // Ẩn/hiện Search Bar + Category Nav + Footer menu khi cuộn trong khu vực nội dung chính.
+        // Dùng transform/opacity (overlay đè lên main) thay vì đổi chiều cao (max-height), vì
+        // transform/opacity chỉ chạy trên GPU (compositor), không bắt trình duyệt tính lại layout
+        // mỗi khung hình -> tránh giật khi đang cuộn, kể cả lúc chạm đáy trang.
         function initTopControlsHideOnScroll() {
             const scrollArea = document.getElementById('mainScrollArea');
             const wrapper = document.getElementById('topControlsWrapper');
+            const header = document.getElementById('headerEl');
             const footer = document.getElementById('footerEl');
-            if (!scrollArea || !wrapper) return;
+            if (!scrollArea || !wrapper || !header) return;
 
             let lastScrollTop = 0;
             let isHidden = false;
             let ticking = false;
             const threshold = 6; // Ngưỡng (px) để tránh rung lắc nhạy quá mức
 
-            function naturalHeight() {
-                const prevTransition = wrapper.style.transition;
-                const prevMax = wrapper.style.maxHeight;
-                wrapper.style.transition = 'none';
-                wrapper.style.maxHeight = 'none';
-                const h = wrapper.scrollHeight;
-                wrapper.style.maxHeight = prevMax;
-                void wrapper.offsetHeight; // ép reflow trước khi bật lại transition
-                wrapper.style.transition = prevTransition;
-                return h;
+            // Đặt vị trí wrapper ngay dưới header, và chừa khoảng trống (padding-top) tương ứng
+            // trong main để nội dung không bị che lúc wrapper đang hiện. Việc này chỉ tính 1 lần
+            // (và khi resize/xoay màn hình) chứ không chạy trong lúc cuộn, nên không gây giật.
+            function layoutTopControls() {
+                const headerH = header.offsetHeight;
+                const wrapperH = wrapper.offsetHeight;
+                wrapper.style.top = headerH + 'px';
+                scrollArea.style.paddingTop = (wrapperH + 8) + 'px';
             }
 
             function show() {
                 if (!isHidden) return;
                 isHidden = false;
-                wrapper.style.maxHeight = naturalHeight() + 'px';
+                wrapper.style.transform = 'translateY(0)';
                 wrapper.style.opacity = '1';
                 wrapper.style.pointerEvents = '';
                 if (footer) {
@@ -465,7 +467,7 @@
             function hide() {
                 if (isHidden) return;
                 isHidden = true;
-                wrapper.style.maxHeight = '0px';
+                wrapper.style.transform = 'translateY(-100%)';
                 wrapper.style.opacity = '0';
                 wrapper.style.pointerEvents = 'none';
                 if (footer) {
@@ -475,18 +477,25 @@
                 }
             }
 
-            // Thiết lập chiều cao ban đầu để transition hoạt động đúng
-            wrapper.style.maxHeight = naturalHeight() + 'px';
+            layoutTopControls();
+            wrapper.style.transform = 'translateY(0)';
+            wrapper.style.opacity = '1';
 
             scrollArea.addEventListener('scroll', () => {
                 if (ticking) return;
                 ticking = true;
                 requestAnimationFrame(() => {
-                    const st = Math.max(0, scrollArea.scrollTop);
+                    // Chặn giá trị scrollTop khi bị hiệu ứng đàn hồi (bounce) ở đầu/cuối trang trên iOS,
+                    // tránh scrollTop âm hoặc vượt quá max làm delta tính sai gây giật liên tục.
+                    const maxScroll = Math.max(0, scrollArea.scrollHeight - scrollArea.clientHeight);
+                    const st = Math.min(Math.max(0, scrollArea.scrollTop), maxScroll);
                     const delta = st - lastScrollTop;
 
                     if (st <= threshold) {
                         show();
+                        lastScrollTop = st;
+                    } else if (st >= maxScroll - threshold) {
+                        // Đang ở vùng đáy trang (kể cả khi đang bounce) -> giữ nguyên trạng thái, không toggle
                         lastScrollTop = st;
                     } else if (delta > threshold) {
                         hide();
@@ -499,15 +508,11 @@
                 });
             }, { passive: true });
 
-            // Tính lại chiều cao khi nội dung (danh mục) thay đổi hoặc xoay màn hình
-            window.addEventListener('resize', () => {
-                if (!isHidden) wrapper.style.maxHeight = naturalHeight() + 'px';
-            });
+            // Tính lại vị trí/khoảng trống khi nội dung (danh mục) thay đổi hoặc xoay màn hình
+            window.addEventListener('resize', layoutTopControls);
 
-            // Cho phép các hàm khác (vd: sau khi load category thật) gọi lại để cập nhật chiều cao
-            window.refreshTopControlsHeight = () => {
-                if (!isHidden) wrapper.style.maxHeight = naturalHeight() + 'px';
-            };
+            // Cho phép các hàm khác (vd: sau khi load category thật, đổi tab) gọi lại để cập nhật
+            window.refreshTopControlsHeight = layoutTopControls;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
