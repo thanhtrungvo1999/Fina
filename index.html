@@ -70,6 +70,18 @@
             animation: shimmerWave 1.8s infinite linear;
         }
 
+        /* Auto-hide bottom toolbar while scrolling down, reveal when scrolling up */
+        #footerEl {
+            transform: translateY(0);
+            transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.2s ease;
+            will-change: transform;
+        }
+        #footerEl.toolbar-hidden {
+            transform: translateY(calc(100% + 1.5rem));
+            opacity: 0;
+            pointer-events: none;
+        }
+
         /* Landscape Orientation Warning Logic */
         #landscapeWarning { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
@@ -422,10 +434,42 @@
             updateWallpapersList();
         }
 
+        function initAutoHideToolbar() {
+            const scrollArea = document.getElementById('mainScrollArea');
+            const footer = document.getElementById('footerEl');
+            if (!scrollArea || !footer) return;
+
+            let lastScrollTop = 0;
+            let ticking = false;
+            const threshold = 8;
+
+            const updateToolbar = () => {
+                const currentScrollTop = Math.max(0, scrollArea.scrollTop);
+                const delta = currentScrollTop - lastScrollTop;
+
+                if (currentScrollTop <= 24 || delta < -threshold) {
+                    footer.classList.remove('toolbar-hidden');
+                } else if (delta > threshold) {
+                    footer.classList.add('toolbar-hidden');
+                }
+
+                lastScrollTop = currentScrollTop;
+                ticking = false;
+            };
+
+            scrollArea.addEventListener('scroll', () => {
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(updateToolbar);
+                }
+            }, { passive: true });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
-            
+
+            initAutoHideToolbar();
             loadLocalGradients();
             updateWallpapersList();
             initGradientStudio();
@@ -905,7 +949,7 @@
             canvas.width = 1080; canvas.height = 1920;
             const ctx = canvas.getContext('2d');
             const t = document.getElementById('gradType').value;
-            let grad = t === 'circle' ? ctx.createRadialGradient(540, 960, 100, 540, 960, 1000) : ctx.createLinearGrid ? ctx.createLinearGradient(0, 0, 1080, 1920) : ctx.createLinearGradient(0, 0, 1080, 1920);
+            let grad = t === 'circle' ? ctx.createRadialGradient(540, 960, 100, 540, 960, 1000) : ctx.createLinearGradient(0, 0, 1080, 1920);
             grad.addColorStop(0, document.getElementById('gradColor1').value);
             grad.addColorStop(1, document.getElementById('gradColor2').value);
             ctx.fillStyle = grad;
