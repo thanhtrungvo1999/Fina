@@ -70,48 +70,6 @@
             animation: shimmerWave 1.8s infinite linear;
         }
 
-        /* Auto-hide bottom toolbar while scrolling down, reveal when scrolling up */
-        #footerEl {
-            transform: translateY(0);
-            transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.2s ease;
-            will-change: transform;
-        }
-        #footerEl.toolbar-hidden {
-            transform: translateY(calc(100% + 1.5rem));
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Auto-hide search + category: collapse their space too */
-        #searchBarContainer,
-        #categoryNav {
-            max-height: 80px;
-            opacity: 1;
-            overflow: hidden;
-            transform: translateY(0);
-            transition:
-                max-height 0.28s cubic-bezier(.4,0,.2,1),
-                opacity 0.18s ease,
-                transform 0.28s cubic-bezier(.4,0,.2,1),
-                padding 0.28s cubic-bezier(.4,0,.2,1);
-            will-change: max-height, opacity, transform;
-        }
-
-        #searchBarContainer.toolbar-top-hidden,
-        #categoryNav.toolbar-top-hidden {
-            max-height: 0 !important;
-            height: 0 !important;
-            min-height: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-            border-width: 0 !important;
-            opacity: 0;
-            transform: translateY(-8px);
-            pointer-events: none;
-        }
-
         /* Landscape Orientation Warning Logic */
         #landscapeWarning { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
@@ -170,22 +128,25 @@
             </div>
         </header>
 
-        <!-- Search Bar Tích Hợp Mới (Đặt font-size 16px trên mobile để tránh tự động zoom) -->
-        <div id="searchBarContainer" class="px-5 pt-3 pb-1 flex-shrink-0 bg-transparent">
-            <div class="relative flex items-center">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs pointer-events-none"></i>
-                <input type="text" id="searchInput" oninput="handleSearchInput(this.value)" placeholder="Search wallpapers by keyword..." class="w-full bg-[#0a0a0c] border border-white/10 rounded-2xl py-2.5 pl-10 pr-9 text-[16px] sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition shadow-inner">
-                <button id="clearSearchBtn" onclick="clearSearch()" class="absolute right-3 text-gray-400 hover:text-white text-xs hidden cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+        <!-- Wrapper để ẩn/hiện Search Bar + Category Nav khi cuộn -->
+        <div id="topControlsWrapper" class="flex-shrink-0 overflow-hidden transition-all duration-300 ease-in-out">
+            <!-- Search Bar Tích Hợp Mới (Đặt font-size 16px trên mobile để tránh tự động zoom) -->
+            <div id="searchBarContainer" class="px-5 pt-3 pb-1 bg-transparent">
+                <div class="relative flex items-center">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-gray-400 text-xs pointer-events-none"></i>
+                    <input type="text" id="searchInput" oninput="handleSearchInput(this.value)" placeholder="Search wallpapers by keyword..." class="w-full bg-[#0a0a0c] border border-white/10 rounded-2xl py-2.5 pl-10 pr-9 text-[16px] sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition shadow-inner">
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="absolute right-3 text-gray-400 hover:text-white text-xs hidden cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <nav id="categoryNav" class="px-5 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none flex-shrink-0 bg-transparent">
-            <div class="h-9 w-24 rounded-full skeleton-wave flex-shrink-0"></div>
-            <div class="h-9 w-28 rounded-full skeleton-wave flex-shrink-0"></div>
-            <div class="h-9 w-20 rounded-full skeleton-wave flex-shrink-0"></div>
-        </nav>
+            <nav id="categoryNav" class="px-5 py-2.5 flex space-x-2 overflow-x-auto scrollbar-none bg-transparent">
+                <div class="h-9 w-24 rounded-full skeleton-wave flex-shrink-0"></div>
+                <div class="h-9 w-28 rounded-full skeleton-wave flex-shrink-0"></div>
+                <div class="h-9 w-20 rounded-full skeleton-wave flex-shrink-0"></div>
+            </nav>
+        </div>
 
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
             <!-- Wallpaper Grid Container -->
@@ -464,51 +425,88 @@
             updateWallpapersList();
         }
 
-        function initAutoHideToolbar() {
+        // Ẩn/hiện Search Bar + Category Nav khi cuộn trong khu vực nội dung chính
+        function initTopControlsHideOnScroll() {
             const scrollArea = document.getElementById('mainScrollArea');
-            const footer = document.getElementById('footerEl');
-            const searchBar = document.getElementById('searchBarContainer');
-            const categoryNav = document.getElementById('categoryNav');
+            const wrapper = document.getElementById('topControlsWrapper');
+            if (!scrollArea || !wrapper) return;
 
-            if (!scrollArea) return;
-
-            const topControls = [searchBar, categoryNav].filter(Boolean);
             let lastScrollTop = 0;
+            let isHidden = false;
             let ticking = false;
-            const threshold = 8;
+            const threshold = 6; // Ngưỡng (px) để tránh rung lắc nhạy quá mức
 
-            const updateToolbar = () => {
-                const currentScrollTop = Math.max(0, scrollArea.scrollTop);
-                const delta = currentScrollTop - lastScrollTop;
+            function naturalHeight() {
+                const prevTransition = wrapper.style.transition;
+                const prevMax = wrapper.style.maxHeight;
+                wrapper.style.transition = 'none';
+                wrapper.style.maxHeight = 'none';
+                const h = wrapper.scrollHeight;
+                wrapper.style.maxHeight = prevMax;
+                void wrapper.offsetHeight; // ép reflow trước khi bật lại transition
+                wrapper.style.transition = prevTransition;
+                return h;
+            }
 
-                if (currentScrollTop <= 24 || delta < -threshold) {
-                    footer?.classList.remove('toolbar-hidden');
-                    topControls.forEach(el => el.classList.remove('toolbar-top-hidden'));
-                } else if (delta > threshold) {
-                    footer?.classList.add('toolbar-hidden');
-                    topControls.forEach(el => el.classList.add('toolbar-top-hidden'));
-                }
+            function show() {
+                if (!isHidden) return;
+                isHidden = false;
+                wrapper.style.maxHeight = naturalHeight() + 'px';
+                wrapper.style.opacity = '1';
+                wrapper.style.pointerEvents = '';
+            }
 
-                lastScrollTop = currentScrollTop;
-                ticking = false;
-            };
+            function hide() {
+                if (isHidden) return;
+                isHidden = true;
+                wrapper.style.maxHeight = '0px';
+                wrapper.style.opacity = '0';
+                wrapper.style.pointerEvents = 'none';
+            }
+
+            // Thiết lập chiều cao ban đầu để transition hoạt động đúng
+            wrapper.style.maxHeight = naturalHeight() + 'px';
 
             scrollArea.addEventListener('scroll', () => {
-                if (!ticking) {
-                    ticking = true;
-                    requestAnimationFrame(updateToolbar);
-                }
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const st = Math.max(0, scrollArea.scrollTop);
+                    const delta = st - lastScrollTop;
+
+                    if (st <= threshold) {
+                        show();
+                        lastScrollTop = st;
+                    } else if (delta > threshold) {
+                        hide();
+                        lastScrollTop = st;
+                    } else if (delta < -threshold) {
+                        show();
+                        lastScrollTop = st;
+                    }
+                    ticking = false;
+                });
             }, { passive: true });
+
+            // Tính lại chiều cao khi nội dung (danh mục) thay đổi hoặc xoay màn hình
+            window.addEventListener('resize', () => {
+                if (!isHidden) wrapper.style.maxHeight = naturalHeight() + 'px';
+            });
+
+            // Cho phép các hàm khác (vd: sau khi load category thật) gọi lại để cập nhật chiều cao
+            window.refreshTopControlsHeight = () => {
+                if (!isHidden) wrapper.style.maxHeight = naturalHeight() + 'px';
+            };
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splashScreen');
             const body = document.getElementById('bodyElement');
-
-            initAutoHideToolbar();
+            
             loadLocalGradients();
             updateWallpapersList();
             initGradientStudio();
+            initTopControlsHideOnScroll();
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
@@ -653,6 +651,7 @@
                 html += `<button onclick="filterCategory('${cat.replace(/'/g, "\\'")}', this)" class="cat-btn ${isActive ? 'bg-white text-black shadow-sm' : 'bg-[#121215] text-gray-400 hover:text-white border border-white/10'} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">${cat}</button>`;
             });
             categoryNav.innerHTML = html;
+            window.refreshTopControlsHeight?.();
         }
 
         window.filterCategory = (cat, el) => {
@@ -695,6 +694,7 @@
                 searchBarContainer.classList.remove('hidden');
                 refreshCurrentView();
             }
+            window.refreshTopControlsHeight?.();
         };
 
         function updateWallpapersList() {
@@ -985,7 +985,7 @@
             canvas.width = 1080; canvas.height = 1920;
             const ctx = canvas.getContext('2d');
             const t = document.getElementById('gradType').value;
-            let grad = t === 'circle' ? ctx.createRadialGradient(540, 960, 100, 540, 960, 1000) : ctx.createLinearGradient(0, 0, 1080, 1920);
+            let grad = t === 'circle' ? ctx.createRadialGradient(540, 960, 100, 540, 960, 1000) : ctx.createLinearGrid ? ctx.createLinearGradient(0, 0, 1080, 1920) : ctx.createLinearGradient(0, 0, 1080, 1920);
             grad.addColorStop(0, document.getElementById('gradColor1').value);
             grad.addColorStop(1, document.getElementById('gradColor2').value);
             ctx.fillStyle = grad;
