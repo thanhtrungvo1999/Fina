@@ -6,7 +6,7 @@
     <title>Wallzy Wallpaper Studio - Cloud Database</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#08080a">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,8 +23,8 @@
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                     colors: {
                         minimal: {
-                            bg: '#fbfbfd', card: '#ffffff', darkBg: '#08080a', darkCard: '#121216',
-                            borderLight: 'rgba(0, 0, 0, 0.06)', borderDark: 'rgba(255, 255, 255, 0.08)'
+                            bg: '#000000', card: '#0a0a0c', darkBg: '#000000', darkCard: '#0a0a0c',
+                            borderLight: 'rgba(255, 255, 255, 0.08)', borderDark: 'rgba(255, 255, 255, 0.08)'
                         }
                     }
                 }
@@ -47,7 +47,7 @@
     <style>
         ::-webkit-scrollbar { width: 3px; height: 3px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
         .animate-spin-slow { animation: spin 3s linear infinite; }
@@ -57,7 +57,7 @@
             -webkit-user-select: none !important;
             user-select: none !important;
             -webkit-user-drag: none !important;
-            will-change: opacity; /* Optimize rendering */
+            will-change: opacity;
         }
 
         @keyframes shimmerWave {
@@ -65,14 +65,13 @@
             100% { background-position: 200% 0; }
         }
         .skeleton-wave {
-            background: linear-gradient(90deg, #121218 0%, #2d2d3a 50%, #121218 100%);
+            background: linear-gradient(90deg, #0a0a0c 0%, #1f1f24 50%, #0a0a0c 100%);
             background-size: 200% 100%;
             animation: shimmerWave 1.8s infinite linear;
         }
 
         /* Landscape Orientation Warning Logic */
         #landscapeWarning { display: none; }
-        /* Only show on mobile devices (max-height/max-width combo) when rotated */
         @media screen and (orientation: landscape) and (max-height: 600px) {
             #landscapeWarning { display: flex !important; }
             #appContainer { display: none !important; }
@@ -81,7 +80,7 @@
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
 
-    <div id="landscapeWarning" class="fixed inset-0 bg-[#08080a] z-[9999] flex-col items-center justify-center p-8 text-center w-full h-full">
+    <div id="landscapeWarning" class="fixed inset-0 bg-[#000000] z-[9999] flex-col items-center justify-center p-8 text-center w-full h-full">
         <div class="relative mb-6">
             <i class="fa-solid fa-mobile-screen text-6xl text-white"></i>
             <i class="fa-solid fa-rotate-right text-2xl text-gray-400 absolute -bottom-2 -right-4 animate-spin-slow"></i>
@@ -90,27 +89,39 @@
         <p class="text-sm text-gray-400 max-w-[300px]">Ứng dụng được thiết kế tối ưu nhất khi sử dụng ở chế độ màn hình dọc. Vui lòng xoay lại thiết bị của bạn.</p>
     </div>
 
-    <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#08080a] transition-colors duration-500 will-change-transform">
+    <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#000000] transition-colors duration-500 will-change-transform">
 
-        <!-- Splash Screen -->
-        <div id="splashScreen" class="absolute inset-0 bg-[#08080a] z-[999] flex flex-col items-center justify-center transition-all duration-500 ease-out">
-            <div class="w-16 h-16 rounded-2xl bg-white text-gray-900 flex items-center justify-center shadow-xl mb-4">
-                <i class="fa-solid fa-cloud text-xl text-gray-900"></i>
+        <!-- Splash Screen Chuẩn Tone Trắng Đen -->
+        <div id="splashScreen" class="absolute inset-0 bg-[#000000] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
+            <div class="relative mb-5">
+                <div class="w-20 h-20 rounded-3xl bg-white p-[1px] shadow-2xl flex items-center justify-center">
+                    <div class="w-full h-full bg-[#0a0a0c] rounded-[23px] flex items-center justify-center">
+                        <i class="fa-solid fa-wand-magic-sparkles text-2xl text-white"></i>
+                    </div>
+                </div>
+                <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-white text-black rounded-full flex items-center justify-center text-xs shadow-lg border-2 border-[#000000]">
+                    <i class="fa-solid fa-cloud text-[10px]"></i>
+                </div>
             </div>
-            <h1 class="font-bold text-lg tracking-tight text-white">WALLZY</h1>
-            <p class="text-[10px] text-gray-400 font-medium tracking-[0.3em] uppercase mt-1">Cloud Database</p>
+            <h1 class="font-extrabold text-xl tracking-tight text-white mb-1">WALLZY STUDIO</h1>
+            <p class="text-[10px] text-gray-400 font-semibold tracking-[0.25em] uppercase">Cloud 4K Wallpapers Database</p>
+            <div class="mt-8 flex items-center space-x-1.5">
+                <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-500 animate-pulse [animation-delay:0.2s]"></div>
+                <div class="w-2 h-2 rounded-full bg-gray-700 animate-pulse [animation-delay:0.4s]"></div>
+            </div>
         </div>
 
-        <header id="headerEl" class="sticky top-0 z-40 bg-[#08080a]/90 backdrop-blur-xl px-5 py-3.5 flex justify-between items-center border-b border-white/5 flex-shrink-0">
+        <header id="headerEl" class="sticky top-0 z-40 bg-[#000000]/90 backdrop-blur-xl px-5 py-3.5 flex justify-between items-center border-b border-white/10 flex-shrink-0">
             <div class="flex items-center space-x-2">
                 <span class="font-bold text-lg tracking-tight text-white">Wallzy DB.</span>
             </div>
             
             <div class="flex items-center space-x-2">
-                <button onclick="openInstallModal()" class="w-9 h-9 rounded-full bg-[#16161a] flex items-center justify-center text-gray-200 hover:bg-[#222228] transition cursor-pointer" title="Install">
+                <button onclick="openInstallModal()" class="w-9 h-9 rounded-full bg-[#121215] border border-white/10 flex items-center justify-center text-gray-200 hover:bg-[#222228] transition cursor-pointer" title="Install">
                     <i class="fa-solid fa-mobile-screen-button text-xs text-white"></i>
                 </button>
-                <button id="authHeaderBtn" onclick="openAuthModal()" class="px-3 py-1.5 rounded-full bg-[#16161a] hover:bg-[#222228] text-gray-200 text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer border border-white/10" title="Account">
+                <button id="authHeaderBtn" onclick="openAuthModal()" class="px-3 py-1.5 rounded-full bg-[#121215] hover:bg-[#222228] text-gray-200 text-xs font-semibold flex items-center space-x-1.5 transition cursor-pointer border border-white/10" title="Account">
                     <i class="fa-solid fa-user-circle text-xs text-white"></i>
                     <span id="authButtonText">Account</span>
                 </button>
@@ -133,7 +144,7 @@
                     <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
                 </div>
                 <div id="paginationContainer" class="py-6 text-center hidden">
-                    <button id="loadMoreBtn" onclick="loadMoreWallpapers()" class="w-full py-3 bg-[#16161a] hover:bg-[#222228] text-gray-200 rounded-2xl text-xs font-semibold transition cursor-pointer shadow-sm">
+                    <button id="loadMoreBtn" onclick="loadMoreWallpapers()" class="w-full py-3 bg-[#121215] border border-white/10 hover:bg-[#222228] text-gray-200 rounded-2xl text-xs font-semibold transition cursor-pointer shadow-sm">
                         Explore more (<span id="remainingCount">0</span>)
                     </button>
                 </div>
@@ -141,30 +152,30 @@
 
             <!-- Gradient Studio Container -->
             <div id="gradientStudioContainer" class="hidden space-y-4">
-                <div class="bg-[#121216] border border-white/10 p-4 rounded-3xl space-y-4 shadow-xl">
+                <div class="bg-[#0a0a0c] border border-white/10 p-4 rounded-3xl space-y-4 shadow-xl">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs font-bold text-white uppercase tracking-wider">Gradient Studio</h3>
                         <span class="text-[10px] text-gray-400">Create custom gradients</span>
                     </div>
 
                     <div id="gradientPreviewBox" class="w-full h-44 rounded-2xl shadow-inner border border-white/10 flex items-center justify-center relative overflow-hidden transition-all duration-300">
-                        <div class="absolute bottom-3 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold text-white border border-white/10" id="gradientTextInfo">Linear 45°</div>
+                        <div class="absolute bottom-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold text-white border border-white/10" id="gradientTextInfo">Linear 45°</div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-[#08080a] p-3 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <div class="bg-[#000000] p-3 rounded-2xl border border-white/10 flex items-center justify-between">
                             <span class="text-[11px] text-gray-400 font-medium">Color 1</span>
-                            <input type="color" id="gradColor1" value="#4f46e5" class="w-8 h-8 rounded-xl bg-transparent border-0 cursor-pointer">
+                            <input type="color" id="gradColor1" value="#111111" class="w-8 h-8 rounded-xl bg-transparent border-0 cursor-pointer">
                         </div>
-                        <div class="bg-[#08080a] p-3 rounded-2xl border border-white/5 flex items-center justify-between">
+                        <div class="bg-[#000000] p-3 rounded-2xl border border-white/10 flex items-center justify-between">
                             <span class="text-[11px] text-gray-400 font-medium">Color 2</span>
-                            <input type="color" id="gradColor2" value="#ec4899" class="w-8 h-8 rounded-xl bg-transparent border-0 cursor-pointer">
+                            <input type="color" id="gradColor2" value="#ffffff" class="w-8 h-8 rounded-xl bg-transparent border-0 cursor-pointer">
                         </div>
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="text-[10px] text-gray-400 font-medium">Gradient Style</label>
-                        <select id="gradType" class="w-full bg-[#08080a] border border-white/5 rounded-2xl p-3 text-xs text-white focus:outline-none transition">
+                        <select id="gradType" class="w-full bg-[#000000] border border-white/10 rounded-2xl p-3 text-xs text-white focus:outline-none transition">
                             <option value="to right">Horizontal (Left to Right)</option>
                             <option value="to bottom">Vertical (Top to Bottom)</option>
                             <option value="to bottom right" selected>Diagonal (Top-Left to Bottom-Right)</option>
@@ -173,10 +184,10 @@
                     </div>
 
                     <div class="flex space-x-2 pt-1">
-                        <button onclick="saveCustomGradient()" class="flex-1 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-2xl text-xs transition cursor-pointer shadow">
-                            <i class="fa-solid fa-bookmark mr-1 text-gray-900"></i> Save Gradient
+                        <button onclick="saveCustomGradient()" class="flex-1 bg-white hover:bg-gray-200 text-black font-semibold py-3 rounded-2xl text-xs transition cursor-pointer shadow">
+                            <i class="fa-solid fa-bookmark mr-1 text-black"></i> Save Gradient
                         </button>
-                        <button onclick="downloadCustomGradient()" class="flex-1 bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl text-xs transition cursor-pointer border border-white/10">
+                        <button onclick="downloadCustomGradient()" class="flex-1 bg-[#121215] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl text-xs transition cursor-pointer border border-white/10">
                             <i class="fa-solid fa-download mr-1 text-white"></i> Download
                         </button>
                     </div>
@@ -189,7 +200,7 @@
             </div>
         </main>
 
-        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#121216]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
+        <footer id="footerEl" class="absolute bottom-12 inset-x-6 bg-[#0a0a0c]/90 backdrop-blur-xl border border-white/10 py-2.5 px-6 flex justify-around items-center flex-shrink-0 z-30 transition-colors duration-300 rounded-full shadow-2xl">
             <button id="navExploreBtn" onclick="switchMainTab('explore', this)" class="flex flex-col items-center space-y-0.5 text-white cursor-pointer transition">
                 <i class="fa-regular fa-compass text-xs text-white"></i>
                 <span class="text-[9px] font-semibold">Explore</span>
@@ -209,7 +220,7 @@
 
     <!-- Install Modal -->
     <div id="installModal" class="fixed inset-0 bg-black/90 backdrop-blur-2xl z-[1400] hidden flex flex-col items-center justify-center p-5 animate-fade-in">
-        <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl relative">
+        <div class="bg-[#0a0a0c] border border-white/10 p-6 rounded-3xl max-w-sm w-full space-y-4 shadow-2xl relative">
             <button onclick="closeInstallModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xs w-8 h-8 rounded-full bg-white/5 flex items-center justify-center transition cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -223,30 +234,30 @@
                 </div>
             </div>
             <div class="space-y-3 pt-2 text-[11px] text-gray-300">
-                <div class="bg-[#08080a] p-3 rounded-2xl border border-white/5 space-y-1">
+                <div class="bg-[#000000] p-3 rounded-2xl border border-white/10 space-y-1">
                     <div class="font-bold text-white flex items-center"><i class="fa-brands fa-apple text-sm mr-1.5 text-white"></i> iPhone (Safari):</div>
                     <p class="text-gray-400 leading-relaxed">1. Tap <b class="text-white">Share</b> button.<br>2. Select <b class="text-white">"Add to Home Screen"</b>.</p>
                 </div>
-                <div class="bg-[#08080a] p-3 rounded-2xl border border-white/5 space-y-1">
+                <div class="bg-[#000000] p-3 rounded-2xl border border-white/10 space-y-1">
                     <div class="font-bold text-white flex items-center"><i class="fa-brands fa-android text-sm mr-1.5 text-white"></i> Android (Chrome):</div>
                     <p class="text-gray-400 leading-relaxed">1. Tap <b class="text-white">3-dot menu</b>.<br>2. Select <b class="text-white">"Add to Home Screen"</b>.</p>
                 </div>
             </div>
-            <button onclick="closeInstallModal()" class="w-full bg-white text-gray-900 font-semibold py-3 rounded-2xl transition text-xs cursor-pointer shadow">Got it</button>
+            <button onclick="closeInstallModal()" class="w-full bg-white text-black font-semibold py-3 rounded-2xl transition text-xs cursor-pointer shadow">Got it</button>
         </div>
     </div>
 
     <!-- Image Detail Modal -->
     <div id="detailModal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[1000] hidden flex flex-col justify-between p-5 animate-fade-in">
         <div class="flex justify-between items-center relative z-10 w-full pt-1 flex-shrink-0">
-            <button onclick="closeModal()" class="text-white text-xs bg-[#16161a] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Back">
+            <button onclick="closeModal()" class="text-white text-xs bg-[#121215] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Back">
                 <i class="fa-solid fa-arrow-left text-white"></i>
             </button>
             <div class="text-center">
-                <span class="text-[10px] font-semibold uppercase tracking-widest text-white/90 bg-[#16161a]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-lg" id="modalCategory">Database</span>
+                <span class="text-[10px] font-semibold uppercase tracking-widest text-white/90 bg-[#121215]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-lg" id="modalCategory">Database</span>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="toggleFavoriteCurrent()" class="text-white text-xs bg-[#16161a] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Favorite">
+                <button onclick="toggleFavoriteCurrent()" class="text-white text-xs bg-[#121215] hover:bg-[#222228] backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center transition cursor-pointer border border-white/20 shadow-lg active:scale-95" title="Favorite">
                     <i id="modalFavIcon" class="fa-regular fa-heart text-white"></i>
                 </button>
             </div>
@@ -254,17 +265,16 @@
 
         <div class="flex-1 flex items-center justify-center p-2 relative my-2 overflow-hidden" id="imageWrapperContainer">
             <div id="modalImgSkel" class="absolute inset-4 rounded-2xl skeleton-wave"></div>
-            <!-- Added async decoding to modal image as well -->
-            <img id="detailImg" src="" decoding="async" alt="Detail" class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10 pointer-events-none select-none" onload="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');" onerror="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');">
+            <img id="detailImg" src="" decoding="async" alt="Detail" class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl transition-opacity duration-300 opacity-0 relative z-10 pointer-events-none select-none" onload="this.classList.remove('opacity-0'); document.getElementById('modalImgSkel')?.classList.add('hidden');" onerror="window.handleModalImageError(this)">
         </div>
         
         <div class="relative z-10 flex flex-col space-y-2.5 p-1 w-full max-w-sm mx-auto flex-shrink-0">
-            <button onclick="shareCurrentWallpaper()" class="w-full bg-[#16161a] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/20 active:scale-95">
+            <button onclick="shareCurrentWallpaper()" class="w-full bg-[#121215] hover:bg-[#222228] text-white font-semibold py-3 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer border border-white/20 active:scale-95">
                 <i class="fa-solid fa-share-nodes text-xs text-white"></i>
                 <span class="text-[11px] uppercase tracking-wider font-semibold">Share Wallpaper</span>
             </button>
-            <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95">
-                <i class="fa-solid fa-download text-xs text-gray-900"></i>
+            <button onclick="startDownloadWith5sCountdown()" class="w-full bg-white hover:bg-gray-200 text-black font-semibold py-3.5 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95">
+                <i class="fa-solid fa-download text-xs text-black"></i>
                 <span class="text-[11px] uppercase tracking-wider font-semibold">Download 4K (Wait 3s)</span>
             </button>
         </div>
@@ -272,45 +282,45 @@
 
     <!-- Countdown Modal -->
     <div id="countdownModal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1500] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
-            <div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-white text-2xl font-bold" id="countdownNumber">3</div>
+        <div class="bg-[#0a0a0c] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mx-auto text-white text-2xl font-bold" id="countdownNumber">3</div>
             <div class="space-y-1">
                 <h3 class="text-xs font-bold text-white uppercase tracking-wider">Preparing Original Image</h3>
                 <p class="text-[11px] text-gray-400">Please wait 3 seconds while we optimize your download link...</p>
             </div>
-            <button onclick="cancelCountdown()" class="w-full bg-[#16161a] hover:bg-[#222228] text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/10">Cancel</button>
+            <button onclick="cancelCountdown()" class="w-full bg-[#121215] hover:bg-[#222228] text-gray-300 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/10">Cancel</button>
         </div>
     </div>
 
     <!-- Message Modal -->
     <div id="msgModal" class="fixed inset-0 bg-black/80 backdrop-blur-xl z-[1200] hidden flex flex-col items-center justify-center p-4 animate-fade-in">
-        <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
+        <div class="bg-[#0a0a0c] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-4 shadow-2xl">
             <p id="msgText" class="text-xs text-gray-200 font-medium"></p>
-            <button onclick="closeMsgModal()" class="w-full bg-white text-gray-900 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer">Got it</button>
+            <button onclick="closeMsgModal()" class="w-full bg-white text-black font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer">Got it</button>
         </div>
     </div>
 
     <!-- Auth Modal -->
     <div id="authModal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1250] hidden flex flex-col items-center justify-center p-5 animate-fade-in">
-        <div class="bg-[#121216] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-5 shadow-2xl relative">
+        <div class="bg-[#0a0a0c] border border-white/10 p-6 rounded-3xl max-w-xs w-full text-center space-y-5 shadow-2xl relative">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xs w-8 h-8 rounded-full bg-white/5 flex items-center justify-center transition cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="w-14 h-14 bg-white text-gray-900 rounded-2xl flex items-center justify-center mx-auto text-xl shadow-lg">
-                <i class="fa-solid fa-cloud text-gray-900"></i>
+            <div class="w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center mx-auto text-xl shadow-lg">
+                <i class="fa-solid fa-cloud text-black"></i>
             </div>
             <div class="space-y-1">
                 <h3 class="text-sm font-bold text-white">Google Account</h3>
                 <p class="text-[11px] text-gray-400 leading-relaxed">Sign in to sync your favorite wallpapers across devices.</p>
             </div>
             <div id="loggedOutView" class="space-y-2.5 pt-1">
-                <button id="googleLoginBtn" onclick="loginWithGoogleReal()" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 px-4 rounded-2xl shadow-md transition flex items-center justify-center space-x-2.5 text-xs cursor-pointer">
-                    <i id="googleIcon" class="fa-brands fa-google text-sm text-red-500"></i>
+                <button id="googleLoginBtn" onclick="loginWithGoogleReal()" class="w-full bg-white hover:bg-gray-200 text-black font-semibold py-3 px-4 rounded-2xl shadow-md transition flex items-center justify-center space-x-2.5 text-xs cursor-pointer">
+                    <i id="googleIcon" class="fa-brands fa-google text-sm text-black"></i>
                     <span id="googleLoginText">Sign in with Google</span>
                 </button>
             </div>
             <div id="loggedInView" class="space-y-3 pt-2 hidden">
-                <div class="flex items-center space-x-3 bg-[#08080a] p-3 rounded-2xl border border-white/5 text-left">
+                <div class="flex items-center space-x-3 bg-[#000000] p-3 rounded-2xl border border-white/10 text-left">
                     <img id="userAvatar" src="" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
                     <div class="overflow-hidden">
                         <div id="userName" class="text-xs font-bold text-white truncate">User Name</div>
@@ -318,8 +328,8 @@
                     </div>
                 </div>
                 <div id="userIdDisplay" class="text-[9px] text-gray-300 font-mono text-left truncate px-1">UID: ...</div>
-                <button onclick="logoutUser()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-red-500/20">
-                    <i class="fa-solid fa-right-from-bracket mr-1.5 text-red-400"></i> Sign out
+                <button onclick="logoutUser()" class="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 rounded-xl transition text-xs cursor-pointer border border-white/20">
+                    <i class="fa-solid fa-right-from-bracket mr-1.5 text-white"></i> Sign out
                 </button>
             </div>
         </div>
@@ -409,7 +419,6 @@
             updateWallpapersList();
             initGradientStudio();
 
-            // Using requestAnimationFrame to ensure smooth hide of splash screen
             requestAnimationFrame(() => {
                 setTimeout(() => {
                     if (splashScreen) {
@@ -421,7 +430,30 @@
             });
         });
 
-        // Expose global methods
+        window.handleImageError = (imgElement) => {
+            imgElement.onerror = null;
+            imgElement.src = 'https://placehold.co/600x900/0a0a0c/ffffff?text=Image+Unavailable';
+            imgElement.classList.remove('opacity-0');
+            if (imgElement.previousElementSibling) {
+                imgElement.previousElementSibling.remove();
+            }
+            imgElement.onclick = null; 
+            const card = imgElement.closest('.group');
+            if (card) {
+                card.classList.remove('cursor-pointer');
+                const favBtn = card.querySelector('button');
+                if (favBtn) favBtn.style.display = 'none';
+            }
+        };
+
+        window.handleModalImageError = (imgElement) => {
+            imgElement.onerror = null;
+            imgElement.src = 'https://placehold.co/600x900/0a0a0c/ffffff?text=Image+Unavailable';
+            imgElement.classList.remove('opacity-0');
+            document.getElementById('modalImgSkel')?.classList.add('hidden');
+            showMessage("Lỗi: Không thể tải hình ảnh từ máy chủ.");
+        };
+
         window.showMessage = msg => {
             document.getElementById('msgText').innerText = msg;
             document.getElementById('msgModal').classList.remove('hidden');
@@ -440,7 +472,7 @@
             
             loginBtn.disabled = true;
             loginBtn.classList.add('opacity-80', 'cursor-not-allowed');
-            googleIcon.className = "fa-solid fa-circle-notch fa-spin text-sm text-indigo-500 mr-2";
+            googleIcon.className = "fa-solid fa-circle-notch fa-spin text-sm text-white mr-2";
             loginText.innerText = "Signing in...";
 
             try {
@@ -452,7 +484,7 @@
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.classList.remove('opacity-80', 'cursor-not-allowed');
-                googleIcon.className = "fa-brands fa-google text-sm text-red-500";
+                googleIcon.className = "fa-brands fa-google text-sm text-black";
                 loginText.innerText = "Sign in with Google";
             }
         };
@@ -472,7 +504,7 @@
                 btnText.innerText = user.displayName ? user.displayName.split(' ')[0] : 'Account';
                 document.getElementById('loggedOutView').classList.add('hidden');
                 document.getElementById('loggedInView').classList.remove('hidden');
-                document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/100x100/121216/ffffff?text=User';
+                document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/100x100/0a0a0c/ffffff?text=User';
                 document.getElementById('userName').innerText = user.displayName || 'Google User';
                 document.getElementById('userEmail').innerText = user.email || '';
                 document.getElementById('userIdDisplay').innerText = `UID: ${user.uid}`;
@@ -496,14 +528,20 @@
                 return;
             }
 
-            const categories = Array.from(new Set(wallpapers.map(w => w.category?.trim()).filter(Boolean)));
+            let categories = Array.from(new Set(wallpapers.map(w => w.category?.trim()).filter(Boolean)));
+            categories.sort((a, b) => a.localeCompare(b));
+
+            const otherIndex = categories.findIndex(c => c.toLowerCase() === 'other');
+            if (otherIndex > -1) {
+                const otherCategory = categories.splice(otherIndex, 1)[0];
+                categories.push(otherCategory);
+            }
             
-            // Build string for nav elements
-            let html = `<button onclick="filterCategory('all', this)" class="cat-btn ${currentCategory === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'bg-[#16161a] text-gray-400 hover:text-white'} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">All Wallpapers</button>`;
+            let html = `<button onclick="filterCategory('all', this)" class="cat-btn ${currentCategory === 'all' ? 'bg-white text-black shadow-sm' : 'bg-[#121215] text-gray-400 hover:text-white border border-white/10'} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">All Wallpapers</button>`;
             
             categories.forEach(cat => {
                 const isActive = currentCategory.toLowerCase() === cat.toLowerCase();
-                html += `<button onclick="filterCategory('${cat.replace(/'/g, "\\'")}', this)" class="cat-btn ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'bg-[#16161a] text-gray-400 hover:text-white'} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">${cat}</button>`;
+                html += `<button onclick="filterCategory('${cat.replace(/'/g, "\\'")}', this)" class="cat-btn ${isActive ? 'bg-white text-black shadow-sm' : 'bg-[#121215] text-gray-400 hover:text-white border border-white/10'} px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer">${cat}</button>`;
             });
             categoryNav.innerHTML = html;
         }
@@ -511,8 +549,8 @@
         window.filterCategory = (cat, el) => {
             currentCategory = cat;
             displayedCount = 10;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.className = 'cat-btn bg-[#16161a] text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer');
-            if (el) el.className = 'cat-btn bg-white text-gray-900 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm';
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.className = 'cat-btn bg-[#121215] border border-white/10 text-gray-400 hover:text-white px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer');
+            if (el) el.className = 'cat-btn bg-white text-black px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shadow-sm';
             renderWallpapers(currentCategory);
         };
 
@@ -563,7 +601,7 @@
             const imgId = new URLSearchParams(window.location.search).get('img');
             if (imgId) {
                 const found = wallpapers.find(w => w.id === imgId);
-                if (found) openModal(found, false); // Cờ false: Tải từ link trực tiếp, không tạo history mới
+                if (found) openModal(found, false); 
             }
         }
 
@@ -572,7 +610,7 @@
             const paginationContainer = document.getElementById('paginationContainer');
             if (!grid) return;
             
-            grid.innerHTML = ''; // Clear fast
+            grid.innerHTML = '';
 
             if (isSkeletonActive) {
                 const fragment = document.createDocumentFragment();
@@ -593,22 +631,20 @@
                 return;
             }
 
-            // Using DocumentFragment to batch DOM inserts = huge performance boost
             const fragment = document.createDocumentFragment();
             filtered.slice(0, displayedCount).forEach(w => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow border border-white/5';
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#0a0a0c] aspect-[9/16] cursor-pointer shadow border border-white/10';
                 const isFav = cloudFavorites.some(f => f.id === w.id);
-                // Added loading="lazy" decoding="async" for smooth scrolling
                 card.innerHTML = `
                     <div class="absolute inset-0 skeleton-wave z-0"></div>
-                    <img src="${w.url}" loading="lazy" decoding="async" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onclick="openModalById('${w.id}')">
-                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[90%]">
+                    <img src="${w.url}" loading="lazy" decoding="async" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="window.handleImageError(this)" onclick="openModalById('${w.id}')">
+                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/70 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/20 shadow-lg max-w-[90%]">
                         <span class="text-[10px] font-bold text-white truncate max-w-[80px]">${w.category || 'All'}</span>
-                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
+                        <span class="bg-white text-black font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
                     </div>
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
-                        <i class="${isFav ? 'fa-solid text-red-500 fa-heart' : 'fa-regular text-white fa-heart'}"></i>
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/80 transition border border-white/20">
+                        <i class="${isFav ? 'fa-solid text-white fa-heart' : 'fa-regular text-white fa-heart'}"></i>
                     </button>
                 `;
                 fragment.appendChild(card);
@@ -636,17 +672,16 @@
             const fragment = document.createDocumentFragment();
             cloudFavorites.forEach(w => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-3xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow border border-white/5';
-                // Added loading="lazy" decoding="async"
+                card.className = 'relative group rounded-3xl overflow-hidden bg-[#0a0a0c] aspect-[9/16] cursor-pointer shadow border border-white/10';
                 card.innerHTML = `
                     <div class="absolute inset-0 skeleton-wave z-0"></div>
-                    <img src="${w.url}" loading="lazy" decoding="async" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onclick="openModalById('${w.id}')">
-                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/60 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/15 shadow-lg max-w-[90%]">
+                    <img src="${w.url}" loading="lazy" decoding="async" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();" onerror="window.handleImageError(this)" onclick="openModalById('${w.id}')">
+                    <div class="absolute top-2 left-2 z-20 flex items-center space-x-1.5 bg-black/70 backdrop-blur-md p-1 pl-2.5 rounded-full border border-white/20 shadow-lg max-w-[90%]">
                         <span class="text-[10px] font-bold text-white truncate max-w-[80px]">${w.category || 'Favorite'}</span>
-                        <span class="bg-white text-gray-900 font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
+                        <span class="bg-white text-black font-extrabold text-[9px] px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm">4K</span>
                     </div>
-                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/60 transition border border-white/10">
-                        <i class="fa-solid text-red-500 fa-heart"></i>
+                    <button onclick="event.stopPropagation(); toggleFavorite('${w.id}')" class="absolute top-2 right-2 z-20 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-xs text-white hover:bg-black/80 transition border border-white/20">
+                        <i class="fa-solid text-white fa-heart"></i>
                     </button>
                 `;
                 fragment.appendChild(card);
@@ -681,7 +716,6 @@
             if (found) openModal(found, true);
         };
 
-        // Nhận thêm cờ isUserInteraction để biết người dùng chủ động bấm hay do web tự tải link
         function openModal(wallpaper, isUserInteraction = true) {
             currentSelectedWallpaper = wallpaper;
             document.getElementById('modalCategory').innerText = `${wallpaper.category || 'Database'} • ${wallpaper.quality || '4K'}`;
@@ -691,7 +725,6 @@
             detailImg.src = wallpaper.url;
             updateModalFavState();
             
-            // Chỉ thêm lịch sử duyệt web nếu người dùng chủ động bấm vào ảnh
             if (isUserInteraction) {
                 try { 
                     window.history.pushState({ modalOpen: true }, '', `?img=${wallpaper.id}`); 
@@ -709,19 +742,15 @@
 
         window.closeModal = () => {
             if (isModalHistoryPushed) {
-                // Kích hoạt phím back của trình duyệt, sẽ tự động gọi event popstate bên dưới
                 window.history.back(); 
             } else {
-                // Nếu vào thẳng từ URL chia sẻ, chỉ cần ẩn UI và xóa parameter trên URL
                 hideModalUI();
                 try { window.history.replaceState(null, '', window.location.pathname); } catch (e) {}
             }
         };
 
-        // Lắng nghe sự kiện Back của trình duyệt / Nút back điện thoại
         window.addEventListener('popstate', (e) => {
             const urlParams = new URLSearchParams(window.location.search);
-            // Khi URL bị lùi về trạng thái không còn parameter 'img', tự động đóng modal
             if (!urlParams.get('img')) {
                 hideModalUI();
                 isModalHistoryPushed = false;
@@ -858,12 +887,12 @@
 
             cloudCustomGradients.forEach(g => {
                 const card = document.createElement('div');
-                card.className = 'relative group rounded-2xl overflow-hidden bg-[#121216] aspect-[9/16] cursor-pointer shadow';
+                card.className = 'relative group rounded-2xl overflow-hidden bg-[#0a0a0c] aspect-[9/16] cursor-pointer shadow border border-white/10';
                 card.onclick = () => openModal(g, true);
                 card.innerHTML = `
                     <div class="absolute inset-0 skeleton-wave z-0"></div>
                     <img src="${g.url}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0'); this.previousElementSibling?.remove();">
-                    <div class="absolute top-2.5 left-2.5 z-20 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-md text-[9px] font-bold text-white tracking-widest uppercase">4K UHD</div>
+                    <div class="absolute top-2.5 left-2.5 z-20 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[9px] font-bold text-white tracking-widest uppercase border border-white/20">4K UHD</div>
                 `;
                 grid.appendChild(card);
             });
