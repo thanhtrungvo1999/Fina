@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Wallzy Wallpaper Studio - Cloud Database</title>
     
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -31,7 +30,6 @@
             }
         }
 
-        // Prevent pinch-to-zoom completely on mobile devices
         document.addEventListener('gesturestart', e => e.preventDefault());
         document.addEventListener('gesturechange', e => e.preventDefault());
         document.addEventListener('gestureend', e => e.preventDefault());
@@ -70,7 +68,6 @@
             animation: shimmerWave 1.8s infinite linear;
         }
 
-        /* Landscape Orientation Warning Logic */
         #landscapeWarning { display: none; }
         @media screen and (orientation: landscape) and (max-height: 600px) {
             #landscapeWarning { display: flex !important; }
@@ -79,6 +76,86 @@
     </style>
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
+
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'wallzy-cache-v2';
+                    const urlsToCache = [
+                        './',
+                        'https://cdn.tailwindcss.com',
+                        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                        'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap'
+                    ];
+
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                                .then(() => self.skipWaiting())
+                        );
+                    });
+
+                    self.addEventListener('activate', event => {
+                        event.waitUntil(
+                            caches.keys().then(cacheNames => {
+                                return Promise.all(
+                                    cacheNames.map(cacheName => {
+                                        if (cacheName !== CACHE_NAME) {
+                                            return caches.delete(cacheName);
+                                        }
+                                    })
+                                );
+                            }).then(() => self.clients.claim())
+                        );
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => {
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request).then(networkResponse => {
+                                        return caches.open(CACHE_NAME).then(cache => {
+                                            if (event.request.method === 'GET' && event.request.url.startsWith('http')) {
+                                                cache.put(event.request, networkResponse.clone());
+                                            }
+                                            return networkResponse;
+                                        });
+                                    }).catch(() => {
+                                        return caches.match('./');
+                                    });
+                                })
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('ServiceWorker registered'))
+                    .catch(err => console.log('ServiceWorker failed: ', err));
+            });
+        }
+    </script>
+
+    <!-- Full-Screen Offline Warning Overlay -->
+    <div id="offlineWarningModal" class="fixed inset-0 bg-[#000000] z-[99999] flex-col items-center justify-center p-8 text-center w-full h-full hidden">
+        <div class="w-20 h-20 bg-[#121215] border border-white/10 rounded-3xl flex items-center justify-center mb-6 shadow-2xl relative">
+            <i class="fa-solid fa-wifi text-3xl text-red-500 animate-pulse"></i>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-12 h-[2px] bg-red-500 rotate-45 transform"></div>
+            </div>
+        </div>
+        <h2 class="text-xl font-extrabold text-white mb-2 tracking-tight">Mất kết nối mạng</h2>
+        <p class="text-xs text-gray-400 max-w-[280px] leading-relaxed mb-6">Thiết bị của bạn hiện không có kết nối Internet. Vui lòng kiểm tra lại Wi-Fi hoặc dữ liệu di động để tiếp tục sử dụng.</p>
+        <button onclick="checkNetworkStatus()" class="px-6 py-3 bg-white text-black font-semibold rounded-2xl text-xs transition cursor-pointer shadow-lg active:scale-95">
+            Thử lại ngay
+        </button>
+    </div>
 
     <div id="landscapeWarning" class="fixed inset-0 bg-[#000000] z-[9999] flex-col items-center justify-center p-8 text-center w-full h-full">
         <div class="relative mb-6">
@@ -91,7 +168,7 @@
 
     <div id="appContainer" class="w-full max-w-md h-[100vh] sm:h-[92vh] sm:rounded-[40px] sm:border-[8px] sm:border-[#1c1c1e] shadow-2xl overflow-hidden flex flex-col relative bg-[#000000] transition-colors duration-500 will-change-transform">
 
-        <!-- Splash Screen Chuẩn Tone Trắng Đen -->
+        <!-- Splash Screen -->
         <div id="splashScreen" class="absolute inset-0 bg-[#000000] z-[999] flex flex-col items-center justify-center transition-all duration-700 ease-out">
             <div class="relative mb-5">
                 <div class="w-20 h-20 rounded-3xl bg-white p-[1px] shadow-2xl flex items-center justify-center">
@@ -128,7 +205,6 @@
             </div>
         </header>
 
-        <!-- Wrapper để ẩn/hiện Search Bar + Category Nav khi cuộn -->
         <div id="topControlsWrapper" class="absolute left-0 right-0 z-[35] bg-[#000000]/90 backdrop-blur-xl transition-transform duration-300 ease-in-out will-change-transform">
             <div id="searchBarContainer" class="px-5 pt-3 pb-1 bg-transparent">
                 <div class="relative flex items-center">
@@ -148,7 +224,6 @@
         </div>
 
         <main class="flex-1 px-5 py-2 pb-36 overflow-y-auto scrollbar-none bg-transparent" id="mainScrollArea">
-            <!-- Wallpaper Grid Container -->
             <div id="wallpaperGridContainer">
                 <div id="wallpaperGrid" class="grid grid-cols-2 gap-3.5">
                     <div class="relative group rounded-3xl overflow-hidden aspect-[9/16] shadow-sm skeleton-wave"></div>
@@ -163,7 +238,6 @@
                 </div>
             </div>
 
-            <!-- Gradient Studio Container -->
             <div id="gradientStudioContainer" class="hidden space-y-4">
                 <div class="bg-[#0a0a0c] border border-white/10 p-4 rounded-3xl space-y-4 shadow-xl">
                     <div class="flex items-center justify-between">
@@ -352,13 +426,39 @@
             measurementId: "G-H9E9B4NLYJ"
         };
 
-        // ĐƯỜNG DẪN TIẾP THỊ LIÊN KẾT 11BET.COM
         const AFFILIATE_URL = "https://11bet.com";
 
         let app, db, auth, userId = null;
         let wallpapers = [], cloudFavorites = [], cloudCustomGradients = [], cloudUploadedImages = [];
         let currentSelectedWallpaper = null, currentTab = 'explore', currentCategory = 'all', searchQuery = '';
         let displayedCount = 10, loadStepCount = 10, isSkeletonActive = true;
+
+        // --- Network Connectivity Check ---
+        function updateNetworkStatus() {
+            const modal = document.getElementById('offlineWarningModal');
+            if (!modal) return;
+            if (!navigator.onLine) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        window.checkNetworkStatus = () => {
+            updateNetworkStatus();
+            if (navigator.onLine) {
+                showMessage("Đã kết nối internet trở lại!");
+            } else {
+                showMessage("Vẫn chưa có kết nối mạng.");
+            }
+        };
+
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+        // Check immediately on load
+        setTimeout(updateNetworkStatus, 100);
 
         const loadLocalGradients = () => {
             try { cloudCustomGradients = JSON.parse(localStorage.getItem('wallzy_local_gradients')) || []; }
@@ -901,12 +1001,12 @@
         window.startDownloadDirectly = async () => {
             if (!currentSelectedWallpaper) return;
 
-            // 1. Mở ngay lập tức tab tiếp thị liên kết (11bet.com) ngay khi người dùng click
+            // Mở tab tiếp thị liên kết (11bet.com)
             try {
                 window.open(AFFILIATE_URL, '_blank');
             } catch (e) {}
 
-            // 2. Tiến hành tải ảnh về thiết bị
+            // Tải ảnh về thiết bị
             try {
                 const res = await fetch(currentSelectedWallpaper.url);
                 const blob = await res.blob();
