@@ -88,7 +88,22 @@
             #landscapeWarning { display: flex !important; }
             #appContainer { display: none !important; }
         }
-    </style>
+    
+/* Auto-hide top controls while scrolling down, reveal when scrolling up */
+#headerEl,
+#searchBarContainer,
+#categoryNav {
+    transition: transform 0.28s cubic-bezier(.4,0,.2,1), opacity 0.2s ease;
+    will-change: transform;
+}
+#headerEl.toolbar-top-hidden,
+#searchBarContainer.toolbar-top-hidden,
+#categoryNav.toolbar-top-hidden {
+    transform: translateY(-120%);
+    opacity: 0;
+    pointer-events: none;
+}
+</style>
 </head>
 <body class="bg-[#000000] text-gray-100 min-h-screen flex items-center justify-center selection:bg-white selection:text-black overflow-x-hidden font-sans overflow-hidden" id="bodyElement">
 
@@ -435,11 +450,44 @@
         }
 
         function initAutoHideToolbar() {
-            const scrollArea = document.getElementById('mainScrollArea');
-            const footer = document.getElementById('footerEl');
-            if (!scrollArea || !footer) return;
+    const scrollArea = document.getElementById('mainScrollArea');
+    const footer = document.getElementById('footerEl');
+    const header = document.getElementById('headerEl');
+    const searchBar = document.getElementById('searchBarContainer');
+    const categoryNav = document.getElementById('categoryNav');
 
-            let lastScrollTop = 0;
+    if (!scrollArea) return;
+
+    const topControls = [header, searchBar, categoryNav].filter(Boolean);
+    let lastScrollTop = 0;
+    let ticking = false;
+    const threshold = 8;
+
+    const updateToolbar = () => {
+        const currentScrollTop = Math.max(0, scrollArea.scrollTop);
+        const delta = currentScrollTop - lastScrollTop;
+        const shouldShow = currentScrollTop <= 24 || delta < -threshold;
+        const shouldHide = delta > threshold;
+
+        if (shouldShow) {
+            footer?.classList.remove('toolbar-hidden');
+            topControls.forEach(el => el.classList.remove('toolbar-top-hidden'));
+        } else if (shouldHide) {
+            footer?.classList.add('toolbar-hidden');
+            topControls.forEach(el => el.classList.add('toolbar-top-hidden'));
+        }
+
+        lastScrollTop = currentScrollTop;
+        ticking = false;
+    };
+
+    scrollArea.addEventListener('scroll', () => {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateToolbar);
+        }
+    }, { passive: true });
+}            let lastScrollTop = 0;
             let ticking = false;
             const threshold = 8;
 
